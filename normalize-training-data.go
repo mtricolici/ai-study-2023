@@ -2,13 +2,10 @@ package main
 
 import (
 	"fmt"
-	"image"
-	"image/jpeg"
-	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
-
-	"gocv.io/x/gocv"
+	"strings"
 )
 
 const (
@@ -17,14 +14,35 @@ const (
 	size      = 100                                     // The size (in pixels) to which the images will be resized
 )
 
+func normalizePath(path string) string {
+	home, _ := os.UserHomeDir()
+	absolutePath, _ := filepath.Abs(strings.Replace(path, "~", home, -1))
+	return absolutePath
+}
+
+func resizeImage(source string, target string) {
+	fmt.Printf("Resizing '%s' to '%s'\n", source, target)
+	size := fmt.Sprintf("%dx%d", size, size)
+
+	args := []string{source, "-gravity", "center", "-background", "red", "-resize", size, "-extent", size, target}
+	cmd := exec.Command("convert", args[:]...)
+	_, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+}
+
 func main() {
+	srcDir := normalizePath(inputDir)
+	dstDir := normalizePath(outputDir)
+
 	// Create the output directory if it does not exist
-	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
-		os.Mkdir(outputDir, 0755)
+	if _, err := os.Stat(dstDir); os.IsNotExist(err) {
+		os.Mkdir(dstDir, 0755)
 	}
 
 	// Get the list of JPEG files in the input directory
-	files, err := ioutil.ReadDir(inputDir)
+	files, err := os.ReadDir(srcDir)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -33,29 +51,10 @@ func main() {
 	// Iterate over the JPEG files in the input directory
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".jpg" {
-			fmt.Printf("Processing file '%s'", file.Name())
-			// Read the image from the file
-			img := gocv.IMRead(filepath.Join(inputDir, file.Name()), gocv.IMReadColor)
 
-			// Resize the image to the desired size
-			resized := gocv.NewMat()
-			gocv.Resize(img, &resized, image.Point{X: size, Y: size}, 0, 0, gocv.InterpolationDefault)
-			resized_image, err := resized.ToImage()
-			if err != nil {
-				fmt.Printf("Erorr: %s", err)
-				continue
-			}
-
-			// Save the resized image to the output directory
-			outPath := filepath.Join(outputDir, file.Name())
-			out, err := os.Create(outPath)
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			defer out.Close()
-			jpeg.Encode(out, resized_image, nil)
-			break
+			srcFile := filepath.Join(srcDir, file.Name())
+			dstFile := filepath.Join(dstDir, file.Name())
+			resizeImage(srcFile, dstFile)
 		}
 	}
 }

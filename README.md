@@ -10,3 +10,5 @@ Make sure you have opencv installed:
 - make && sudo make install
 ```
 
+Make sure you have 'convert' command i.e. ImageMagick installed.
+
