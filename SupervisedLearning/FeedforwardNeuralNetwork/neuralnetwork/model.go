@@ -57,6 +57,11 @@ func (nn *NeuralNet) RandomizeWeights() {
 }
 
 func (nn *NeuralNet) Compute(input []float64) []float64 {
+	output, _ := nn.ComputeWithActivations(input)
+	return output
+}
+
+func (nn *NeuralNet) ComputeWithActivations(input []float64) ([]float64, [][]float64) {
 	if len(input) != nn.numInputs {
 		panic("input size does not match network input size")
 	}
@@ -84,11 +89,15 @@ func (nn *NeuralNet) Compute(input []float64) []float64 {
 	}
 
 	// output layer activations are the network output
-	return activations[nn.numHiddenLayers+1]
+	return activations[nn.numHiddenLayers+1], activations
 }
 
 func sigmoid(x float64) float64 {
 	return 1 / (1 + math.Exp(-x))
+}
+
+func (nn *NeuralNet) sigmoidDerivative(x float64) float64 {
+	return x * (1 - x)
 }
 
 /*

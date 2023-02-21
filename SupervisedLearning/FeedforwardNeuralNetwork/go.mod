@@ -1,3 +1,3 @@
-module mtricolici/ai-study-2023/SupervisedLearning/FeedforwardNeuralNetwork
+module MyFeedforwardNeuralNetwork
 
 go 1.20
