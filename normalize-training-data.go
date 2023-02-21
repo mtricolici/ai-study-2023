@@ -9,9 +9,7 @@ import (
 )
 
 const (
-	inputDir  = "~/ai-datasets/dogs-cats/train/"        // Directory with original training images (different sizes)
-	outputDir = "~/ai-datasets/dogs-cats/train-normal/" // Target dir to save normalized images
-	size      = 100                                     // The size (in pixels) to which the images will be resized
+	size = 100 // The size (in pixels) to which the images will be resized
 )
 
 func normalizePath(path string) string {
@@ -32,7 +30,7 @@ func resizeImage(source string, target string) {
 	}
 }
 
-func main() {
+func normalizeImages(inputDir string, outputDir string) {
 	srcDir := normalizePath(inputDir)
 	dstDir := normalizePath(outputDir)
 
@@ -51,10 +49,14 @@ func main() {
 	// Iterate over the JPEG files in the input directory
 	for _, file := range files {
 		if filepath.Ext(file.Name()) == ".jpg" {
-
 			srcFile := filepath.Join(srcDir, file.Name())
 			dstFile := filepath.Join(dstDir, file.Name())
 			resizeImage(srcFile, dstFile)
 		}
 	}
+}
+
+func main() {
+	normalizeImages("~/ai-datasets/dogs-cats/train/", "~/ai-datasets/dogs-cats/train-normal/")
+	normalizeImages("~/ai-datasets/dogs-cats/test1/", "~/ai-datasets/dogs-cats/test1-normal/")
 }
