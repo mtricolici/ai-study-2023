@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	size = 100
+	Size = 100
 )
 
 func ReadJpegImage(filename string) ([]float64, error) {
@@ -29,12 +29,12 @@ func ReadJpegImage(filename string) ([]float64, error) {
 
 	// Check that the image is 100x100
 	bounds := img.Bounds()
-	if bounds.Dx() != size || bounds.Dy() != size {
-		return nil, fmt.Errorf("image size must be %dx%d", size, size)
+	if bounds.Dx() != Size || bounds.Dy() != Size {
+		return nil, fmt.Errorf("image size must be %dx%d", Size, Size)
 	}
 
 	// Create an array to hold the pixel values
-	pixels := make([]float64, size*size)
+	pixels := make([]float64, Size*Size)
 
 	// Convert the image to grayscale and normalize the pixel values
 	for y := 0; y < bounds.Dy(); y++ {

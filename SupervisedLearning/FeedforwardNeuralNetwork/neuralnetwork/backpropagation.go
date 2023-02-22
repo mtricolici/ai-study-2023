@@ -1,17 +1,30 @@
 package neuralnetwork
 
+import (
+	"MyFeedforwardNeuralNetwork/utils"
+	"fmt"
+)
+
 func (nn *NeuralNet) Train(inputs [][]float64, labels [][]float64, learningRate float64, numEpochs int) {
 	for epoch := 0; epoch < numEpochs; epoch++ {
+		avgError := 0.0
+
 		for i, input := range inputs {
+			fmt.Println()
 			output, activations := nn.ComputeWithActivations(input)
 			label := labels[i]
 
 			outputError := nn.calculateOutputError(output, label)
+			avgError += utils.SumFloatsArray(outputError)
 
 			hiddenErrors := nn.calculateHiddenErrors(outputError, activations)
 
 			nn.updateWeights(outputError, hiddenErrors, activations, input, learningRate)
 		}
+
+		avgError = avgError / float64(len(inputs))
+
+		fmt.Printf("Epoch %d: Error = %.6f\n", epoch+1, avgError)
 	}
 }
 
@@ -25,23 +38,26 @@ func (nn *NeuralNet) calculateOutputError(output, label []float64) []float64 {
 
 func (nn *NeuralNet) calculateHiddenErrors(outputError []float64, activations [][]float64) [][]float64 {
 	hiddenErrors := make([][]float64, nn.numHiddenLayers)
-	for i := range hiddenErrors {
+
+	// Iterate over the hidden layers in reverse order
+	for i := len(hiddenErrors) - 1; i >= 0; i-- {
 		hiddenErrors[i] = make([]float64, nn.neuronsPerHiddenLayer)
-	}
-	for i := nn.numHiddenLayers - 1; i >= 0; i-- {
-		for j := range nn.weights[i] {
-			errorSum := 0.0
-			for k := range nn.weights[i][j] {
-				if i == nn.numHiddenLayers-1 {
+
+		// Iterate over the neurons in the current hidden layer
+		for j := range hiddenErrors[i] {
+			// Calculate the error for the current neuron
+			var errorSum float64
+			for k := 0; k < len(nn.weights[i+1]); k++ {
+				if k < len(outputError) {
 					errorSum += outputError[k] * nn.weights[i+1][k][j]
-				} else {
-					errorSum += hiddenErrors[i+1][k] * nn.weights[i+1][k][j]
 				}
 			}
+
 			neuronOutput := nn.sigmoidDerivative(activations[i+1][j])
 			hiddenErrors[i][j] = errorSum * neuronOutput
 		}
 	}
+
 	return hiddenErrors
 }
 
