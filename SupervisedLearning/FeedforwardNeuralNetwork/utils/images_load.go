@@ -1,33 +1,27 @@
 package utils
 
 import (
+	"math/rand"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
-)
-
-const (
-	maxNumberOfSampleForTraining = 10000
+	"time"
 )
 
 func labelFromFilename(filename string) []float64 {
 	switch {
-	case strings.HasPrefix(filename, "cat"):
+	case strings.Contains(filename, "/cat"):
 		return []float64{1, 0}
-	case strings.HasPrefix(filename, "dog"):
+	case strings.Contains(filename, "/dog"):
 		return []float64{0, 1}
 	default:
 		return []float64{0, 0}
 	}
 }
 
-func isJpegFile(name string) bool {
-	return strings.HasSuffix(name, ".jpg") || strings.HasSuffix(name, ".jpeg")
-}
-
-// LoadImages reads JPEG images from the specified directory and returns a slice of
-// image pixel arrays and a slice of corresponding labels.
-func LoadImages(path string) ([][]float64, [][]float64) {
+func LoadRandomImageFiles(path string, pattern string, max_items int) []string {
+	fileRegex := regexp.MustCompile(pattern)
 
 	// Open the directory
 	dir, err := os.Open(path)
@@ -42,29 +36,46 @@ func LoadImages(path string) ([][]float64, [][]float64) {
 		panic(err)
 	}
 
-	var images [][]float64
-	var labels [][]float64
+	// Randomly shuffle the array
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	r.Shuffle(len(files), func(i, j int) { files[i], files[j] = files[j], files[i] })
 
+	var result []string
 	count := 0
 
 	for _, file := range files {
-		if isJpegFile(strings.ToLower(file.Name())) {
-
-			// Load the image file
-			image, err := ReadJpegImage(filepath.Join(path, file.Name()))
-			if err != nil {
-				panic("Could not read image")
-			}
-
-			// Add the image and its label to the slices
-			images = append(images, image)
-			labels = append(labels, labelFromFilename(file.Name()))
+		if fileRegex.MatchString(file.Name()) {
+			result = append(result, filepath.Join(path, file.Name()))
 
 			count += 1
-			if count >= maxNumberOfSampleForTraining {
+			if count >= max_items {
 				break
 			}
 		}
+	}
+
+	return result
+}
+
+// LoadImages reads JPEG images from the specified directory and returns a slice of
+// image pixel arrays and a slice of corresponding labels.
+func LoadImagesData(path string, pattern string, max_items int) ([][]float64, [][]float64) {
+
+	var images [][]float64
+	var labels [][]float64
+
+	files := LoadRandomImageFiles(path, pattern, max_items)
+
+	for _, file := range files {
+		// Load the image file
+		image, err := ReadJpegImage(file)
+		if err != nil {
+			panic("Could not read image")
+		}
+
+		// Add the image and its label to the slices
+		images = append(images, image)
+		labels = append(labels, labelFromFilename(file))
 	}
 
 	return images, labels
