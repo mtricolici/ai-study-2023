@@ -1,6 +1,8 @@
 package ai
 
-import "fmt"
+import (
+	"log"
+)
 
 type FeedForwardNeuralNetwork struct {
 	inputLayer  *Layer
@@ -76,6 +78,6 @@ func (n *FeedForwardNeuralNetwork) Train(inputs [][]float64, targets [][]float64
 			}
 		}
 		avgError := totalError / float64(len(inputs))
-		fmt.Printf("Epoch %d, Average Error: %f\n", epoch+1, avgError)
+		log.Printf("Epoch %d, Average Error: %f\n", epoch+1, avgError)
 	}
 }
