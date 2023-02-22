@@ -1,44 +1,58 @@
 package main
 
 import (
-	"MyFeedforwardNeuralNetwork/neuralnetwork"
+	"MyFeedforwardNeuralNetwork/ai"
 	"MyFeedforwardNeuralNetwork/utils"
 	"fmt"
-	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const (
-	hiddenLayersCount  = 1
-	hiddenLayerNeurons = 200
+	inputNeurons       = 3
+	hiddenLayerNeurons = 51
 	outputNeuronsCount = 2 // 1 for cat, 2nd for dog
 	trainingIterations = 100
 	learningRate       = 0.1
 )
 
 func main() {
-	home, _ := os.UserHomeDir()
-	trainImagesDirectory := home + "/ai-datasets/dogs-cats/train-normal"
+	fmt.Println("Hi world")
 
-	images, labels, err := LoadImages(trainImagesDirectory)
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
-	if err != nil {
-		log.Fatal(err)
+	sample_imput := make([]float64, inputNeurons)
+	for i := range sample_imput {
+		sample_imput[i] = r.Float64()*2 - 1 // random value in [-1 .. 1] range
 	}
 
-	// Create a neural network with 100 input neurons, 10 hidden neurons, and 4 output neurons
-	nn := neuralnetwork.NewNeuralNet(utils.Size*utils.Size, outputNeuronsCount, hiddenLayersCount, hiddenLayerNeurons)
-	nn.RandomizeWeights()
+	nn := ai.NewFeedForwardNeuralNetwork(inputNeurons, hiddenLayerNeurons, outputNeuronsCount)
+	result := nn.Predict(sample_imput)
+	fmt.Println(result)
 
-	// Train the neural network using the images and labels
-	nn.Train(images, labels, learningRate, trainingIterations)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// home, _ := os.UserHomeDir()
+	// trainImagesDirectory := home + "/ai-datasets/dogs-cats/train-normal"
 
-	fmt.Println("Training complete!")
+	// images, labels, err := LoadImages(trainImagesDirectory)
+
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// // Create a neural network with 100 input neurons, 10 hidden neurons, and 4 output neurons
+	// nn := neuralnetwork.NewNeuralNet(utils.Size*utils.Size, outputNeuronsCount, hiddenLayersCount, hiddenLayerNeurons)
+	// nn.RandomizeWeights()
+
+	// // Train the neural network using the images and labels
+	// nn.Train(images, labels, learningRate, trainingIterations)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Println("Training complete!")
 	//TODO: load test images and test the NN with new examples
 }
 
