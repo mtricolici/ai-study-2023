@@ -3,7 +3,7 @@ class Neuron
 
   def initialize(num_inputs:)
     @weights = Array.new(num_inputs) { rand(-1.0..1.0) }
-    @bias = rand(0.0..1.0) * 0.01
+    @bias = rand(0.1..1.0) * 0.01
     @num_inputs = num_inputs
   end
 
