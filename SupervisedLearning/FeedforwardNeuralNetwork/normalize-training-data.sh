@@ -18,7 +18,7 @@ function handle() {
     if [ ! -f "$dst_file" ]; then
        echo "$dst_file"
        convert "$src_file" \
-         -gravity center -background red \
+         -gravity center -background black \
          -resize 100x100 -extent 100x100 \
          "$dst_file"
     fi

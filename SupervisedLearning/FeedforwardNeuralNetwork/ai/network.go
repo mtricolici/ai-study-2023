@@ -5,18 +5,15 @@ import (
 )
 
 type FeedForwardNeuralNetwork struct {
-	inputLayer  *Layer
 	hiddenLayer *Layer
 	outputLayer *Layer
 }
 
 func NewFeedForwardNeuralNetwork(numInput, numHidden, numOutput int) *FeedForwardNeuralNetwork {
-	inputLayer := NewLayer(numInput, 0)
-	hiddenLayer := NewLayer(numHidden, numInput)
-	outputLayer := NewLayer(numOutput, numHidden)
+	hiddenLayer := NewLayer(numHidden, numInput, ActivationSigmoid)
+	outputLayer := NewLayer(numOutput, numHidden, ActivationSigmoid)
 
 	return &FeedForwardNeuralNetwork{
-		inputLayer:  inputLayer,
 		hiddenLayer: hiddenLayer,
 		outputLayer: outputLayer,
 	}
@@ -28,7 +25,14 @@ func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 	return outputOutputs
 }
 
-func (n *FeedForwardNeuralNetwork) Train(inputs [][]float64, targets [][]float64, numEpochs int, learningRate float64) {
+func (n *FeedForwardNeuralNetwork) Train(
+	inputs [][]float64, targets [][]float64,
+	numEpochs int, learningRate float64,
+	stopTrainingMaxAvgError float64) {
+
+	log.Printf("Max Iterations: %d, Stop when avgError < %f\n",
+		numEpochs, stopTrainingMaxAvgError)
+
 	for epoch := 0; epoch < numEpochs; epoch++ {
 		totalError := 0.0
 		for i := range inputs {
@@ -78,6 +82,10 @@ func (n *FeedForwardNeuralNetwork) Train(inputs [][]float64, targets [][]float64
 			}
 		}
 		avgError := totalError / float64(len(inputs))
-		log.Printf("Epoch %d, Average Error: %f\n", epoch+1, avgError)
+		log.Printf("Epoch %d of %d, Average Error: %f\n", epoch+1, numEpochs, avgError)
+		if avgError < stopTrainingMaxAvgError {
+			log.Println("Average error is small enough. Stop training")
+			break
+		}
 	}
 }

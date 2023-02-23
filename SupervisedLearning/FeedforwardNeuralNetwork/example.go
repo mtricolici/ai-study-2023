@@ -10,13 +10,14 @@ import (
 )
 
 const (
-	inputNeurons       = utils.Size * utils.Size
-	hiddenLayerNeurons = 300
-	outputNeuronsCount = 2 // 1 for cat, 2nd for dog
-	trainingIterations = 10
-	learningRate       = 0.1
-	trainSamples       = 1000 // nr of dogs and cats for training
-	testSamples        = 100
+	inputNeurons         = utils.Size * utils.Size
+	hiddenLayerNeurons   = 50
+	outputNeuronsCount   = 2 // 1 for cat, 2nd for dog
+	trainingIterations   = 50000
+	trainingStopMaxError = 0.01 // If error is less than this the training stops.
+	learningRate         = 0.001
+	trainSamples         = 2000 // nr of dogs and cats for training
+	testSamples          = 100
 )
 
 func main() {
@@ -29,20 +30,20 @@ func main() {
 	log.Println("Loading training data into memory ...")
 
 	// Load random X images of cats and X images of dogs
+	log.Printf("Loading %d images of cats", trainSamples)
 	catImages, catLabels := utils.LoadImagesData(trainImagesDirectory, "^cat.*\\.jp.?g$", trainSamples)
+	log.Printf("Loading %d images of dogs", trainSamples)
 	dogImages, dogLabels := utils.LoadImagesData(trainImagesDirectory, "^dog.*\\.jp.?g$", trainSamples)
 
 	trainingImages := append(catImages, dogImages...)
 	trainingLabels := append(catLabels, dogLabels...)
-
-	log.Println("Creating a Neural network")
 
 	// Create a neural network
 	nn := ai.NewFeedForwardNeuralNetwork(inputNeurons, hiddenLayerNeurons, outputNeuronsCount)
 
 	log.Println("Training started ...")
 
-	nn.Train(trainingImages, trainingLabels, trainingIterations, learningRate)
+	nn.Train(trainingImages, trainingLabels, trainingIterations, learningRate, trainingStopMaxError)
 
 	log.Println("Training complete!")
 
@@ -64,12 +65,15 @@ func testNetwork(testImagesDirectory, outputDirectory string, nn *ai.FeedForward
 		}
 
 		res := nn.Predict(image)
+
 		// 1st neuron in output - cat
 		// 2nd neuron in output - dog
 		petName := "cat"
 		if res[1] > res[0] {
 			petName = "dog"
 		}
+
+		log.Println(res, petName)
 
 		outFileName := fmt.Sprintf("%s%d.jpg", petName, idx)
 		outFilePath := filepath.Join(outputDirectory, outFileName)

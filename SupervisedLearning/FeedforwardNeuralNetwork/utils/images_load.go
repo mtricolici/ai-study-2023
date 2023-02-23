@@ -16,7 +16,7 @@ func labelFromFilename(filename string) []float64 {
 	case strings.Contains(filename, "/dog"):
 		return []float64{0, 1}
 	default:
-		return []float64{0, 0}
+		panic("Cannot load lable from this file: " + filename)
 	}
 }
 
