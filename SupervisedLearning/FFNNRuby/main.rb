@@ -4,6 +4,17 @@ require 'pp'
 
 Dir[File.dirname(__FILE__) + '/ai/*.rb'].each {|file| require file }
 
+# Define the XOR problem inputs and labels
+inputs = [[0, 0], [0, 1], [1, 0], [1, 1]]
+labels = [[0], [1], [1], [0]]
+
 nn = Network.new(num_inputs:2, num_hidden:5, num_outputs:1)
-o = nn.predict([0.1, 0.2])
-pp(o)
+
+nn.train(inputs: inputs, labels: labels, num_epochs: 20, learning_rate: 0.1)
+
+puts "Let's test NN:"
+inputs.each_with_index do |inp, i|
+    res = nn.predict(inp) # Prediction
+    exp = labels[i] # Expected
+    puts("predict(#{inp}) = #{res}. expected: #{exp}")
+end
