@@ -7,10 +7,10 @@ def sigmoidDerivative(x)
     x * (1.0 - x)
 end
 
-def array_sum_elements(arr)
+def calculate_error_sum(arr)
     sum = 0
     arr.each do |num|
-      sum += num
+      sum += num.abs
     end
     return sum
 end
@@ -22,18 +22,18 @@ def array_minus_array(arr1, arr2)
 
     result = []
     arr1.each_with_index do |val, i|
-        result[i] = val + arr2[i]
+        result[i] = val - arr2[i]
     end
 
     return result
 end
 
 def calculate_delta(errorArr, outArr)
-    if errorArr.size != outArr.size
+    if errorArr.length != outArr.length
         raise "calculate_delta: Arrays must be of the same size!"
     end
 
-    result = []
+    result = Array.new(errorArr.length) { 0.0 }
     errorArr.each_with_index do |err, i|
         result[i] = err * sigmoidDerivative(outArr[i])
     end

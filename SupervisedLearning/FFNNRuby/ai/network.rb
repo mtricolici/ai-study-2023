@@ -42,19 +42,17 @@ class Network
         layer2_output = @layer2.activate(layer1_output)
 
         # Calculate error: difference between expected-output (i.e. label) and actual-output (i.e. layer2_output)
-        networkErrors = array_minus_array(label, layer2_output)
+        layer2_errors = array_minus_array(label, layer2_output)
+        layer2_delta = calculate_delta(layer2_errors, layer2_output)
 
-        # Backward pass
-        layer2_delta = calculate_delta(networkErrors, layer2_output) # size=1
-        #layer1_errors = @layer1.calculate_errors(layer2_delta)
-
-        #layer1_delta = calculate_delta(layer1_errors, layer1_output) # size=5
-        layer1_delta = @layer1.calculate_errors(layer2_delta)
+        layer1_errors = Array.new(layer1_output.length) { 0.0 }
+        @layer2.calculate_errors(layer1_errors, layer2_delta)
+        layer1_delta = calculate_delta(layer1_errors, layer1_output)
 
         # Update weights and biases
-        @layer2.update_weights(learning_rate, layer2_delta)
-        @layer1.update_weights(learning_rate, layer1_delta)
+        @layer2.update_weights(layer1_output, layer2_delta, learning_rate)
+        @layer1.update_weights(input, layer1_delta, learning_rate)
 
-        return array_sum_elements(networkErrors)
+        return calculate_error_sum(layer2_errors)
     end
 end

@@ -10,7 +10,7 @@ labels = [[0], [1], [1], [0]]
 
 nn = Network.new(num_inputs:2, num_hidden:10, num_outputs:1)
 
-nn.train(inputs: inputs, labels: labels, num_epochs: 30, learning_rate: 0.1)
+nn.train(inputs: inputs, labels: labels, num_epochs: 5000, learning_rate: 0.1)
 
 puts "Let's test NN:"
 inputs.each_with_index do |inp, i|
