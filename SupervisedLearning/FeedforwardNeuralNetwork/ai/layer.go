@@ -35,3 +35,12 @@ func (l *Layer) CalculateErrors(prevLayerOutpus, delta []float64) []float64 {
 
 	return errors
 }
+
+func (l *Layer) UpdateWeights(inputs, delta []float64, learningRate float64) {
+	for i, neuron := range l.neurons {
+		for k := range neuron.weights {
+			neuron.weights[k] += learningRate * delta[i] * inputs[k]
+		}
+		neuron.bias += learningRate * delta[i]
+	}
+}

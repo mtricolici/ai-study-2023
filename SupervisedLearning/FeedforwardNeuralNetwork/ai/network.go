@@ -3,7 +3,6 @@ package ai
 import (
 	"MyFeedforwardNeuralNetwork/utils"
 	"log"
-	"math"
 )
 
 type FeedForwardNeuralNetwork struct {
@@ -73,28 +72,9 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	layer1_errors := n.layer2.CalculateErrors(layer1_outputs, layer2_delta)
 	layer1_delta := utils.Calculate_delta(layer1_errors, layer1_outputs)
 
-	// Update output layer weights and bias
-	for j, neuron := range n.layer2.neurons {
-		for k := range neuron.weights {
-			neuron.weights[k] += learningRate * layer2_delta[j] * layer1_outputs[k]
-		}
-		neuron.bias += learningRate * layer2_delta[j]
-	}
+	// Update weights and bias
+	n.layer2.UpdateWeights(layer1_outputs, layer2_delta, learningRate)
+	n.layer1.UpdateWeights(input, layer1_delta, learningRate)
 
-	// Update hidden layer weights and bias
-	for j, neuron := range n.layer1.neurons {
-		for k := range neuron.weights {
-			neuron.weights[k] += learningRate * layer1_delta[j] * input[k]
-		}
-		neuron.bias += learningRate * layer1_delta[j]
-	}
-
-	// Calculate total error
-	totalError := 0.0
-
-	for _, err := range layer2_errors {
-		totalError += math.Abs(err)
-	}
-
-	return totalError
+	return utils.Calcualte_error_sum(layer2_errors)
 }

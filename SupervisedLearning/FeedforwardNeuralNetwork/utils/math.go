@@ -27,3 +27,13 @@ func Calculate_delta(errors, outputs []float64) []float64 {
 
 	return delta
 }
+
+func Calcualte_error_sum(errors []float64) float64 {
+	error := 0.0
+
+	for _, err := range errors {
+		error += math.Abs(err)
+	}
+
+	return error
+}
