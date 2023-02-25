@@ -21,11 +21,23 @@ class Neuron
     @output
   end
 
-  # Update the weights of the neuron during backpropagation
-  def update_weights(learning_rate, error)
-    @weights = @weights.each_with_index.map do |weight, index|
-      weight + learning_rate * error * @output
+
+  def calculate_error(deltas)
+    sum = 0.0
+    @weights.each do |weight|
+      deltas.each do |delta|
+        sum += weight * delta
+      end
     end
-    @bias = @bias + learning_rate * error
+
+    return sigmoidDerivative(@output) * sum
+  end
+
+  # Update the weights of the neuron during backpropagation
+  def update_weights(learning_rate, delta)
+    @weights = @weights.each_with_index.map do |weight, index|
+      weight + learning_rate * delta * @output
+    end
+    @bias = @bias + learning_rate * delta
   end
 end

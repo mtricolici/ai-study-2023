@@ -27,3 +27,16 @@ def array_minus_array(arr1, arr2)
 
     return result
 end
+
+def calculate_delta(errorArr, outArr)
+    if errorArr.size != outArr.size
+        raise "calculate_delta: Arrays must be of the same size!"
+    end
+
+    result = []
+    errorArr.each_with_index do |err, i|
+        result[i] = err * sigmoidDerivative(outArr[i])
+    end
+
+    return result
+end

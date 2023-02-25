@@ -33,7 +33,7 @@ class Network
                 input: inp, label: labels[i], learning_rate: learning_rate)
         end
 
-        return sum_errors # / inputs.length()
+        return sum_errors / inputs.length()
     end
 
     def train_one_input(input:, label:, learning_rate:)
@@ -42,11 +42,21 @@ class Network
         layer2_output = @layer2.activate(layer1_output)
 
         # Calculate error: difference between expected-output (i.e. label) and actual-output (i.e. layer2_output)
-        errors = array_minus_array(label, layer2_output)
-        sumErrors = array_sum_elements(errors)
+        networkErrors = array_minus_array(label, layer2_output)
+        sumErrors = array_sum_elements(networkErrors)
 
         # Backward pass
+        layer2_delta = calculate_delta(networkErrors, layer2_output) # size=1
+        layer1_errors = @layer1.calculate_errors(layer2_delta)
+        #puts "layer1_errors=#{layer1_errors}"
 
+        #layer1_errors = @weights_ho.transpose * layer2_delta # size=5
+        layer1_delta = calculate_delta(layer1_errors, layer1_output) # size=5
+        #puts "layer1_delta=#{layer1_delta}"
+
+        # Update weights and biases
+        @layer2.update_weights(learning_rate, layer2_delta)
+        @layer1.update_weights(learning_rate, layer1_delta)
 
         return sumErrors
     end
