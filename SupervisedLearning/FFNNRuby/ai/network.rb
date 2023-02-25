@@ -43,7 +43,6 @@ class Network
 
         # Calculate error: difference between expected-output (i.e. label) and actual-output (i.e. layer2_output)
         networkErrors = array_minus_array(label, layer2_output)
-        sumErrors = array_sum_elements(networkErrors)
 
         # Backward pass
         layer2_delta = calculate_delta(networkErrors, layer2_output) # size=1
@@ -58,6 +57,6 @@ class Network
         @layer2.update_weights(learning_rate, layer2_delta)
         @layer1.update_weights(learning_rate, layer1_delta)
 
-        return sumErrors
+        return array_sum_elements(networkErrors)
     end
 end

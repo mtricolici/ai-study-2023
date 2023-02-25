@@ -4,7 +4,7 @@ def sigmoid(x)
 end
 
 def sigmoidDerivative(x)
-    x * (1 - x)
+    x * (1.0 - x)
 end
 
 def array_sum_elements(arr)
