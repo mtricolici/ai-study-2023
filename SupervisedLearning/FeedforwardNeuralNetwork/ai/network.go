@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"MyFeedforwardNeuralNetwork/utils"
 	"log"
 	"math"
 )
@@ -11,8 +12,8 @@ type FeedForwardNeuralNetwork struct {
 }
 
 func NewFeedForwardNeuralNetwork(numInput, numHidden, numOutput int) *FeedForwardNeuralNetwork {
-	layer1 := NewLayer(numHidden, numInput, ActivationSigmoid)
-	layer2 := NewLayer(numOutput, numHidden, ActivationSigmoid)
+	layer1 := NewLayer(numHidden, numInput)
+	layer2 := NewLayer(numOutput, numHidden)
 
 	return &FeedForwardNeuralNetwork{
 		layer1: layer1,
@@ -66,10 +67,7 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	layer2_outputs := n.layer2.Activate(layer1_outputs)
 
 	// Calculate output layer errors and deltas
-	layer2_errors := make([]float64, len(layer2_outputs))
-	for j, output := range layer2_outputs {
-		layer2_errors[j] = target[j] - output
-	}
+	layer2_errors := utils.Array_minus_array(target, layer2_outputs)
 
 	layer2_delta := make([]float64, len(layer2_outputs))
 	for j, output := range layer2_outputs {

@@ -4,12 +4,12 @@ type Layer struct {
 	neurons []*Neuron
 }
 
-func NewLayer(numNeurons, numInputs int, activationType ActivationType) *Layer {
+func NewLayer(numNeurons, numInputs int) *Layer {
 	layer := &Layer{
 		neurons: make([]*Neuron, numNeurons),
 	}
 	for i := range layer.neurons {
-		layer.neurons[i] = NewNeuron(numInputs, activationType)
+		layer.neurons[i] = NewNeuron(numInputs)
 	}
 	return layer
 }
