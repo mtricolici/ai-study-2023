@@ -37,3 +37,11 @@ func (n *Neuron) Activate(inputs []float64) float64 {
 
 	return utils.Sigmoid(sum)
 }
+
+func (n *Neuron) UpdateWeights(inputs []float64, delta, learningRate float64) {
+	for i := range n.weights {
+		n.weights[i] += learningRate * delta * inputs[i]
+	}
+
+	n.bias += learningRate * delta
+}
