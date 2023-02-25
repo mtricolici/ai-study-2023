@@ -1,18 +1,17 @@
 class Neuron
-  attr_accessor :weights, :bias, :output
+  attr_accessor :weights, :output
 
   def initialize(num_inputs)
     @weights = Array.new(num_inputs) { rand(-1.0..1.0) }
-    @bias = rand(0.1..1.0) * 0.01
     @num_inputs = num_inputs
   end
 
-  def activate(inputs)
+  def activate(inputs, bias)
     if @num_inputs != inputs.length then
       abort("Wrong number of inputs")
     end
 
-    sum = @bias
+    sum = bias
     inputs.each_with_index do |input, i|
       sum += input * weights[i]
     end
@@ -38,6 +37,6 @@ class Neuron
     @weights = @weights.each_with_index.map do |weight, index|
       weight + learning_rate * delta * @output
     end
-    @bias = @bias + learning_rate * delta
   end
+
 end
