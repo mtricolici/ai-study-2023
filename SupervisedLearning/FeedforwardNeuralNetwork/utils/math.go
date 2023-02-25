@@ -17,3 +17,13 @@ func Array_minus_array(arr1, arr2 []float64) []float64 {
 	}
 	return result
 }
+
+func Calculate_delta(errors, outputs []float64) []float64 {
+	delta := make([]float64, len(outputs))
+
+	for j, output := range outputs {
+		delta[j] = errors[j] * SigmoidDerivative(output)
+	}
+
+	return delta
+}
