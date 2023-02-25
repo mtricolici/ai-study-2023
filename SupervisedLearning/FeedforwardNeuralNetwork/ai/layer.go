@@ -22,18 +22,10 @@ func (l *Layer) Activate(inputs []float64) []float64 {
 	return outputs
 }
 
-func (l *Layer) CalculateErrors(prevLayerOutpus, delta []float64) []float64 {
-
-	errors := make([]float64, len(prevLayerOutpus))
-	for i := range prevLayerOutpus {
-		errorSum := 0.0
-		for k, delta := range delta {
-			errorSum += delta * l.neurons[k].weights[i]
-		}
-		errors[i] = errorSum
+func (l *Layer) CalculateErrors(errors *[]float64, delta []float64) {
+	for i, neuron := range l.neurons {
+		neuron.CalculateError(errors, delta[i])
 	}
-
-	return errors
 }
 
 func (l *Layer) UpdateWeights(inputs, delta []float64, learningRate float64) {

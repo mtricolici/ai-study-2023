@@ -69,7 +69,9 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	layer2_errors := utils.Array_minus_array(target, layer2_outputs)
 	layer2_delta := utils.Calculate_delta(layer2_errors, layer2_outputs)
 
-	layer1_errors := n.layer2.CalculateErrors(layer1_outputs, layer2_delta)
+	layer1_errors := make([]float64, len(layer1_outputs))
+	n.layer2.CalculateErrors(&layer1_errors, layer2_delta)
+
 	layer1_delta := utils.Calculate_delta(layer1_errors, layer1_outputs)
 
 	// Update weights and bias

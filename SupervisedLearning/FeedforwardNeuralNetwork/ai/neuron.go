@@ -38,6 +38,12 @@ func (n *Neuron) Activate(inputs []float64) float64 {
 	return utils.Sigmoid(sum)
 }
 
+func (n *Neuron) CalculateError(errors *[]float64, delta float64) {
+	for i := 0; i < len(n.weights); i++ {
+		(*errors)[i] += delta * n.weights[i]
+	}
+}
+
 func (n *Neuron) UpdateWeights(inputs []float64, delta, learningRate float64) {
 	for i := range n.weights {
 		n.weights[i] += learningRate * delta * inputs[i]
