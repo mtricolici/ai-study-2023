@@ -61,8 +61,6 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	input []float64, target []float64,
 	learningRate float64) float64 {
 
-	totalError := 0.0
-
 	// Forward pass
 	layer1_outputs := n.layer1.Activate(input)
 	layer2_outputs := n.layer2.Activate(layer1_outputs)
@@ -71,7 +69,6 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	layer2_errors := make([]float64, len(layer2_outputs))
 	for j, output := range layer2_outputs {
 		layer2_errors[j] = target[j] - output
-		totalError += math.Abs(layer2_errors[j]) //* outputErrors[j]
 	}
 
 	layer2_delta := make([]float64, len(layer2_outputs))
@@ -108,6 +105,13 @@ func (n *FeedForwardNeuralNetwork) train_input(
 			neuron.weights[k] += learningRate * layer1_delta[j] * input[k]
 		}
 		neuron.bias += learningRate * layer1_delta[j]
+	}
+
+	// Calculate total error
+	totalError := 0.0
+
+	for _, err := range layer2_errors {
+		totalError += math.Abs(err)
 	}
 
 	return totalError
