@@ -1,5 +1,5 @@
 class Neuron
-  attr_accessor :weights, :output
+  attr_accessor :weights, :inputs, :output
 
   def initialize(num_inputs)
     @weights = Array.new(num_inputs) { rand(-1.0..1.0) }
@@ -10,6 +10,8 @@ class Neuron
     if @num_inputs != inputs.length then
       abort("Wrong number of inputs")
     end
+
+    @inputs = inputs
 
     sum = bias
     inputs.each_with_index do |input, i|
@@ -35,7 +37,7 @@ class Neuron
   # Update the weights of the neuron during backpropagation
   def update_weights(learning_rate, delta)
     @weights = @weights.each_with_index.map do |weight, index|
-      weight + learning_rate * delta * @output
+      weight + learning_rate * delta * @output #@inputs[index]
     end
   end
 

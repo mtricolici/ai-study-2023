@@ -46,12 +46,10 @@ class Network
 
         # Backward pass
         layer2_delta = calculate_delta(networkErrors, layer2_output) # size=1
-        layer1_errors = @layer1.calculate_errors(layer2_delta)
-        #puts "layer1_errors=#{layer1_errors}"
+        #layer1_errors = @layer1.calculate_errors(layer2_delta)
 
-        #layer1_errors = @weights_ho.transpose * layer2_delta # size=5
-        layer1_delta = calculate_delta(layer1_errors, layer1_output) # size=5
-        #puts "layer1_delta=#{layer1_delta}"
+        #layer1_delta = calculate_delta(layer1_errors, layer1_output) # size=5
+        layer1_delta = @layer1.calculate_errors(layer2_delta)
 
         # Update weights and biases
         @layer2.update_weights(learning_rate, layer2_delta)
