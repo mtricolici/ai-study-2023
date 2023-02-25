@@ -75,18 +75,11 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	}
 
 	// Calculate hidden layer errors and deltas
-	layer1_errors := make([]float64, len(layer1_outputs))
-	for j := range layer1_outputs {
-		errorSum := 0.0
-		for k, delta := range layer2_delta {
-			errorSum += delta * n.layer2.neurons[k].weights[j]
-		}
-		layer1_errors[j] = errorSum
-	}
+	layer1_errors := n.layer2.CalculateErrors(layer1_outputs, layer2_delta)
 
 	layer1_delta := make([]float64, len(layer1_outputs))
-	for j, hiddenOutput := range layer1_outputs {
-		layer1_delta[j] = layer1_errors[j] * hiddenOutput * (1 - hiddenOutput)
+	for j, output := range layer1_outputs {
+		layer1_delta[j] = layer1_errors[j] * output * (1 - output)
 	}
 
 	// Update output layer weights and bias
