@@ -11,11 +11,11 @@ import (
 
 const (
 	inputNeurons         = utils.Size * utils.Size
-	hiddenLayerNeurons   = 50
+	hiddenLayerNeurons   = 300
 	outputNeuronsCount   = 2 // 1 for cat, 2nd for dog
 	trainingIterations   = 50000
 	trainingStopMaxError = 0.01 // If error is less than this the training stops.
-	learningRate         = 0.001
+	learningRate         = 0.05
 	trainSamples         = 2000 // nr of dogs and cats for training
 	testSamples          = 100
 )
