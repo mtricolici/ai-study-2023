@@ -1,0 +1,15 @@
+There are several training methods for feed-forward neural networks in supervised learning to solve a classification problem. Some of the most commonly used training methods include:
+
+    Backpropagation: This is the most widely used training method for feed-forward neural networks in supervised learning. It involves adjusting the weights of the network in a way that reduces the error between the predicted output and the actual output.
+
+    Stochastic gradient descent (SGD): This is a variant of the backpropagation algorithm that updates the weights of the network after processing each training example. It is typically faster than batch training but may require more iterations to converge.
+
+    Batch training: This involves updating the weights of the network after processing a batch of training examples. It is slower than stochastic gradient descent but may be more stable.
+
+    Mini-batch training: This is a compromise between batch training and stochastic gradient descent. It updates the weights of the network after processing a small batch of training examples.
+
+    Adaptive learning rate methods: These are methods that adjust the learning rate of the network during training. They can improve the convergence rate and performance of the network.
+
+    Regularization methods: These are methods that prevent overfitting of the network by adding a penalty term to the error function. Some commonly used regularization methods include L1 and L2 regularization.
+
+The choice of training method will depend on the specific characteristics of the classification problem and the available computing resources. Experimenting with different methods and tuning their hyperparameters can help to identify the best approach for a particular problem.
