@@ -43,7 +43,7 @@ func main() {
 	for i, sample := range xorSamples {
 		result := nn.Predict(sample)
 
-		fmt.Printf("%f xor %f expected %f. Actual: %f\n",
+		fmt.Printf("%.0f xor %.0f expected %.0f. Actual: %.2f\n",
 			sample[0], sample[1], xorLabels[i][0], result[0])
 	}
 }
