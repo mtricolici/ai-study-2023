@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"image/color"
 	"path/filepath"
 
@@ -9,10 +10,10 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-func DrawRegressionToPngFile(inputs, predicted []float64, outputFileName string) {
+func DrawRegressionToPngFile(inputs, predicted []float64, title, outputFileName string) {
 	p := plot.New()
 
-	p.Title.Text = "Simple Regression"
+	p.Title.Text = title
 	p.X.Label.Text = "X-axis"
 	p.Y.Label.Text = "Y-axis"
 
@@ -37,6 +38,7 @@ func DrawRegressionToPngFile(inputs, predicted []float64, outputFileName string)
 
 	saveFileName := filepath.Join(Get_executable_folder(), outputFileName)
 	p.Save(600, 400, saveFileName)
+	fmt.Printf("%s - saved to %s\n", title, saveFileName)
 }
 
 func createPlotXYs(data []float64, deltaX int) *plotter.Line {
