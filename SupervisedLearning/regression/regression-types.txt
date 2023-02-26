@@ -1,0 +1,13 @@
+Examples of regression techniques:
+- linear
+- Polynomial Regression
+- Ridge Regression
+- Lasso Regression
+- Support Vector Regression
+- Decision Tree Regression
+
+- Autoregressive Integrated Moving Average (ARIMA) models
+- Vector Autoregression (VAR) models
+- Artificial Neural Networks (ANNs) - forecasting time series data
+- Random Forest Regression
+
