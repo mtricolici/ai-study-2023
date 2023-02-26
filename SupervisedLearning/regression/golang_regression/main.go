@@ -6,10 +6,6 @@ import (
 	"time"
 )
 
-const (
-	predictedValuesCount = 10
-)
-
 func main() {
 	fmt.Println("Example of regression in golang!")
 
@@ -24,6 +20,8 @@ func main() {
 	var nextPredictedValues []float64
 
 	lastDate := time.Unix(int64(inputDates[len(inputDates)-1]), 0)
+
+	predictedValuesCount := (len(inputValues) - 1) / 2
 
 	for i := 0; i < predictedValuesCount; i++ {
 		nextDate := lastDate.AddDate(0, 0, 1) // Add 1 day
