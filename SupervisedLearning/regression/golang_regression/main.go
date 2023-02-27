@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"regression_sample1/regression/linear"
+	"regression_sample1/regression/neural"
 	"regression_sample1/utils"
 )
 
@@ -16,6 +17,9 @@ func main() {
 	// Invoke Linear Regression POC
 	lr := linear.NewLinearRegression()
 	lr.TrainAndTest(inputDates, inputValues)
+
+	nr := neural.NewNeuralRegression(100, 300)
+	nr.TrainAndTest(inputValues, 500)
 
 	fmt.Println("Done!")
 }
