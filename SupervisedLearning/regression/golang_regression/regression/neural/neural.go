@@ -19,8 +19,8 @@ func NewNeuralRegression(batchSize, hiddenNeurons int) *NeuralRegression {
 	return &NeuralRegression{
 		batchSize:                batchSize,
 		numEpochs:                1000,
-		learningRate:             0.05,
-		stopTrainingMaxAvgError:  0.1,
+		learningRate:             0.08,
+		stopTrainingMaxAvgError:  0.001,
 		normalizeValueMultiplier: 0.5,
 		network:                  network,
 	}
