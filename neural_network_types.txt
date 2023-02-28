@@ -1,0 +1,71 @@
+Examples of Neural Network types:
+
+1. Feedforward Neural Network (FFNN)
+   The most basic type of neural network, where the information flows only in one direction,
+   from input layer to output layer.
+   There are no feedback loops, and each layer processes information independently.
+   effective for problems where the input and output data have a clear relationship
+   Also, can be used for problems where the input data has a high degree of redundancy or noise,
+   learns to filter out irrelevant information and focus on the most important features
+
+2. Convolutional Neural Network (CNN)
+   used for image and video recognition where convolutional layers are used to extract features from the input data
+
+3. Recurrent Neural Network (RNN)
+   used for sequence data, such as time series data, where information can flow in both directions
+   the network has memory of previous inputs.
+
+4. Long Short-Term Memory (LSTM) Network
+   A type of recurrent neural network that is designed to handle long-term dependencies in sequence data
+   by using specialized memory cells to store and retrieve information.
+
+5. Autoencoder
+   used for unsupervised learning, where the goal is to learn a compact representation of the input data by
+   encoding it into a lower-dimensional space, and then decoding it back to the original space.
+
+6. Generative Adversarial Network (GAN)
+   used for generating new data that is similar to the training data
+   It consists of two networks:
+   - generator that creates new data
+   - discriminator that tries to distinguish the generated data from the real data
+
+7. Deep Belief Network (DBN)
+   used for unsupervised learning where the goal is to learn a hierarchical representation of the input data
+   It consists of multiple layers of restricted Boltzmann machines (RBMs) that are trained one at a time.
+
+8. Reinforcement Learning Network
+   used for learning how to make decisions based on rewards and punishments.
+   The network learns by interacting with an environment and receiving feedback (reward/punishment)
+
+9. Hopfield Network
+   used for associative memory and pattern recognition
+   fully connected network of binary neurons that are updated synchronously based on a simple energy function.
+
+10. Boltzmann Machine
+   used for unsupervised learning and pattern recognition. network of binary neurons that are connected with weighted synapses,
+   and uses a probabilistic approach to update the neurons.
+
+11. Self-Organizing Map (SOM)
+   used for unsupervised learning and data visualization.
+   competitive learning algorithm to cluster similar input data into a two-dimensional map
+
+12. Deep Convolutional Inverse Graphics Network (DCIGN)
+   used for unsupervised learning and image reconstruction
+   learns to invert the graphics rendering process, allowing it to generate 3D objects from 2D images
+
+13. Echo State Network (ESN)
+   A type of RNN that is used for time-series prediction and control.
+   uses a simple learning rule to adapt to the input data
+
+14. Modular Neural Network
+   A neural network that is composed of smaller, simpler networks called modules.
+   modules are  connected together to perform complex tasks.
+   Each module can be trained independently and optimized for a specific task
+
+15. Radial Basis Function Network (RBFN)
+   uses radial basis functions to model complex patterns in the input data.
+   used to transform the input data into a higher-dimensional space
+
+
+
+
