@@ -1,6 +1,7 @@
 package linear
 
 import (
+	"fmt"
 	"regression_sample1/utils"
 	"time"
 )
@@ -48,6 +49,7 @@ func mean(values []float64) float64 {
 }
 
 func (lr *LinearRegression) TrainAndTest(inputDates, inputValues []float64) {
+	fmt.Println("Linear regression in progress ..")
 
 	lr.Train(inputDates, inputValues)
 

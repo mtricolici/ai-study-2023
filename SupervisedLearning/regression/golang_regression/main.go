@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"regression_sample1/regression/linear"
-	"regression_sample1/regression/neural"
+	"regression_sample1/regression/polynomial"
 	"regression_sample1/utils"
 )
 
@@ -18,8 +18,11 @@ func main() {
 	lr := linear.NewLinearRegression()
 	lr.TrainAndTest(inputDates, inputValues)
 
-	nr := neural.NewNeuralRegression(300, 300)
-	nr.TrainAndTest(inputValues, 500)
+	// nr := neural.NewNeuralRegression(300, 300)
+	// nr.TrainAndTest(inputValues, 500)
+
+	pl := polynomial.NewPolynomialRegression(2)
+	pl.TrainAndTest(inputDates, inputValues)
 
 	fmt.Println("Done!")
 }
