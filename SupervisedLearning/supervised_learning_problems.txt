@@ -1,0 +1,21 @@
+Supervised learning is a type of ML in which an algorithm learns to map inputs to outputs based on examples:
+
+1. Classification - predict a categorical label or class for a given input.
+   example: given an image, classify it as either a cat or a dog.
+
+2. Regression - predict a continuous numerical output for a given input.
+   example: given the age, education, and work experience of a person, predict their salary.
+
+3. Object detection - detect and localize objects within an image or video frame.
+   example: given an image of a street scene, identify the location of all the cars.
+
+4. Natural Language Processing (NLP) - analyze and understand human language
+   example: given a sentence, predict the sentiment of the writer (positive or negative)
+
+5. Recommender systems - predict a user's preferences or interests based on their past behavior or the behavior of similar users.
+   example: recommend products to customers based on their purchase history and browsing behavior
+
+6. Time series forecasting - predict future values of a time-dependent variable based on its past values
+   example: predict the stock prices of a company based on its historical stock prices.
+
+

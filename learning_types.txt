@@ -1,0 +1,58 @@
+Types of ML:
+
+1. Supervised learning - the algorithm is trained on labeled data, where the target variable (i.e., the output) is known
+   The algorithm learns to map inputs to outputs based on the given data
+
+   example1: Given a set of emails, the algorithm can be trained to classify each email as either spam or not spam
+   example2: Given a set of handwritten digits, the algorithm can be trained to classify each digit as a number between 0 and 9.
+
+2. Unsupervised learning - the algorithm is trained on unlabeled data, where the target variable is not known
+   The algorithm learns to discover patterns and relationships in the data without any guidance.
+
+   example1: clustering - groups similar data points together
+   example2: dimensionality reduction - reduces the number of features in the data
+   example3: Anomaly Detection in Network Traffic - A cybersecurity company wants to identify anomalies in network traffic to detect potential cyber attacks.
+   The company has a large dataset of network traffic data, but it is not clear how to identify patterns of abnormal behavior.
+   The company decides to use unsupervised learning and clustering to identify patterns of normal behavior, and 
+   to flag any instances that deviate significantly from these patterns.
+
+3. Semi-supervised learning - the algorithm is trained on a combination of labeled and unlabeled data
+
+   example: Credit Card Fraud Detection
+   A credit card company wants to improve its fraud detection system, but there is a limited amount of labeled data available
+   The company decides to use semi-supervised learning to leverage both the labeled and unlabeled data to improve performance.
+   step1: train a supervised learning model on the limited amount of labeled data
+   step2: use this model to predict the labels of the large amount of unlabeled data
+   step3: use the expanded dataset (labeled and predicted) to retrain the model.
+   This process can be repeated iteratively to improve performance.
+
+4. Reinforcement learning - the algorithm learns through trial and error by interacting with an environment.
+   The algorithm receives feedback in the form of rewards or penalties, which it uses to adjust its actions in order to maximize the rewards.
+
+   example: AI learns to play Snake (2d game). AI is equipped with sensors that provide input about the game state.
+   for example: the positions of the food and obstacles.
+   and AI must learn to take actions that maximize its score.
+   AI receives a reward (or penalty) based on its actions, and over time it learns to make decisions that maximize its score.
+
+5. Deep learning - uses neural networks with multiple layers to learn representations of the data
+
+   example: Natural Language Processing. NLP model is trained on a large dataset (books, articles, facebook posts...)
+   NLP model can do various tasks: language translation, sentiment analysis, or question answering etc
+   The system can generate human-like responses to questions or prompts, and it can understand the context and meaning of complex language structures.
+
+6. Transfer learning - a pre-trained model is used as the starting point for a new task.
+   The pre-trained model has already learned useful features from a large dataset, which can be applied to a new, smaller dataset to improve performance.
+
+   example: to be defined
+
+7. Online learning - the algorithm learns from data that is received in a continuous stream, rather than in batches.
+   tasks such as fraud detection or recommendation systems, where new data is constantly being generated.
+
+8. Bayesian learning - the algorithm makes use of Bayesian inference to update its beliefs about the parameters of a model as it receives new data.
+   Bayesian learning is particularly useful for problems where there is uncertainty in the data or the model.
+
+Note: there're many many other types of ML :)
+
+
+
+
