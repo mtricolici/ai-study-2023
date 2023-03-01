@@ -2,6 +2,9 @@
 #include <X11/Xutil.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <stdbool.h>
 #define win_width 400
 #define win_height 400
 
@@ -11,6 +14,9 @@ Display *display = NULL;
 Window window;
 int screen = 0;
 GC gc;
+pthread_t loop_thr;
+bool thread_created = false;
+bool thread_should_stop = false;
 
 // game variables
 int g_size;
@@ -60,6 +66,9 @@ void destroy_game() {
   game_data = NULL;
 }
 
+void* window_loop(); // implemented later
+
+
 // Creates a simple X window
 int create_window() {
     display = XOpenDisplay(NULL);
@@ -85,6 +94,14 @@ int create_window() {
     XSelectInput(display, window, ExposureMask | KeyPressMask);
     XMapWindow(display, window);
     gc = XCreateGC(display, window, 0, NULL);
+
+    int ret = pthread_create(&loop_thr, NULL, window_loop, NULL);
+    if (ret != 0) {
+      fprintf(stderr, "Error creating window loop");
+      return 2;
+    } else {
+      thread_created = true;
+    }
     return 1;
 }
 
@@ -113,23 +130,31 @@ void draw_objects(){
 
 // Closes previous created window
 void close_window() {
+    if (thread_created) {
+      thread_should_stop = true;
+      pthread_join(loop_thr, NULL);
+    }
     XFreeGC(display, gc);
     XDestroyWindow(display, window);
     XCloseDisplay(display);
 }
 
-void window_loop() {
+void* window_loop() {
     XEvent event;
-    while (1) {
-        XNextEvent(display, &event);
-        switch(event.type){
-        case Expose:
-          draw_objects();
-          break;
-        case KeyPress:
-          return;
+
+    while (!thread_should_stop) {
+        while(XPending(display)) {
+            XNextEvent(display, &event);
+            switch(event.type){
+            case Expose:
+              draw_objects();
+              break;
+            }
         }
+        usleep(10000); // sleep 10 ms = 10,000 microseconds
     }
+
+    return NULL;
 }
 
 int main() {
@@ -143,7 +168,13 @@ int main() {
     if (create_window()) {
 
        printf("window created!\n");
-       window_loop();
+       sleep(3);
+
+       set_game_data(14,14,3); // apple at 14x14
+       draw_objects();
+       sleep(3);
+
+       printf("stopping...\n");
        close_window();
     } else {
        printf("window creation failure\n");
