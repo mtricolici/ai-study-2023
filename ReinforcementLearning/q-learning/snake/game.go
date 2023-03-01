@@ -44,15 +44,14 @@ func NewSnakeGame(size int) *SnakeGame {
 
 func (sn *SnakeGame) generateRandomSnakeBody() {
 	mlt := 1
-	var startX int
+
+	startX := 3 + rnd.Intn(sn.Size-6)
 
 	if rnd.Intn(2) == 0 {
 		sn.Direction = Left
-		startX = 3 + rnd.Intn(sn.Size-4)
 		fmt.Println("new direction: LEFT")
 	} else {
 		sn.Direction = Right
-		startX = rnd.Intn(sn.Size - 4)
 		fmt.Println("new direction: RIGHT")
 		mlt = -1
 	}
