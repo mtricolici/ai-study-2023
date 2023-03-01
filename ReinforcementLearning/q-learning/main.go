@@ -16,11 +16,19 @@ func main() {
 	snake.UpdateGameData(g)
 
 	snake.X_create_window()
+
 	time.Sleep(1 * time.Second)
 
-	//snake.Set_game_data(14, 15, 3) // new apple
-	//snake.X_draw_objects()
-	//time.Sleep(10 * time.Second)
+	for !g.GameOver {
+		g.NextTick()
+		snake.UpdateGameData(g)
+		snake.X_draw_objects()
+		time.Sleep(1 * time.Second)
+	}
+
+	fmt.Println("End of program")
+
+	time.Sleep(2 * time.Second)
 
 	snake.Destroy_game()
 }

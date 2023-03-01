@@ -20,6 +20,15 @@ const (
 	Right
 )
 
+type Object int
+
+const (
+	Nothing Object = iota
+	Border
+	Apple
+	Body
+)
+
 var (
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
@@ -29,11 +38,13 @@ type SnakeGame struct {
 	Apple     Position
 	Size      int
 	Direction Direction
+	GameOver  bool
 }
 
 func NewSnakeGame(size int) *SnakeGame {
 	game := SnakeGame{
-		Size: size,
+		Size:     size,
+		GameOver: false,
 	}
 
 	game.generateRandomSnakeBody()
@@ -82,4 +93,40 @@ func (sn *SnakeGame) generateRandomApple() {
 			return
 		}
 	}
+}
+
+func (sn *SnakeGame) NextTick() {
+	if !sn.GameOver {
+		nextObj, next_x, next_y := sn.getObjectInFront()
+		if nextObj == Body || nextObj == Border {
+			sn.GameOver = true
+		} else if nextObj == Apple {
+			apple := Position{X: next_x, Y: next_y}
+			sn.Body = append([]Position{apple}, sn.Body...)
+		} else {
+			for i := len(sn.Body) - 1; i > 0; i-- {
+				sn.Body[i].X = sn.Body[i-1].X
+				sn.Body[i].Y = sn.Body[i-1].Y
+			}
+			sn.Body[0].X = next_x
+			sn.Body[0].Y = next_y
+		}
+	}
+}
+
+func (sn *SnakeGame) getObjectInFront() (Object, int, int) {
+	bx := sn.Body[0].X
+	by := sn.Body[0].Y
+
+	switch sn.Direction {
+	case Up:
+		return get_object_at(bx, by-1), bx, by - 1
+	case Down:
+		return get_object_at(bx, by+1), bx, by + 1
+	case Left:
+		return get_object_at(bx-1, by), bx - 1, by
+	case Right:
+		return get_object_at(bx+1, by), bx + 1, by
+	}
+	panic("getObjectInFront: Unkown direction detected!")
 }

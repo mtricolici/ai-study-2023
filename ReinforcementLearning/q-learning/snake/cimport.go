@@ -2,7 +2,9 @@ package snake
 
 // #cgo LDFLAGS: -L/tmp -lsnake
 // void create_game(int size);
+// int get_game_size();
 // void set_game_data(int x, int y, int value);
+// int get_game_data(int x, int y);
 // void destroy_game();
 //int create_window();
 //void draw_objects();
@@ -11,6 +13,14 @@ import "C"
 
 func Create_game(size int) {
 	C.create_game(C.int(size))
+}
+
+func Get_game_size() int {
+	return int(C.get_game_size())
+}
+
+func Get_game_data(x, y int) int {
+	return int(C.get_game_data(C.int(x), C.int(y)))
 }
 
 func Set_game_data(x, y, value int) {
