@@ -39,6 +39,7 @@ type SnakeGame struct {
 	Size      int
 	Direction Direction
 	GameOver  bool
+	Score     float64
 }
 
 func NewSnakeGame(size int) *SnakeGame {
@@ -46,11 +47,19 @@ func NewSnakeGame(size int) *SnakeGame {
 		Size:     size,
 		GameOver: false,
 	}
-
-	game.generateRandomSnakeBody()
-	game.generateRandomApple()
-
+	game.Reset()
 	return &game
+}
+
+func (sn *SnakeGame) Reset() {
+	sn.GameOver = false
+	sn.Score = 0.0
+	sn.generateRandomSnakeBody()
+	sn.generateRandomApple()
+}
+
+func (sn *SnakeGame) ChangeDirection(dir Direction) {
+	sn.Direction = dir
 }
 
 func (sn *SnakeGame) generateRandomSnakeBody() {
@@ -100,9 +109,11 @@ func (sn *SnakeGame) NextTick() {
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
 			sn.GameOver = true
+			sn.Score = -1.0
 		} else if nextObj == Apple {
 			apple := Position{X: next_x, Y: next_y}
 			sn.Body = append([]Position{apple}, sn.Body...)
+			sn.Score += 1.0
 		} else {
 			for i := len(sn.Body) - 1; i > 0; i-- {
 				sn.Body[i].X = sn.Body[i-1].X
@@ -110,6 +121,7 @@ func (sn *SnakeGame) NextTick() {
 			}
 			sn.Body[0].X = next_x
 			sn.Body[0].Y = next_y
+			sn.Score += 0.001
 		}
 	}
 }
