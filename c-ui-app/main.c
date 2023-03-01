@@ -12,6 +12,54 @@ Window window;
 int screen = 0;
 GC gc;
 
+// game variables
+int g_size;
+int **game_data = NULL; // matrix. 0-nothing, 1-> head, 2->body, 3->apple
+
+// color constants
+unsigned long color_nothing = 0xFFFFFF; // white
+unsigned long color_head = 0x0000EE;
+unsigned long color_body = 0x000055;
+unsigned long color_apple = 0xAA0000;
+
+unsigned long get_color(int x, int y) {
+  switch (game_data[x][y]) {
+    case 1: return color_head;
+    case 2: return color_body;
+    case 3: return color_apple;
+  }
+
+  return color_nothing;
+}
+
+// creates a matrix of ints (snake game)
+void create_game(int size) {
+  g_size = size;
+  game_data = (int**)malloc(size * sizeof(int*));
+
+  // alocate memory for each array
+  for (int i=0; i<size; i++) {
+    game_data[i] = malloc(size * sizeof(int));
+    for (int j=0; j<size; j++) {
+      game_data[i][j] = 0; // nothing
+    }
+  }
+}
+
+void set_game_data(int x, int y, int value) {
+  game_data[x][y] = value;
+}
+
+void destroy_game() {
+  if (game_data != NULL) {
+    for (int i=0; i<g_size; i++) {
+      free(game_data[i]);
+    }
+    free(game_data);
+  }
+  game_data = NULL;
+}
+
 // Creates a simple X window
 int create_window() {
     display = XOpenDisplay(NULL);
@@ -41,9 +89,25 @@ int create_window() {
 }
 
 void draw_objects(){
-    XSetForeground(display, gc, BlackPixel(display, screen));
-    XDrawLine(display, window, gc, 50, 50, 350, 350); // adjusted coordinates
-    XDrawLine(display, window, gc, 200, 200, 100, 10); // adjusted coordinates
+    if (game_data == NULL) {
+      return; // nothing to draw
+    }
+
+    int p_w = win_width / g_size;
+    int p_h = win_height / g_size;
+
+
+    for (int i=0; i<g_size; i++) {
+      for (int j=0; j<g_size; j++) {
+        XSetForeground(display, gc, get_color(i, j));
+        int x=i*p_w;
+        int y=j*p_h;
+        XFillRectangle(display, window, gc, x+1, y+1, p_w-2, p_h-2);
+      }
+    }
+
+    //XDrawLine(display, window, gc, 50, 50, 350, 350); // adjusted coordinates
+    //XDrawLine(display, window, gc, 200, 200, 100, 10); // adjusted coordinates
     XFlush(display);
 }
 
@@ -69,13 +133,23 @@ void window_loop() {
 }
 
 int main() {
+    create_game(20);
+    set_game_data(10,5,1); // head at 10x5
+    set_game_data(9,5,2); // body at 9x5
+    set_game_data(8,5,2); // body at 8x5
+    set_game_data(7,5,2); // body at 7x5
+    set_game_data(13,13,3); // apple at 13x13
+
     if (create_window()) {
+
        printf("window created!\n");
        window_loop();
        close_window();
     } else {
        printf("window creation failure\n");
     }
+
+    destroy_game();
     return 0;
 }
 
