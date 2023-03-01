@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// #cgo LDFLAGS: -L${SRCDIR}/../../c-ui-app -lsnake
+// #cgo LDFLAGS: -L/tmp -lsnake
 // void create_game(int size);
 // void set_game_data(int x, int y, int value);
 // void destroy_game();
