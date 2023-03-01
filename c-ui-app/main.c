@@ -1,6 +1,7 @@
 //#include <stdio.h>
 //#include <unistd.h>
 #include "game.h"
+#include "xwrapper.h"
 
 /*
 Example of usage:
