@@ -27,6 +27,16 @@ func (ql *QLearning) PredictNextTurn() {
 	state := ql.game.GetState()
 	action, _ := ql.getMaxQValue(state)
 	ql.gameChangeDirection(action)
+	switch action {
+	case TurnLeft:
+		fmt.Println("-- predict: turn LEFT")
+	case TurnRight:
+		fmt.Println("-- predict: turn RIGHT")
+	case ContinueTheSame:
+		fmt.Println("-- predict: continue")
+	default:
+		panic("predict: UNKNOWN action detected")
+	}
 }
 
 func (ql *QLearning) gameChangeDirection(action Action) {
@@ -47,16 +57,16 @@ func (ql *QLearning) Train(iterations int) {
 		// Start a new game!
 		ql.game.Reset()
 
-		reward := ql.playRandomGame()
-		sum_rewards += reward
-		if max_reward < reward {
-			max_reward = reward
+		score := ql.playRandomGame()
+		sum_rewards += score
+		if max_reward < score {
+			max_reward = score
 		}
 
 		// Reduce epsilon over time
 		ql.epsilon *= 0.99
 
-		if i > 0 && i%(iterations/10) == 0 {
+		if i > 0 && i%(iterations/5) == 0 {
 			progress := float64(i) / float64(iterations) * 100.0
 			avgReward := sum_rewards / float64(i) // Avg Reward for played games
 			fmt.Printf("Training %.2f%% avgScore: %f, maxScore: %f\n", progress, avgReward, max_reward)

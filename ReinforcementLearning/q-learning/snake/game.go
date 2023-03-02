@@ -69,6 +69,20 @@ func (sn *SnakeGame) Reset() {
 	}
 }
 
+func (sn *SnakeGame) GetDirectionAsString() string {
+	switch sn.Direction {
+	case Up:
+		return "up"
+	case Down:
+		return "down"
+	case Left:
+		return "left"
+	case Right:
+		return "right"
+	}
+	return "UNKNOWN"
+}
+
 func (sn *SnakeGame) TurnLeft() {
 	switch sn.Direction {
 	case Up:
