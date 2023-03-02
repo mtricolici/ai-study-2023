@@ -8,13 +8,13 @@ import (
 )
 
 var (
-	alpha      = 0.3 // bigger value means QTable is updated faster
+	alpha      = 0.1 // bigger value means QTable is updated faster
 	gamma      = 0.9
 	iterations = 1_000_000 // Number of games to train
 )
 
 func main() {
-	g := snake.NewSnakeGame(8, false)
+	g := snake.NewSnakeGame(10, false)
 	ai := ai.NewQLearning(g, alpha, gamma)
 
 	fmt.Printf("Training AI for %d games ...\n", iterations)
@@ -22,7 +22,7 @@ func main() {
 
 	fmt.Println("Training finished! Let's play a game ;)")
 
-	g = snake.NewSnakeGame(20, false)
+	g = snake.NewSnakeGame(10, false)
 
 	snake.Create_game(g.Size)
 	snake.X_create_window()

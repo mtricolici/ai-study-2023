@@ -84,30 +84,8 @@ func (sn *SnakeGame) GetDirectionAsString() string {
 	return "UNKNOWN"
 }
 
-func (sn *SnakeGame) TurnLeft() {
-	switch sn.Direction {
-	case Up:
-		sn.Direction = Left
-	case Down:
-		sn.Direction = Right
-	case Left:
-		sn.Direction = Down
-	case Right:
-		sn.Direction = Up
-	}
-}
-
-func (sn *SnakeGame) TurnRight() {
-	switch sn.Direction {
-	case Up:
-		sn.Direction = Right
-	case Down:
-		sn.Direction = Left
-	case Left:
-		sn.Direction = Up
-	case Right:
-		sn.Direction = Down
-	}
+func (sn *SnakeGame) ChangeDirection(newDirection Direction) {
+	sn.Direction = newDirection
 }
 
 func (sn *SnakeGame) generateStaticPosition() {

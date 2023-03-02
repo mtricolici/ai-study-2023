@@ -5,9 +5,10 @@ import "qlsample/snake"
 type Action int
 
 const (
-	ContinueTheSame Action = iota
-	TurnLeft
+	TurnLeft Action = iota
 	TurnRight
+	TurnUp
+	TurnDown
 )
 
 type QTable map[string]map[Action]float64
