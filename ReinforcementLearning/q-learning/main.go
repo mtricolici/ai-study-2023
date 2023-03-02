@@ -10,8 +10,8 @@ import (
 )
 
 func invoke_QLearning(numberOfGamesToPlay int, saveFileName string) {
-	// train on very small tables 6x6
-	g := snake.NewSnakeGame(6, false)
+	// train on very small tables 8x8
+	g := snake.NewSnakeGame(8, false)
 	bot := ai.NewQLearning(g, 0.1)
 
 	fmt.Printf("Training AI for %d games ...\n", numberOfGamesToPlay)
@@ -64,7 +64,7 @@ func main() {
 
 	switch args[0] {
 	case "train":
-		invoke_QLearning(10_000, "/tmp/brain.zzz")
+		invoke_QLearning(5_000_000, "/tmp/brain.zzz")
 	case "demo":
 		play_DemoGame("/tmp/brain.zzz")
 	default:

@@ -17,7 +17,7 @@ func NewQLearning(game *snake.SnakeGame, learningRate float64) *QLearning {
 		qtable:             make(QTable),
 		game:               game,
 		learningRate:       learningRate,
-		max_moves_per_game: 200,
+		max_moves_per_game: 300,
 	}
 
 	return &q

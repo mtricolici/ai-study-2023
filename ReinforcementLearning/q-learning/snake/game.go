@@ -120,6 +120,7 @@ func (sn *SnakeGame) NextTick() {
 			sn.Body = append([]Position{apple}, sn.Body...)
 			sn.ConsumedApples += 1
 			sn.Reward = 10
+			sn.generateRandomApple() // Generate a new apple!
 		} else {
 			sn.Reward = sn.CalculateReward(next_x, next_y)
 			for i := len(sn.Body) - 1; i > 0; i-- {
