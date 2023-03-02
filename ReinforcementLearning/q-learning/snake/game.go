@@ -3,7 +3,6 @@ package snake
 import (
 	"math"
 	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -215,7 +214,7 @@ func (sn *SnakeGame) GetState() string {
 	var sb strings.Builder
 
 	// Save current direction
-	sb.WriteString(strconv.Itoa(int(sn.Direction)))
+	//sb.WriteString(strconv.Itoa(int(sn.Direction)))
 
 	// is LEFT move illegal
 	sb.WriteString(bool_to_str(Can_move_to(x-1, y)))

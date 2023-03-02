@@ -10,13 +10,11 @@ import (
 var (
 	alpha      = 0.1 // bigger value means QTable is updated faster
 	gamma      = 0.9
-	iterations = 50_000 // Number of games to train
+	iterations = 50_000_000 // Number of games to train
 )
 
 func main() {
-	snake.Create_game(10)
-
-	g := snake.NewSnakeGame(10, false)
+	g := snake.NewSnakeGame(8, false)
 	ai := ai.NewQLearning(g, alpha, gamma)
 
 	fmt.Printf("Training AI for %d games ...\n", iterations)
@@ -24,6 +22,9 @@ func main() {
 
 	fmt.Println("Training finished! Let's play a game ;)")
 
+	g = snake.NewSnakeGame(20, false)
+
+	snake.Create_game(g.Size)
 	snake.X_create_window()
 
 	g.Reset()
@@ -35,6 +36,7 @@ func main() {
 		g.NextTick()
 		snake.UpdateGameData(g)
 		snake.X_draw_objects()
+		fmt.Printf("state: '%s'\n", g.GetState())
 		fmt.Printf("Direction: %s Reward: %f\n", g.GetDirectionAsString(), g.Reward)
 		time.Sleep(500 * time.Millisecond)
 	}

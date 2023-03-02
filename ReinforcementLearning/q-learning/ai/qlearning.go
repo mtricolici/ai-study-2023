@@ -17,7 +17,7 @@ func NewQLearning(game *snake.SnakeGame, alpha, gamma float64) *QLearning {
 		game:               game,
 		alpha:              alpha,
 		gamma:              gamma,
-		max_moves_per_game: 500,
+		max_moves_per_game: 100,
 	}
 
 	return &q
@@ -77,10 +77,12 @@ func (ql *QLearning) Train(iterations int) {
 		if i > 0 && i%(iterations/5) == 0 {
 			avgReward := sum_rewards / float64(i) // Avg Reward for played games
 			avgApples := sum_apples_eaten / float64(i)
-			fmt.Printf("%.2f%% avgScore: %f, maxScore: %f, max-apples: %d, avg-apples: %f\n",
-				progress, avgReward, max_reward, max_apples_eaten, avgApples)
+			fmt.Printf("%.2f%% avgScore: %f, maxScore: %f, max-apples: %d, avg-apples: %f. States:%d\n",
+				progress, avgReward, max_reward, max_apples_eaten, avgApples, len(ql.qtable))
 		}
 	}
+
+	fmt.Printf("Q-Learning finished. States: %d", len(ql.qtable))
 }
 
 func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
@@ -120,10 +122,10 @@ func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
 }
 
 func (ql *QLearning) updateQValue(state string, action Action, reward, maxq float64) {
-	v := ql.qtable[state][action]
-	v += ql.alpha * (reward + ql.gamma*maxq - v)
+	// v := ql.qtable[state][action]
+	// v += ql.alpha * (reward + ql.gamma*maxq - v)
 
-	ql.qtable[state][action] = v
+	ql.qtable[state][action] = reward + ql.gamma*maxq
 }
 
 func (ql *QLearning) getMaxQValue(state string) (Action, float64) {
