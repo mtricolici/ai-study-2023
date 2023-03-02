@@ -12,12 +12,11 @@ var (
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-func NewQLearning(game *snake.SnakeGame, alpha, gamma float64) *QLearning {
+func NewQLearning(game *snake.SnakeGame, learningRate float64) *QLearning {
 	q := QLearning{
 		qtable:             make(QTable),
 		game:               game,
-		alpha:              alpha,
-		gamma:              gamma,
+		learningRate:       learningRate,
 		max_moves_per_game: 200,
 	}
 
@@ -141,9 +140,9 @@ func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
 
 func (ql *QLearning) updateQValue(state string, action Action, reward, maxq float64) {
 	// v := ql.qtable[state][action]
-	// v += ql.alpha * (reward + ql.gamma*maxq - v)
+	// v += ql.alpha * (reward + ql.learningRate*maxq - v)
 
-	ql.qtable[state][action] = reward + ql.gamma*maxq
+	ql.qtable[state][action] = reward + ql.learningRate*maxq
 }
 
 func (ql *QLearning) getMaxQValue(state string) (Action, float64) {

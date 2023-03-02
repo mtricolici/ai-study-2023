@@ -2,37 +2,35 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"qlsample/ai"
 	"qlsample/cimport"
 	"qlsample/snake"
 	"time"
 )
 
-var (
-	alpha      = 0.1 // bigger value means QTable is updated faster
-	gamma      = 0.9
-	iterations = 50_000_000 // Number of games to train
-)
-
-func invoke_QLearning() *ai.QLearning {
+func invoke_QLearning(numberOfGamesToPlay int, saveFileName string) {
 	// train on very small tables 6x6
 	g := snake.NewSnakeGame(6, false)
-	bot := ai.NewQLearning(g, alpha, gamma)
+	bot := ai.NewQLearning(g, 0.1)
 
-	fmt.Printf("Training AI for %d games ...\n", iterations)
-	bot.Train(iterations)
+	fmt.Printf("Training AI for %d games ...\n", numberOfGamesToPlay)
+	bot.Train(numberOfGamesToPlay)
 
-	fmt.Println("Training finished! Let's play a game ;)")
-
-	return bot
+	fmt.Println("Training finished!")
+	bot.SaveToFile(saveFileName)
+	fmt.Println("bye bye")
 }
 
-func play_DemoGame(bot *ai.QLearning) {
+func play_DemoGame(brainFileLocation string) {
 	// demo on a biggger table ;)
 	g := snake.NewSnakeGame(20, false)
 
 	cimport.Create_game(g.Size)
 	cimport.X_create_window()
+
+	bot := ai.NewQLearning(g, 0.0) // Learning rate is not needed here
+	bot.LoadFromFile(brainFileLocation)
 
 	g.Reset()
 	cimport.UpdateGameData(g)
@@ -52,7 +50,24 @@ func play_DemoGame(bot *ai.QLearning) {
 	cimport.Destroy_game()
 }
 
+func show_usage() {
+	fmt.Println("Bad argument. Please use 'train' or 'demo' argument")
+}
+
 func main() {
-	bot := invoke_QLearning()
-	play_DemoGame(bot)
+	args := os.Args[1:] // Skip the first argument
+
+	if len(args) != 1 {
+		show_usage()
+		return
+	}
+
+	switch args[0] {
+	case "train":
+		invoke_QLearning(50_000_000, "/tmp/brain.zzz")
+	case "demo":
+		play_DemoGame("/tmp/brain.zzz")
+	default:
+		show_usage()
+	}
 }
