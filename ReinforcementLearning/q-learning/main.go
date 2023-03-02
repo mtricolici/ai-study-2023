@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	alpha      = 0.1 // bigger value means QTable is updated faster
+	alpha      = 0.3 // bigger value means QTable is updated faster
 	gamma      = 0.9
-	iterations = 50_000_000 // Number of games to train
+	iterations = 1_000_000 // Number of games to train
 )
 
 func main() {

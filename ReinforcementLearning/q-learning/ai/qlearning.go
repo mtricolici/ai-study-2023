@@ -82,7 +82,7 @@ func (ql *QLearning) Train(iterations int) {
 		}
 	}
 
-	fmt.Printf("Q-Learning finished. States: %d", len(ql.qtable))
+	fmt.Printf("Q-Learning finished. States: %d\n", len(ql.qtable))
 }
 
 func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
