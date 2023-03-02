@@ -10,7 +10,6 @@ import (
 var (
 	alpha      = 0.1 // bigger value means QTable is updated faster
 	gamma      = 0.9
-	epsilon    = 1.0       // how often a RANDOM action is invoked. Example: 0.3 means 30%
 	iterations = 1_000_000 // Number of games to train
 )
 
@@ -18,7 +17,7 @@ func main() {
 	snake.Create_game(10)
 
 	g := snake.NewSnakeGame(10, false)
-	ai := ai.NewQLearning(g, alpha, gamma, epsilon)
+	ai := ai.NewQLearning(g, alpha, gamma)
 
 	fmt.Printf("Training AI for %d games ...\n", iterations)
 	ai.Train(iterations)

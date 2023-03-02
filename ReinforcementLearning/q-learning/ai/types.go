@@ -13,7 +13,7 @@ const (
 type QTable map[string]map[Action]float64
 
 type QLearning struct {
-	qtable                QTable
-	game                  *snake.SnakeGame
-	alpha, gamma, epsilon float64
+	qtable       QTable
+	game         *snake.SnakeGame
+	alpha, gamma float64
 }

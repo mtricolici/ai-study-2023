@@ -11,13 +11,12 @@ var (
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-func NewQLearning(game *snake.SnakeGame, alpha, gamma, epsilon float64) *QLearning {
+func NewQLearning(game *snake.SnakeGame, alpha, gamma float64) *QLearning {
 	q := QLearning{
-		qtable:  make(QTable),
-		game:    game,
-		alpha:   alpha,
-		gamma:   gamma,
-		epsilon: epsilon,
+		qtable: make(QTable),
+		game:   game,
+		alpha:  alpha,
+		gamma:  gamma,
 	}
 
 	return &q
@@ -59,7 +58,10 @@ func (ql *QLearning) Train(iterations int) {
 		// Start a new game!
 		ql.game.Reset()
 
-		score, apples := ql.playRandomGame()
+		progress := float64(i) / float64(iterations) * 100.0
+		epsilon := ql.GetRandomRate(progress)
+
+		score, apples := ql.playRandomGame(epsilon)
 		sum_rewards += score
 		sum_apples_eaten += float64(apples)
 
@@ -71,11 +73,7 @@ func (ql *QLearning) Train(iterations int) {
 			max_apples_eaten = apples
 		}
 
-		// Reduce epsilon over time
-		ql.epsilon *= 0.99
-
 		if i > 0 && i%(iterations/5) == 0 {
-			progress := float64(i) / float64(iterations) * 100.0
 			avgReward := sum_rewards / float64(i) // Avg Reward for played games
 			avgApples := sum_apples_eaten / float64(i)
 			fmt.Printf("%.2f%% avgScore: %f, maxScore: %f, max-apples: %d, avg-apples: %f\n",
@@ -84,7 +82,7 @@ func (ql *QLearning) Train(iterations int) {
 	}
 }
 
-func (ql *QLearning) playRandomGame() (float64, int) {
+func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
 	state := ql.game.GetState()
 
 	max_reward := 0.0
@@ -94,7 +92,7 @@ func (ql *QLearning) playRandomGame() (float64, int) {
 
 		ql.checkStatePresence(state)
 
-		if rnd.Float64() < ql.epsilon {
+		if rnd.Float64() < epsilon {
 			action = Action(rnd.Intn(3))
 		} else {
 			action, _ = ql.getMaxQValue(state)
@@ -152,4 +150,20 @@ func (ql *QLearning) checkStatePresence(state string) {
 		ql.qtable[state][TurnLeft] = 0.0
 		ql.qtable[state][TurnRight] = 0.0
 	}
+}
+
+func (ql *QLearning) GetRandomRate(progress float64) float64 {
+	if progress < 5 {
+		return 1.0 // exploration 100%
+	}
+
+	if progress < 20 {
+		return 0.5 // 50% exploration
+	}
+
+	if progress < 80 {
+		return 0.3
+	}
+
+	return 0.1
 }
