@@ -3,7 +3,13 @@ package ai
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"qlsample/snake"
+	"time"
+)
+
+var (
+	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 func NewQLearning(game *snake.SnakeGame) *QLearning {
@@ -60,6 +66,8 @@ func (ql *QLearning) playRandomGame(alpha, gamma, epsilon float64) float64 {
 	for !ql.game.GameOver {
 		var action Action
 
+		ql.checkStatePresence(state)
+
 		if rnd.Float64() < epsilon {
 			action = Action(rnd.Intn(3))
 		} else {
@@ -77,6 +85,7 @@ func (ql *QLearning) playRandomGame(alpha, gamma, epsilon float64) float64 {
 		if reward >= 0 {
 			newState := ql.game.GetState()
 			_, maxQ := ql.getMaxQValue(newState)
+			ql.checkStatePresence(newState)
 
 			ql.qtable[state][action] = ql.qtable[state][action] + alpha*(reward+gamma*maxQ-ql.qtable[state][action])
 			state = newState
@@ -98,4 +107,14 @@ func (ql *QLearning) getMaxQValue(state string) (Action, float64) {
 	}
 
 	return bestAction, maxQ
+}
+
+func (ql *QLearning) checkStatePresence(state string) {
+	if _, ok := ql.qtable[state]; !ok {
+		ql.qtable[state] = make(map[Action]float64)
+		// initialize with 0.0
+		ql.qtable[state][ContinueTheSame] = 0.0
+		ql.qtable[state][TurnLeft] = 0.0
+		ql.qtable[state][TurnRight] = 0.0
+	}
 }
