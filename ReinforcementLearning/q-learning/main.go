@@ -15,8 +15,6 @@ var (
 )
 
 func main() {
-	fmt.Println("Hello world")
-
 	snake.Create_game(10)
 
 	g := snake.NewSnakeGame(10, false)
@@ -38,7 +36,7 @@ func main() {
 		g.NextTick()
 		snake.UpdateGameData(g)
 		snake.X_draw_objects()
-		fmt.Printf("Direction: %s Score: %f\n", g.GetDirectionAsString(), g.Score)
+		fmt.Printf("Direction: %s Score: %f\n", g.GetDirectionAsString(), g.GetScore())
 		time.Sleep(500 * time.Millisecond)
 	}
 

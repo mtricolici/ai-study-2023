@@ -52,15 +52,23 @@ func (ql *QLearning) gameChangeDirection(action Action) {
 func (ql *QLearning) Train(iterations int) {
 	sum_rewards := 0.0
 	max_reward := 0.0
+	max_apples_eaten := 0
+	sum_apples_eaten := 0.0
 
 	for i := 0; i < iterations; i++ {
 		// Start a new game!
 		ql.game.Reset()
 
-		score := ql.playRandomGame()
+		score, apples := ql.playRandomGame()
 		sum_rewards += score
+		sum_apples_eaten += float64(apples)
+
 		if max_reward < score {
 			max_reward = score
+		}
+
+		if max_apples_eaten < apples {
+			max_apples_eaten = apples
 		}
 
 		// Reduce epsilon over time
@@ -69,12 +77,14 @@ func (ql *QLearning) Train(iterations int) {
 		if i > 0 && i%(iterations/5) == 0 {
 			progress := float64(i) / float64(iterations) * 100.0
 			avgReward := sum_rewards / float64(i) // Avg Reward for played games
-			fmt.Printf("Training %.2f%% avgScore: %f, maxScore: %f\n", progress, avgReward, max_reward)
+			avgApples := sum_apples_eaten / float64(i)
+			fmt.Printf("%.2f%% avgScore: %f, maxScore: %f, max-apples: %d, avg-apples: %f\n",
+				progress, avgReward, max_reward, max_apples_eaten, avgApples)
 		}
 	}
 }
 
-func (ql *QLearning) playRandomGame() float64 {
+func (ql *QLearning) playRandomGame() (float64, int) {
 	state := ql.game.GetState()
 
 	max_reward := 0.0
@@ -92,7 +102,7 @@ func (ql *QLearning) playRandomGame() float64 {
 
 		ql.gameChangeDirection(action)
 		ql.game.NextTick()
-		reward := ql.game.Score
+		reward := ql.game.GetScore()
 
 		newState := ql.game.GetState()
 		ql.checkStatePresence(newState)
@@ -107,7 +117,7 @@ func (ql *QLearning) playRandomGame() float64 {
 		}
 	}
 
-	return max_reward
+	return max_reward, ql.game.ConsumedApples
 }
 
 func (ql *QLearning) updateQValue(state string, action Action, reward, maxq float64) {
