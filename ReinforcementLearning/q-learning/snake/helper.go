@@ -1,22 +1,26 @@
 package snake
 
-func get_object_at(x, y int) Object {
-	size := Get_game_size()
-	if x < 0 || x >= size || y < 0 || y >= size {
+func (sn *SnakeGame) get_object_at(x, y int) Object {
+	if x < 0 || x >= sn.Size || y < 0 || y >= sn.Size {
 		return Border
 	}
 
-	data := Get_game_data(x, y)
-	switch data {
-	case 3:
+	if sn.Apple.X == x && sn.Apple.Y == y {
 		return Apple
-	case 2:
-		return Body // head actually
-	case 1:
-		return Body
+	}
+
+	for _, p := range sn.Body {
+		if p.X == x && p.Y == y {
+			return Body
+		}
 	}
 
 	return Nothing
+}
+
+func (sn *SnakeGame) can_move_to(x, y int) bool {
+	obj := sn.get_object_at(x, y)
+	return obj == Nothing || obj == Apple
 }
 
 func bool_to_str(b bool) string {

@@ -18,7 +18,7 @@ func NewQLearning(game *snake.SnakeGame, alpha, gamma float64) *QLearning {
 		game:               game,
 		alpha:              alpha,
 		gamma:              gamma,
-		max_moves_per_game: 100,
+		max_moves_per_game: 200,
 	}
 
 	return &q

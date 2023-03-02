@@ -7,45 +7,9 @@ import (
 	"time"
 )
 
-type Position struct {
-	X int
-	Y int
-}
-
-type Direction int
-
-const (
-	Up Direction = iota
-	Down
-	Left
-	Right
-)
-
-type Object int
-
-const (
-	Nothing Object = iota
-	Border
-	Apple
-	Body
-)
-
 var (
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
-
-type SnakeGame struct {
-	Body           []Position
-	Apple          Position
-	Size           int
-	Direction      Direction
-	GameOver       bool
-	ConsumedApples int
-	Moves_made     int
-	Reward         float64
-
-	random_initial_position bool
-}
 
 func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 	game := SnakeGame{
@@ -174,13 +138,13 @@ func (sn *SnakeGame) getObjectInFront() (Object, int, int) {
 
 	switch sn.Direction {
 	case Up:
-		return get_object_at(bx, by-1), bx, by - 1
+		return sn.get_object_at(bx, by-1), bx, by - 1
 	case Down:
-		return get_object_at(bx, by+1), bx, by + 1
+		return sn.get_object_at(bx, by+1), bx, by + 1
 	case Left:
-		return get_object_at(bx-1, by), bx - 1, by
+		return sn.get_object_at(bx-1, by), bx - 1, by
 	case Right:
-		return get_object_at(bx+1, by), bx + 1, by
+		return sn.get_object_at(bx+1, by), bx + 1, by
 	}
 	panic("getObjectInFront: Unkown direction detected!")
 }
@@ -194,14 +158,14 @@ func (sn *SnakeGame) GetState() string {
 	// Save current direction
 	//sb.WriteString(strconv.Itoa(int(sn.Direction)))
 
-	// is LEFT move illegal
-	sb.WriteString(bool_to_str(Can_move_to(x-1, y)))
-	// is RIGHT move illegal
-	sb.WriteString(bool_to_str(Can_move_to(x+1, y)))
-	// is UP move illegal
-	sb.WriteString(bool_to_str(Can_move_to(x, y-1)))
-	// is Down move illegal
-	sb.WriteString(bool_to_str(Can_move_to(x, y+1)))
+	// is LEFT move allowed
+	sb.WriteString(bool_to_str(sn.can_move_to(x-1, y)))
+	// is RIGHT move allowed
+	sb.WriteString(bool_to_str(sn.can_move_to(x+1, y)))
+	// is UP move allowed
+	sb.WriteString(bool_to_str(sn.can_move_to(x, y-1)))
+	// is Down move allowed
+	sb.WriteString(bool_to_str(sn.can_move_to(x, y+1)))
 
 	// is FOOD on the left
 	sb.WriteString(bool_to_str(x > sn.Apple.X))
