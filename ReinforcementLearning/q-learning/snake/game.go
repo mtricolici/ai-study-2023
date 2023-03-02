@@ -35,22 +35,20 @@ var (
 )
 
 type SnakeGame struct {
-	Body                    []Position
-	Apple                   Position
-	Size                    int
-	Direction               Direction
-	GameOver                bool
-	ConsumedApples          int
+	Body           []Position
+	Apple          Position
+	Size           int
+	Direction      Direction
+	GameOver       bool
+	ConsumedApples int
+	Moves_made     int
+
 	random_initial_position bool
-	max_moves_without_apple int
-	moves_left              int
-	moves_made              int
 }
 
 func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 	game := SnakeGame{
 		Size:                    size,
-		max_moves_without_apple: size * 2,
 		random_initial_position: randomPosition,
 	}
 	game.Reset()
@@ -58,10 +56,9 @@ func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 }
 
 func (sn *SnakeGame) Reset() {
-	sn.moves_left = sn.max_moves_without_apple
 	sn.GameOver = false
 	sn.ConsumedApples = 0
-	sn.moves_made = 0
+	sn.Moves_made = 0
 
 	if sn.random_initial_position {
 		sn.generateRandomSnakeBody()
@@ -78,7 +75,7 @@ func (sn *SnakeGame) GetScore() float64 {
 	}
 
 	score := float64(sn.ConsumedApples)
-	score += float64(sn.moves_made) * 0.1
+	score += float64(sn.Moves_made) * 0.1
 	return score
 }
 
@@ -179,14 +176,7 @@ func (sn *SnakeGame) generateRandomApple() {
 
 func (sn *SnakeGame) NextTick() {
 	if !sn.GameOver {
-		// Do not allow it to move in circle without eating an apple
-		sn.moves_left -= 1
-		if sn.moves_left < 0 {
-			sn.GameOver = true
-			return
-		}
-
-		sn.moves_made += 1
+		sn.Moves_made += 1
 
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
@@ -195,9 +185,6 @@ func (sn *SnakeGame) NextTick() {
 			apple := Position{X: next_x, Y: next_y}
 			sn.Body = append([]Position{apple}, sn.Body...)
 			sn.ConsumedApples += 1
-
-			// Give the snake More moves ! Reward
-			sn.moves_left = sn.max_moves_without_apple
 		} else {
 			for i := len(sn.Body) - 1; i > 0; i-- {
 				sn.Body[i].X = sn.Body[i-1].X

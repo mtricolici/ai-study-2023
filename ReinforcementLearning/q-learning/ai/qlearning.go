@@ -13,10 +13,11 @@ var (
 
 func NewQLearning(game *snake.SnakeGame, alpha, gamma float64) *QLearning {
 	q := QLearning{
-		qtable: make(QTable),
-		game:   game,
-		alpha:  alpha,
-		gamma:  gamma,
+		qtable:             make(QTable),
+		game:               game,
+		alpha:              alpha,
+		gamma:              gamma,
+		max_moves_per_game: 500,
 	}
 
 	return &q
@@ -87,7 +88,7 @@ func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
 
 	max_reward := 0.0
 
-	for !ql.game.GameOver {
+	for !ql.game.GameOver && ql.game.Moves_made < ql.max_moves_per_game {
 		var action Action
 
 		ql.checkStatePresence(state)
