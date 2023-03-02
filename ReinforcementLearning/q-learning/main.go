@@ -64,7 +64,7 @@ func main() {
 
 	switch args[0] {
 	case "train":
-		invoke_QLearning(50_000_000, "/tmp/brain.zzz")
+		invoke_QLearning(10_000, "/tmp/brain.zzz")
 	case "demo":
 		play_DemoGame("/tmp/brain.zzz")
 	default:
