@@ -1,7 +1,6 @@
 package snake
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
@@ -34,24 +33,28 @@ var (
 )
 
 type SnakeGame struct {
-	Body      []Position
-	Apple     Position
-	Size      int
-	Direction Direction
-	GameOver  bool
-	Score     float64
+	Body                    []Position
+	Apple                   Position
+	Size                    int
+	Direction               Direction
+	GameOver                bool
+	Score                   float64
+	max_moves_without_apple int
+	moves_left              int
 }
 
 func NewSnakeGame(size int) *SnakeGame {
 	game := SnakeGame{
-		Size:     size,
-		GameOver: false,
+		Size:                    size,
+		GameOver:                false,
+		max_moves_without_apple: size * 3,
 	}
 	game.Reset()
 	return &game
 }
 
 func (sn *SnakeGame) Reset() {
+	sn.moves_left = sn.max_moves_without_apple
 	sn.GameOver = false
 	sn.Score = 0.0
 	sn.generateRandomSnakeBody()
@@ -69,10 +72,8 @@ func (sn *SnakeGame) generateRandomSnakeBody() {
 
 	if rnd.Intn(2) == 0 {
 		sn.Direction = Left
-		fmt.Println("new direction: LEFT")
 	} else {
 		sn.Direction = Right
-		fmt.Println("new direction: RIGHT")
 		mlt = -1
 	}
 
@@ -106,6 +107,14 @@ func (sn *SnakeGame) generateRandomApple() {
 
 func (sn *SnakeGame) NextTick() {
 	if !sn.GameOver {
+		// Do not allow it to move in circle without eating an apple
+		sn.moves_left -= 1
+		if sn.moves_left < 0 {
+			sn.GameOver = true
+			sn.Score = -1.0
+			return
+		}
+
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
 			sn.GameOver = true
@@ -114,6 +123,8 @@ func (sn *SnakeGame) NextTick() {
 			apple := Position{X: next_x, Y: next_y}
 			sn.Body = append([]Position{apple}, sn.Body...)
 			sn.Score += 1.0
+			// Give the snake More moves ! Reward
+			sn.moves_left = sn.max_moves_without_apple
 		} else {
 			for i := len(sn.Body) - 1; i > 0; i-- {
 				sn.Body[i].X = sn.Body[i-1].X

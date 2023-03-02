@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"qlsample/snake"
@@ -17,17 +18,27 @@ const (
 
 type QTable map[string]map[Action]float64
 
+func allocate_nested_hash_if_needed(qt QTable, state string) {
+	if _, ok := qt[state]; !ok {
+		qt[state] = make(map[Action]float64)
+	}
+}
+
 func TrainQTable(game *snake.SnakeGame, alpha float64, gamma float64, epsilon float64, iterations int) QTable {
 	qTable := make(QTable)
 
+	bestScore := 0.0
+
 	for i := 0; i < iterations; i++ {
 		state := getState(game)
+		allocate_nested_hash_if_needed(qTable, state)
 
 		for !game.GameOver {
 			var action Action
 
 			if rand.Float64() < epsilon {
 				action = Action(rand.Intn(4))
+
 			} else {
 				maxQ := math.Inf(-1)
 
@@ -43,12 +54,14 @@ func TrainQTable(game *snake.SnakeGame, alpha float64, gamma float64, epsilon fl
 			game.NextTick()
 			reward := game.Score
 
+			if reward > bestScore {
+				bestScore = reward
+			}
+
 			if reward >= 0 {
 				newState := getState(game)
 
-				if qTable[newState] == nil {
-					qTable[newState] = make(map[Action]float64)
-				}
+				allocate_nested_hash_if_needed(qTable, newState)
 
 				maxQ := math.Inf(-1)
 
@@ -67,6 +80,11 @@ func TrainQTable(game *snake.SnakeGame, alpha float64, gamma float64, epsilon fl
 
 		// Reduce epsilon over time
 		epsilon *= 0.99
+
+		if i > 0 && i%(iterations/10) == 0 {
+			progress := float64(i) / float64(iterations) * 100.0
+			fmt.Printf("Training %.2f%% bestScore: %f\n", progress, bestScore)
+		}
 	}
 
 	return qTable
