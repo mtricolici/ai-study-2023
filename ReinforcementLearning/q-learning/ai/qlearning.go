@@ -101,7 +101,7 @@ func (ql *QLearning) playRandomGame(epsilon float64) (float64, int) {
 
 		ql.gameChangeDirection(action)
 		ql.game.NextTick()
-		reward := ql.game.GetScore()
+		reward := ql.game.Reward
 
 		newState := ql.game.GetState()
 		ql.checkStatePresence(newState)

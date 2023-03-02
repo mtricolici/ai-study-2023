@@ -1,6 +1,7 @@
 package snake
 
 import (
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -42,6 +43,7 @@ type SnakeGame struct {
 	GameOver       bool
 	ConsumedApples int
 	Moves_made     int
+	Reward         float64
 
 	random_initial_position bool
 }
@@ -67,16 +69,6 @@ func (sn *SnakeGame) Reset() {
 		// best for QLearning to learn. the same position for all Games
 		sn.generateStaticPosition()
 	}
-}
-
-func (sn *SnakeGame) GetScore() float64 {
-	if sn.GameOver {
-		return -10.0
-	}
-
-	score := float64(sn.ConsumedApples)
-	score += float64(sn.Moves_made) * 0.1
-	return score
 }
 
 func (sn *SnakeGame) GetDirectionAsString() string {
@@ -180,12 +172,15 @@ func (sn *SnakeGame) NextTick() {
 
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
+			sn.Reward = -10.0
 			sn.GameOver = true
 		} else if nextObj == Apple {
 			apple := Position{X: next_x, Y: next_y}
 			sn.Body = append([]Position{apple}, sn.Body...)
 			sn.ConsumedApples += 1
+			sn.Reward = 10
 		} else {
+			sn.Reward = sn.CalculateReward(next_x, next_y)
 			for i := len(sn.Body) - 1; i > 0; i-- {
 				sn.Body[i].X = sn.Body[i-1].X
 				sn.Body[i].Y = sn.Body[i-1].Y
@@ -241,4 +236,22 @@ func (sn *SnakeGame) GetState() string {
 	sb.WriteString(bool_to_str(y < sn.Apple.Y))
 
 	return sb.String()
+}
+
+func (sn *SnakeGame) CalculateReward(next_x, next_y int) float64 {
+	x := sn.Body[0].X
+	y := sn.Body[0].Y
+
+	ax := sn.Apple.X
+	ay := sn.Apple.Y
+
+	current_distance := math.Hypot(float64(x-ax), float64(y-ay))
+	next_distance := math.Hypot(float64(next_x-ax), float64(next_y-ay))
+
+	// If snake is moving TO apple then a small reward!
+	if next_distance < current_distance {
+		return 1.0
+	}
+
+	return 0.0
 }

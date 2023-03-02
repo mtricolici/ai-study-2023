@@ -10,7 +10,7 @@ import (
 var (
 	alpha      = 0.1 // bigger value means QTable is updated faster
 	gamma      = 0.9
-	iterations = 1_000_000 // Number of games to train
+	iterations = 50_000 // Number of games to train
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 		g.NextTick()
 		snake.UpdateGameData(g)
 		snake.X_draw_objects()
-		fmt.Printf("Direction: %s Score: %f\n", g.GetDirectionAsString(), g.GetScore())
+		fmt.Printf("Direction: %s Reward: %f\n", g.GetDirectionAsString(), g.Reward)
 		time.Sleep(500 * time.Millisecond)
 	}
 
