@@ -19,7 +19,7 @@ func main() {
 
 	snake.Create_game(10)
 
-	g := snake.NewSnakeGame(10)
+	g := snake.NewSnakeGame(10, false)
 
 	fmt.Printf("Training AI for %d games ...\n", iterations)
 	qtable := ai.TrainQTable(g, alpha, gamma, epsilon, iterations)

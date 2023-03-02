@@ -39,15 +39,16 @@ type SnakeGame struct {
 	Direction               Direction
 	GameOver                bool
 	Score                   float64
+	random_initial_position bool
 	max_moves_without_apple int
 	moves_left              int
 }
 
-func NewSnakeGame(size int) *SnakeGame {
+func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 	game := SnakeGame{
 		Size:                    size,
-		GameOver:                false,
 		max_moves_without_apple: size * 3,
+		random_initial_position: randomPosition,
 	}
 	game.Reset()
 	return &game
@@ -57,12 +58,33 @@ func (sn *SnakeGame) Reset() {
 	sn.moves_left = sn.max_moves_without_apple
 	sn.GameOver = false
 	sn.Score = 0.0
-	sn.generateRandomSnakeBody()
-	sn.generateRandomApple()
+
+	if sn.random_initial_position {
+		sn.generateRandomSnakeBody()
+		sn.generateRandomApple()
+	} else {
+		// best for QLearning to learn. the same position for all Games
+		sn.generateStaticPosition()
+	}
 }
 
 func (sn *SnakeGame) ChangeDirection(dir Direction) {
 	sn.Direction = dir
+}
+
+func (sn *SnakeGame) generateStaticPosition() {
+	sn.Direction = Left
+
+	x := sn.Size/2 - 2
+	y := 2
+
+	sn.Body = []Position{
+		{X: x, Y: y},
+		{X: x + 1, Y: y},
+		{X: x + 2, Y: y},
+	}
+
+	sn.Apple = Position{X: x + 1, Y: y + 1}
 }
 
 func (sn *SnakeGame) generateRandomSnakeBody() {
