@@ -34,6 +34,10 @@ func play_DemoGame(brainFileLocation string) {
 
 	g.Reset()
 	cimport.UpdateGameData(g)
+	time.Sleep(1 * time.Second)
+	cimport.X_draw_objects()
+	fmt.Println("Game starts in 10 seconds... prepare video recorder! ;)")
+	time.Sleep(10 * time.Second)
 
 	for !g.GameOver {
 		bot.PredictNextTurn()
@@ -47,6 +51,7 @@ func play_DemoGame(brainFileLocation string) {
 	}
 
 	fmt.Println("Game over")
+	time.Sleep(10 * time.Second)
 	cimport.Destroy_game()
 }
 
