@@ -39,13 +39,17 @@ func (ql *QLearning) gameChangeDirection(action Action) {
 
 func (ql *QLearning) Train(alpha, gamma, epsilon float64, iterations int) {
 	sum_rewards := 0.0
+	max_reward := 0.0
 
 	for i := 0; i < iterations; i++ {
 		// Start a new game!
 		ql.game.Reset()
 
-		max_reward := ql.playRandomGame(alpha, gamma, epsilon)
-		sum_rewards += max_reward
+		reward := ql.playRandomGame(alpha, gamma, epsilon)
+		sum_rewards += reward
+		if max_reward < reward {
+			max_reward = reward
+		}
 
 		// Reduce epsilon over time
 		epsilon *= 0.99
@@ -53,7 +57,7 @@ func (ql *QLearning) Train(alpha, gamma, epsilon float64, iterations int) {
 		if i > 0 && i%(iterations/10) == 0 {
 			progress := float64(i) / float64(iterations) * 100.0
 			avgReward := sum_rewards / float64(i) // Avg Reward for played games
-			fmt.Printf("Training %.2f%% avgScore: %f\n", progress, avgReward)
+			fmt.Printf("Training %.2f%% avgScore: %f, maxScore: %f\n", progress, avgReward, max_reward)
 		}
 	}
 }
@@ -82,31 +86,29 @@ func (ql *QLearning) playRandomGame(alpha, gamma, epsilon float64) float64 {
 			max_reward = reward
 		}
 
-		if reward >= 0 {
-			newState := ql.game.GetState()
-			_, maxQ := ql.getMaxQValue(newState)
-			ql.checkStatePresence(newState)
+		newState := ql.game.GetState()
+		_, maxQ := ql.getMaxQValue(newState)
+		ql.checkStatePresence(newState)
 
-			ql.qtable[state][action] = ql.qtable[state][action] + alpha*(reward+gamma*maxQ-ql.qtable[state][action])
-			state = newState
-		}
+		ql.qtable[state][action] = ql.qtable[state][action] + alpha*(reward+gamma*maxQ-ql.qtable[state][action])
+		state = newState
 	}
 
 	return max_reward
 }
 
 func (ql *QLearning) getMaxQValue(state string) (Action, float64) {
-	maxQ := math.Inf(-1)
+	max_q := math.Inf(-1)
 	bestAction := ContinueTheSame // Do not change direction - default one
 
-	for action, reward := range ql.qtable[state] {
-		if reward > maxQ {
-			maxQ = reward
+	for action, q := range ql.qtable[state] {
+		if q > max_q {
+			max_q = q
 			bestAction = action
 		}
 	}
 
-	return bestAction, maxQ
+	return bestAction, max_q
 }
 
 func (ql *QLearning) checkStatePresence(state string) {

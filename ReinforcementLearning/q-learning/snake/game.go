@@ -160,14 +160,12 @@ func (sn *SnakeGame) NextTick() {
 		sn.moves_left -= 1
 		if sn.moves_left < 0 {
 			sn.GameOver = true
-			sn.Score = -1.0
 			return
 		}
 
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
 			sn.GameOver = true
-			sn.Score = -1.0
 		} else if nextObj == Apple {
 			apple := Position{X: next_x, Y: next_y}
 			sn.Body = append([]Position{apple}, sn.Body...)
@@ -181,7 +179,7 @@ func (sn *SnakeGame) NextTick() {
 			}
 			sn.Body[0].X = next_x
 			sn.Body[0].Y = next_y
-			sn.Score += 0.001
+			sn.Score += 0.01
 		}
 	}
 }
