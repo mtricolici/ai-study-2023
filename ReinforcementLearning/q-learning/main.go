@@ -10,7 +10,7 @@ import (
 var (
 	alpha      = 0.2 // bigger value means QTable is updated faster
 	gamma      = 0.9
-	epsilon    = 0.1
+	epsilon    = 0.1       // how often a RANDOM action is invoked. 1 means ALWAYS
 	iterations = 5_000_000 // Number of games to train
 )
 
@@ -20,28 +20,27 @@ func main() {
 	snake.Create_game(10)
 
 	g := snake.NewSnakeGame(10, false)
+	ai := ai.NewQLearning(g)
 
 	fmt.Printf("Training AI for %d games ...\n", iterations)
-	qtable := ai.TrainQTable(g, alpha, gamma, epsilon, iterations)
+	ai.Train(alpha, gamma, epsilon, iterations)
 
 	fmt.Println("Training finished! Let's play a game ;)")
-
-	snake.UpdateGameData(g)
 
 	snake.X_create_window()
 
 	g.Reset()
+	snake.UpdateGameData(g)
+
 	for !g.GameOver {
-		ai.PlayQTableNextMove(g, qtable)
+		// AI decides to turn Left or Right or keep the same direction
+		ai.PredictNextTurn()
 		g.NextTick()
 		snake.UpdateGameData(g)
 		snake.X_draw_objects()
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 	}
 
-	fmt.Println("End of program")
-
-	time.Sleep(500 * time.Millisecond)
-
+	fmt.Println("bye bye!")
 	snake.Destroy_game()
 }

@@ -1,22 +1,17 @@
 package ai
 
 import (
-	"fmt"
-	"qlsample/snake"
+	"math/rand"
+	"time"
 )
 
-func getState(game *snake.SnakeGame) string {
-	return fmt.Sprintf("%v|%v|%v", game.Body, game.Apple, game.Direction)
-}
+var (
+	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
+)
 
-func getDirection(action Action) snake.Direction {
-	switch action {
-	case Up:
-		return snake.Up
-	case Down:
-		return snake.Down
-	case Left:
-		return snake.Left
+// TODO: use this later
+func Allocate_nested_hash_if_needed(qt QTable, state string) {
+	if _, ok := qt[state]; !ok {
+		qt[state] = make(map[Action]float64)
 	}
-	return snake.Right
 }

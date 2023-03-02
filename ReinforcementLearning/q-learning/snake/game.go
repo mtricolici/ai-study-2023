@@ -1,6 +1,7 @@
 package snake
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -68,8 +69,34 @@ func (sn *SnakeGame) Reset() {
 	}
 }
 
-func (sn *SnakeGame) ChangeDirection(dir Direction) {
-	sn.Direction = dir
+func (sn *SnakeGame) TurnLeft() {
+	switch sn.Direction {
+	case Up:
+		sn.Direction = Left
+	case Down:
+		sn.Direction = Right
+	case Left:
+		sn.Direction = Down
+	case Right:
+		sn.Direction = Up
+	}
+}
+
+func (sn *SnakeGame) TurnRight() {
+	switch sn.Direction {
+	case Up:
+		sn.Direction = Right
+	case Down:
+		sn.Direction = Left
+	case Left:
+		sn.Direction = Up
+	case Right:
+		sn.Direction = Down
+	}
+}
+
+func (sn *SnakeGame) GetState() string {
+	return fmt.Sprintf("%v|%v|%v", sn.Body, sn.Apple, sn.Direction)
 }
 
 func (sn *SnakeGame) generateStaticPosition() {
