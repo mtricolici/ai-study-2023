@@ -56,6 +56,8 @@ int create_window() {
 
     screen = DefaultScreen(display);
 
+    XInitThreads();
+
     unsigned long bg_color = 0xFFAAAA;
     window = XCreateSimpleWindow(display, RootWindow(display, screen), 0, 0, win_width, win_height, 0, BlackPixel(display, screen), bg_color);
     XSizeHints *hints = XAllocSizeHints();
