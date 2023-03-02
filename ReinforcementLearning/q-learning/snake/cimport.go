@@ -23,6 +23,18 @@ func Get_game_data(x, y int) int {
 	return int(C.get_game_data(C.int(x), C.int(y)))
 }
 
+func Can_move_to(x, y int) bool {
+	s := Get_game_size()
+
+	if x < 0 || x >= s || y < 0 || y >= s {
+		return false
+	}
+	data := Get_game_data(x, y)
+
+	// should not be Head or Body
+	return data != 1 && data != 2
+}
+
 func Set_game_data(x, y, value int) {
 	C.set_game_data(C.int(x), C.int(y), C.int(value))
 }

@@ -18,3 +18,11 @@ func get_object_at(x, y int) Object {
 
 	return Nothing
 }
+
+func bool_to_str(b bool) string {
+	if b {
+		return "1"
+	}
+
+	return "0"
+}

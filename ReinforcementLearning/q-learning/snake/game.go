@@ -1,8 +1,8 @@
 package snake
 
 import (
-	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -117,10 +117,6 @@ func (sn *SnakeGame) TurnRight() {
 	}
 }
 
-func (sn *SnakeGame) GetState() string {
-	return fmt.Sprintf("%v|%v|%v", sn.Body, sn.Apple, sn.Direction)
-}
-
 func (sn *SnakeGame) generateStaticPosition() {
 	sn.Direction = Left
 
@@ -223,4 +219,31 @@ func (sn *SnakeGame) getObjectInFront() (Object, int, int) {
 		return get_object_at(bx+1, by), bx + 1, by
 	}
 	panic("getObjectInFront: Unkown direction detected!")
+}
+
+func (sn *SnakeGame) GetState() string {
+	x := sn.Body[0].X
+	y := sn.Body[0].Y
+
+	var sb strings.Builder
+
+	// is LEFT move illegal
+	sb.WriteString(bool_to_str(Can_move_to(x-1, y)))
+	// is RIGHT move illegal
+	sb.WriteString(bool_to_str(Can_move_to(x+1, y)))
+	// is UP move illegal
+	sb.WriteString(bool_to_str(Can_move_to(x, y-1)))
+	// is Down move illegal
+	sb.WriteString(bool_to_str(Can_move_to(x, y+1)))
+
+	// is FOOD on the left
+	sb.WriteString(bool_to_str(x > sn.Apple.X))
+	// is FOOD on the right
+	sb.WriteString(bool_to_str(x < sn.Apple.X))
+	// is FOOD up
+	sb.WriteString(bool_to_str(y > sn.Apple.Y))
+	// is FOOD down
+	sb.WriteString(bool_to_str(y < sn.Apple.Y))
+
+	return sb.String()
 }
