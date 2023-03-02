@@ -121,22 +121,14 @@ func (ql *QLearning) getMaxQValue(state string) (Action, float64) {
 	max_q := -1.0                 //math.Inf(-1)
 	bestAction := ContinueTheSame // Do not change direction - default one
 
-	failure := true
-
-	if _, ok := ql.qtable[state]; !ok {
-		panic("getMaxQValue - FAILURE. ql.qtable[something] is NIL")
-	}
+	//qtable[state] can be nil. i.e. a new total state!
+	ql.checkStatePresence(state)
 
 	for action, q := range ql.qtable[state] {
 		if q > max_q {
 			max_q = q
 			bestAction = action
-			failure = false
 		}
-	}
-
-	if failure {
-		panic("getMaxQValue - FAILURE. max-q is undefined")
 	}
 
 	return bestAction, max_q
