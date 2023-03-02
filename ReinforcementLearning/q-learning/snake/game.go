@@ -2,6 +2,7 @@ package snake
 
 import (
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -72,8 +73,12 @@ func (sn *SnakeGame) Reset() {
 }
 
 func (sn *SnakeGame) GetScore() float64 {
+	if sn.GameOver {
+		return -10.0
+	}
+
 	score := float64(sn.ConsumedApples)
-	score += float64(sn.moves_made) * 0.01
+	score += float64(sn.moves_made) * 0.1
 	return score
 }
 
@@ -226,6 +231,9 @@ func (sn *SnakeGame) GetState() string {
 	y := sn.Body[0].Y
 
 	var sb strings.Builder
+
+	// Save current direction
+	sb.WriteString(strconv.Itoa(int(sn.Direction)))
 
 	// is LEFT move illegal
 	sb.WriteString(bool_to_str(Can_move_to(x-1, y)))

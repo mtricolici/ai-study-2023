@@ -10,7 +10,7 @@ import (
 var (
 	alpha      = 0.1 // bigger value means QTable is updated faster
 	gamma      = 0.9
-	epsilon    = 0.3       // how often a RANDOM action is invoked. Example: 0.3 means 30%
+	epsilon    = 1.0       // how often a RANDOM action is invoked. Example: 0.3 means 30%
 	iterations = 1_000_000 // Number of games to train
 )
 
