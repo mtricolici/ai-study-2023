@@ -2,7 +2,6 @@ package ai
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 	"qlsample/snake"
 	"time"
@@ -12,10 +11,13 @@ var (
 	rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
-func NewQLearning(game *snake.SnakeGame) *QLearning {
+func NewQLearning(game *snake.SnakeGame, alpha, gamma, epsilon float64) *QLearning {
 	q := QLearning{
-		qtable: make(QTable),
-		game:   game,
+		qtable:  make(QTable),
+		game:    game,
+		alpha:   alpha,
+		gamma:   gamma,
+		epsilon: epsilon,
 	}
 
 	return &q
@@ -37,7 +39,7 @@ func (ql *QLearning) gameChangeDirection(action Action) {
 	}
 }
 
-func (ql *QLearning) Train(alpha, gamma, epsilon float64, iterations int) {
+func (ql *QLearning) Train(iterations int) {
 	sum_rewards := 0.0
 	max_reward := 0.0
 
@@ -45,14 +47,14 @@ func (ql *QLearning) Train(alpha, gamma, epsilon float64, iterations int) {
 		// Start a new game!
 		ql.game.Reset()
 
-		reward := ql.playRandomGame(alpha, gamma, epsilon)
+		reward := ql.playRandomGame()
 		sum_rewards += reward
 		if max_reward < reward {
 			max_reward = reward
 		}
 
 		// Reduce epsilon over time
-		epsilon *= 0.99
+		ql.epsilon *= 0.99
 
 		if i > 0 && i%(iterations/10) == 0 {
 			progress := float64(i) / float64(iterations) * 100.0
@@ -62,7 +64,7 @@ func (ql *QLearning) Train(alpha, gamma, epsilon float64, iterations int) {
 	}
 }
 
-func (ql *QLearning) playRandomGame(alpha, gamma, epsilon float64) float64 {
+func (ql *QLearning) playRandomGame() float64 {
 	state := ql.game.GetState()
 
 	max_reward := 0.0
@@ -72,7 +74,7 @@ func (ql *QLearning) playRandomGame(alpha, gamma, epsilon float64) float64 {
 
 		ql.checkStatePresence(state)
 
-		if rnd.Float64() < epsilon {
+		if rnd.Float64() < ql.epsilon {
 			action = Action(rnd.Intn(3))
 		} else {
 			action, _ = ql.getMaxQValue(state)
@@ -82,30 +84,49 @@ func (ql *QLearning) playRandomGame(alpha, gamma, epsilon float64) float64 {
 		ql.game.NextTick()
 		reward := ql.game.Score
 
+		newState := ql.game.GetState()
+		ql.checkStatePresence(newState)
+
+		_, maxQ := ql.getMaxQValue(newState)
+
+		ql.updateQValue(state, action, reward, maxQ)
+
+		state = newState
 		if reward > max_reward {
 			max_reward = reward
 		}
-
-		newState := ql.game.GetState()
-		_, maxQ := ql.getMaxQValue(newState)
-		ql.checkStatePresence(newState)
-
-		ql.qtable[state][action] = ql.qtable[state][action] + alpha*(reward+gamma*maxQ-ql.qtable[state][action])
-		state = newState
 	}
 
 	return max_reward
 }
 
+func (ql *QLearning) updateQValue(state string, action Action, reward, maxq float64) {
+	v := ql.qtable[state][action]
+	v += ql.alpha * (reward + ql.gamma*maxq - v)
+
+	ql.qtable[state][action] = v
+}
+
 func (ql *QLearning) getMaxQValue(state string) (Action, float64) {
-	max_q := math.Inf(-1)
+	max_q := -1.0                 //math.Inf(-1)
 	bestAction := ContinueTheSame // Do not change direction - default one
+
+	failure := true
+
+	if _, ok := ql.qtable[state]; !ok {
+		panic("getMaxQValue - FAILURE. ql.qtable[something] is NIL")
+	}
 
 	for action, q := range ql.qtable[state] {
 		if q > max_q {
 			max_q = q
 			bestAction = action
+			failure = false
 		}
+	}
+
+	if failure {
+		panic("getMaxQValue - FAILURE. max-q is undefined")
 	}
 
 	return bestAction, max_q
