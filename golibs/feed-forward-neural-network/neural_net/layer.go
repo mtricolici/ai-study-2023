@@ -1,35 +1,29 @@
 package neural_net
 
 type Layer struct {
-	neurons []*Neuron
+	Neurons   []*Neuron
+	numInputs int
 }
 
 func NewLayer(numNeurons, numInputs int) *Layer {
 	layer := &Layer{
-		neurons: make([]*Neuron, numNeurons),
+		numInputs: numInputs,
+		Neurons:   make([]*Neuron, numNeurons),
 	}
-	for i := range layer.neurons {
-		layer.neurons[i] = NewNeuron(numInputs)
+	for i := range layer.Neurons {
+		layer.Neurons[i] = NewNeuron(numInputs)
 	}
 	return layer
 }
 
 func (l *Layer) Activate(inputs []float64) []float64 {
-	outputs := make([]float64, len(l.neurons))
-	for i, neuron := range l.neurons {
+	if l.numInputs != len(inputs) {
+		panic("layer.activate: bad number of inputs")
+	}
+
+	outputs := make([]float64, len(l.Neurons))
+	for i, neuron := range l.Neurons {
 		outputs[i] = neuron.Activate(inputs)
 	}
 	return outputs
-}
-
-func (l *Layer) CalculateErrors(errors *[]float64, delta []float64) {
-	for i, neuron := range l.neurons {
-		neuron.CalculateError(errors, delta[i])
-	}
-}
-
-func (l *Layer) UpdateWeights(inputs, delta []float64, learningRate float64) {
-	for i, neuron := range l.neurons {
-		neuron.UpdateWeights(inputs, delta[i], learningRate)
-	}
 }

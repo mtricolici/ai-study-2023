@@ -6,8 +6,8 @@ import (
 )
 
 type Neuron struct {
-	weights []float64 // the neuron's weight values
-	bias    float64   // the neuron's bias value
+	Weights []float64
+	Bias    float64
 }
 
 func NewNeuron(numInputs int) *Neuron {
@@ -23,30 +23,14 @@ func NewNeuron(numInputs int) *Neuron {
 }
 
 func (n *Neuron) Activate(inputs []float64) float64 {
-	// Ensure the input length matches the number of weights
-	if len(inputs) != len(n.weights) {
-		panic("number of inputs does not match number of weights")
+	if len(inputs) != len(n.Weights) {
+		panic("neuron.activate error: number of inputs does not match number of weights")
 	}
 
-	// Calculate the weighted sum of inputs and weights
-	sum := n.bias
+	sum := n.Bias
 	for i := range inputs {
-		sum += inputs[i] * n.weights[i]
+		sum += inputs[i] * n.Weights[i]
 	}
 
 	return sigmoid(sum)
-}
-
-func (n *Neuron) CalculateError(errors *[]float64, delta float64) {
-	for i := 0; i < len(n.weights); i++ {
-		(*errors)[i] += delta * n.weights[i]
-	}
-}
-
-func (n *Neuron) UpdateWeights(inputs []float64, delta, learningRate float64) {
-	for i := range n.weights {
-		n.weights[i] += learningRate * delta * inputs[i]
-	}
-
-	n.bias += learningRate * delta
 }
