@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"qlsample/snake"
 	"time"
+
+	"github.com/mtricolici/ai-study-2023/golib-snake/snake"
 )
 
 var (
