@@ -1,7 +1,6 @@
 package ai
 
 import (
-	"MyFeedforwardNeuralNetwork/utils"
 	"math/rand"
 	"time"
 )
@@ -35,7 +34,7 @@ func (n *Neuron) Activate(inputs []float64) float64 {
 		sum += inputs[i] * n.weights[i]
 	}
 
-	return utils.Sigmoid(sum)
+	return sigmoid(sum)
 }
 
 func (n *Neuron) CalculateError(errors *[]float64, delta float64) {

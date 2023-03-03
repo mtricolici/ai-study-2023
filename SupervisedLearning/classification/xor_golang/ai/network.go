@@ -1,7 +1,6 @@
 package ai
 
 import (
-	"MyFeedforwardNeuralNetwork/utils"
 	"log"
 )
 
@@ -66,17 +65,17 @@ func (n *FeedForwardNeuralNetwork) train_input(
 	layer2_outputs := n.layer2.Activate(layer1_outputs)
 
 	// Calculate Errors and deltas
-	layer2_errors := utils.Array_minus_array(target, layer2_outputs)
-	layer2_delta := utils.Calculate_delta(layer2_errors, layer2_outputs)
+	layer2_errors := array_minus_array(target, layer2_outputs)
+	layer2_delta := calculate_delta(layer2_errors, layer2_outputs)
 
 	layer1_errors := make([]float64, len(layer1_outputs))
 	n.layer2.CalculateErrors(&layer1_errors, layer2_delta)
 
-	layer1_delta := utils.Calculate_delta(layer1_errors, layer1_outputs)
+	layer1_delta := calculate_delta(layer1_errors, layer1_outputs)
 
 	// Update weights and bias
 	n.layer2.UpdateWeights(layer1_outputs, layer2_delta, learningRate)
 	n.layer1.UpdateWeights(input, layer1_delta, learningRate)
 
-	return utils.Calcualte_error_sum(layer2_errors)
+	return calcualte_error_sum(layer2_errors)
 }
