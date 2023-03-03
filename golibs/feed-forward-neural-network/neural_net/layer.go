@@ -1,4 +1,4 @@
-package ai
+package neural_net
 
 type Layer struct {
 	neurons []*Neuron

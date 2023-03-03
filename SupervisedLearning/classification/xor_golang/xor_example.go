@@ -1,23 +1,24 @@
 package main
 
 import (
-	"MyFeedforwardNeuralNetwork/ai"
 	"fmt"
 	"log"
+
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_net"
 )
 
 const (
 	inputNeurons         = 2
 	hiddenLayerNeurons   = 5
 	outputNeuronsCount   = 1
-	trainingIterations   = 50000
+	trainingIterations   = 5000
 	trainingStopMaxError = 0.01 // If error is less than this the training stops.
 	learningRate         = 0.07
 )
 
 func main() {
 
-	nn := ai.NewFeedForwardNeuralNetwork(inputNeurons, hiddenLayerNeurons, outputNeuronsCount)
+	nn := neural_net.NewFeedForwardNeuralNetwork(inputNeurons, hiddenLayerNeurons, outputNeuronsCount)
 	log.Println("Training started ...")
 
 	xorSamples := [][]float64{
