@@ -10,7 +10,7 @@ package cimport
 //void draw_objects();
 //void close_window();
 import "C"
-import "github.com/mtricolici/ai-study-2023/golib-snake/snake"
+import "github.com/mtricolici/ai-study-2023/golibs/snake/snake"
 
 func Create_game(size int) {
 	C.create_game(C.int(size))

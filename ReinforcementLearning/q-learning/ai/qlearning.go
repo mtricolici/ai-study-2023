@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/mtricolici/ai-study-2023/golib-snake/snake"
+	"github.com/mtricolici/ai-study-2023/golibs/snake/snake"
 )
 
 var (

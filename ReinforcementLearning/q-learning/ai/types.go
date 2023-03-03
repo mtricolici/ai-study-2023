@@ -1,6 +1,6 @@
 package ai
 
-import "github.com/mtricolici/ai-study-2023/golib-snake/snake"
+import "github.com/mtricolici/ai-study-2023/golibs/snake/snake"
 
 type Action int
 

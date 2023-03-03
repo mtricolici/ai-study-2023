@@ -2,8 +2,8 @@ module qlsample
 
 go 1.20
 
-replace github.com/mtricolici/ai-study-2023/golib-snake => ../../golib-snake
+replace github.com/mtricolici/ai-study-2023/golibs/snake => ../../golibs/snake
 
 require (
-    github.com/mtricolici/ai-study-2023/golib-snake v0.0.0
+    github.com/mtricolici/ai-study-2023/golibs/snake v0.0.0
 )
