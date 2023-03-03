@@ -7,7 +7,7 @@ import (
 	"qlsample/cimport"
 	"time"
 
-	"github.com/mtricolici/ai-study-2023/golibs/snake/snake"
+	"github.com/mtricolici/ai-study-2023/golibs/snake"
 )
 
 func invoke_QLearning(numberOfGamesToPlay int, saveFileName string) {
