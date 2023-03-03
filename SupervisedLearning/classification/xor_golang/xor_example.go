@@ -8,12 +8,6 @@ import (
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_net"
 )
 
-const (
-	inputNeurons       = 2
-	hiddenLayerNeurons = 5
-	outputNeuronsCount = 1
-)
-
 func main() {
 	xorSamples := [][]float64{
 		{0.0, 0.0},
@@ -29,7 +23,7 @@ func main() {
 		{0.0},
 	}
 
-	neuralNetwork := neural_net.NewFeedForwardNeuralNetwork(inputNeurons, hiddenLayerNeurons, outputNeuronsCount)
+	neuralNetwork := neural_net.NewFeedForwardNeuralNetwork([]int{2, 5, 1})
 
 	training := backpropagation.NewBackpropagationTraining(neuralNetwork)
 	training.LearningRate = 0.07

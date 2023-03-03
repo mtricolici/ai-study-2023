@@ -50,26 +50,54 @@ func (t *BackpropagationTraining) train_epoch(
 	return totalError / float64(len(inputs))
 }
 
+func (t *BackpropagationTraining) activate_layers(input []float64) [][]float64 {
+	inp := input
+	result := make([][]float64, len(t.network.Layers))
+
+	for i, l := range t.network.Layers {
+		out := l.Activate(inp)
+		result[i] = out
+		inp = out // output from layer 1 is input for layer 2 ..
+	}
+
+	return result
+}
+
 func (t *BackpropagationTraining) train_input(
 	input []float64, target []float64) float64 {
 
+	lcount := len(t.network.Layers)
+
 	// Forward pass
-	layer1_outputs := t.network.Layer1.Activate(input)
-	layer2_outputs := t.network.Layer2.Activate(layer1_outputs)
+	outputs := t.activate_layers(input)
 
-	// Calculate Errors and deltas for layer2
-	layer2_errors := array_minus_array(target, layer2_outputs)
-	layer2_delta := calculate_delta(layer2_errors, layer2_outputs)
+	// Calculate errors and delta for each layer in reverse order
 
-	// Calculate errors/deltas for layer1
-	layer1_errors := t.calculate_layer_errors(len(layer1_outputs), t.network.Layer2, layer2_delta)
-	layer1_delta := calculate_delta(layer1_errors, layer1_outputs)
+	errors := make([][]float64, len(t.network.Layers))
+	delta := make([][]float64, len(t.network.Layers))
 
-	// Update weights and bias
-	t.update_weights(t.network.Layer2, layer1_outputs, layer2_delta)
-	t.update_weights(t.network.Layer1, input, layer1_delta)
+	for i := lcount - 1; i >= 0; i-- {
+		if i == lcount-1 {
+			// this is the output layer !
+			errors[i] = array_minus_array(target, outputs[i])
+		} else {
+			size := len(outputs[i])
+			errors[i] = t.calculate_layer_errors(size, &t.network.Layers[i+1], delta[i+1])
+		}
 
-	return calcualte_error_sum(layer2_errors)
+		delta[i] = calculate_delta(errors[i], outputs[i])
+	}
+
+	// Update Weights and Biases in reverse order
+	for i := lcount - 1; i >= 0; i-- {
+		if i == 0 {
+			t.update_weights(&t.network.Layers[i], input, delta[i])
+		} else {
+			t.update_weights(&t.network.Layers[i], outputs[i-1], delta[i])
+		}
+	}
+
+	return calcualte_error_sum(errors[lcount-1])
 }
 
 func (t *BackpropagationTraining) calculate_layer_errors(size int, layer *neural_net.Layer, delta []float64) []float64 {

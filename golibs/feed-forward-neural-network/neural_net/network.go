@@ -1,23 +1,33 @@
 package neural_net
 
 type FeedForwardNeuralNetwork struct {
-	//TODO: refactoring - allow multiple hidden layers
-	Layer1 *Layer
-	Layer2 *Layer
+	Layers []Layer
 }
 
-func NewFeedForwardNeuralNetwork(numInput, numHidden, numOutput int) *FeedForwardNeuralNetwork {
-	layer1 := NewLayer(numHidden, numInput)
-	layer2 := NewLayer(numOutput, numHidden)
+func NewFeedForwardNeuralNetwork(neurons []int) *FeedForwardNeuralNetwork {
+	if len(neurons) < 2 {
+		panic("NewFeedForwardNeuralNetwork: at least 1 layer is required (2 arguments - number of inputs and number of outputs)")
+	}
+
+	layers := make([]Layer, len(neurons)-1)
+
+	for i := 0; i < len(neurons)-1; i++ {
+		layers[i] = *NewLayer(neurons[i+1], neurons[i])
+	}
 
 	return &FeedForwardNeuralNetwork{
-		Layer1: layer1,
-		Layer2: layer2,
+		Layers: layers,
 	}
 }
 
 func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
-	layer1_outputs := n.Layer1.Activate(inputs)
-	layer2_outputs := n.Layer2.Activate(layer1_outputs)
-	return layer2_outputs
+	inp := inputs
+	var out []float64
+
+	for _, layer := range n.Layers {
+		out = layer.Activate(inp)
+		inp = out // this 'out' is input for next layer
+	}
+
+	return out
 }
