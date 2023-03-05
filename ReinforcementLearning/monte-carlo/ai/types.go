@@ -33,5 +33,5 @@ type MonteCarlo struct {
 	FinalEpsilon     float64
 	EpsilonDecayRate float64
 
-	max_moves_per_game int
+	max_moves_without_eat int
 }

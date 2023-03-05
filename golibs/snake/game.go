@@ -24,6 +24,7 @@ func (sn *SnakeGame) Reset() {
 	sn.GameOver = false
 	sn.ConsumedApples = 0
 	sn.Moves_made = 0
+	sn.Moves_since_apple = 0
 
 	if sn.random_initial_position {
 		sn.generateRandomSnakeBody()
@@ -110,6 +111,7 @@ func (sn *SnakeGame) generateRandomApple() {
 func (sn *SnakeGame) NextTick() {
 	if !sn.GameOver {
 		sn.Moves_made += 1
+		sn.Moves_since_apple += 1
 
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
@@ -120,6 +122,7 @@ func (sn *SnakeGame) NextTick() {
 			sn.Body = append([]Position{apple}, sn.Body...)
 			sn.ConsumedApples += 1
 			sn.Reward = 10
+			sn.Moves_since_apple = 0
 			sn.generateRandomApple() // Generate a new apple!
 		} else {
 			sn.Reward = sn.CalculateReward(next_x, next_y)
@@ -192,7 +195,7 @@ func (sn *SnakeGame) CalculateReward(next_x, next_y int) float64 {
 
 	// If snake is moving TO apple then a small reward!
 	if next_distance < current_distance {
-		return 1.0
+		return 0.5
 	}
 
 	return 0.0

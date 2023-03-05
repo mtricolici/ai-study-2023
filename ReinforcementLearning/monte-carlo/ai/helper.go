@@ -14,7 +14,7 @@ func (mc *MonteCarlo) calculateEpsilon(episode int) float64 {
 }
 
 func (mc *MonteCarlo) SaveToFile(fileName string) {
-	fmt.Printf("QLearning save to '%s' ...\n", fileName)
+	fmt.Printf("MonteCarlo qtable save to '%s' ...\n", fileName)
 
 	file, err := os.Create(fileName)
 	if err != nil {
@@ -31,7 +31,7 @@ func (mc *MonteCarlo) SaveToFile(fileName string) {
 }
 
 func (mc *MonteCarlo) LoadFromFile(fileName string) {
-	fmt.Printf("QLearning load from '%s' ...\n", fileName)
+	fmt.Printf("MonteCarlo qtable load from '%s' ...\n", fileName)
 
 	file, err := os.Open(fileName)
 	if err != nil {

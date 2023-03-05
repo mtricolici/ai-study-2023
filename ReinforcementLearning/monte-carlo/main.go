@@ -12,7 +12,7 @@ import (
 
 func invoke_MonteCarlo(numberOfGamesToPlay int, saveFileName string) {
 	// train on very small tables 8x8
-	g := snake.NewSnakeGame(8, false)
+	g := snake.NewSnakeGame(10, false)
 	bot := ai.NewMonteCarlo(g)
 
 	fmt.Printf("Training AI for %d games ...\n", numberOfGamesToPlay)

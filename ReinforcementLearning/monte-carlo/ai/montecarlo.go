@@ -15,14 +15,14 @@ var (
 
 func NewMonteCarlo(game *snake.SnakeGame) *MonteCarlo {
 	q := MonteCarlo{
-		qtable:             make(QTable),
-		game:               game,
-		LearningRate:       0.1,
-		DiscountFactor:     0.9,
-		InitialEpsilon:     1.0,
-		FinalEpsilon:       0.1,
-		EpsilonDecayRate:   0.01,
-		max_moves_per_game: 200,
+		qtable:                make(QTable),
+		game:                  game,
+		LearningRate:          0.1,
+		DiscountFactor:        0.9,
+		InitialEpsilon:        1.0,
+		FinalEpsilon:          0.1,
+		EpsilonDecayRate:      0.01,
+		max_moves_without_eat: 100,
 	}
 
 	return &q
@@ -88,7 +88,7 @@ func (mc *MonteCarlo) playRandomGame(epsilon float64) (float64, int) {
 	history := make([]StateActionReward, 0)
 
 	// Play the game until over or max moves
-	for !mc.game.GameOver && mc.game.Moves_made < mc.max_moves_per_game {
+	for !mc.game.GameOver && mc.game.Moves_since_apple < mc.max_moves_without_eat {
 		mc.checkStatePresence(state)
 		action := mc.chooseAction(state, epsilon)
 		reward, nextState := mc.takeAction(action)

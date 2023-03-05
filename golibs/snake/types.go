@@ -24,14 +24,15 @@ const (
 )
 
 type SnakeGame struct {
-	Body           []Position
-	Apple          Position
-	Size           int
-	Direction      Direction
-	GameOver       bool
-	ConsumedApples int
-	Moves_made     int
-	Reward         float64
+	Body              []Position
+	Apple             Position
+	Size              int
+	Direction         Direction
+	GameOver          bool
+	ConsumedApples    int
+	Moves_made        int
+	Moves_since_apple int
+	Reward            float64
 
 	random_initial_position bool
 }
