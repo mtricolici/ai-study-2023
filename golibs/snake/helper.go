@@ -30,3 +30,11 @@ func bool_to_str(b bool) string {
 
 	return "0"
 }
+
+func bool_to_float(b bool) float64 {
+	if b {
+		return 1.0
+	}
+
+	return 0.0
+}

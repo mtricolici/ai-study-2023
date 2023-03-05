@@ -153,6 +153,24 @@ func (sn *SnakeGame) getObjectInFront() (Object, int, int) {
 	panic("getObjectInFront: Unkown direction detected!")
 }
 
+func (sn *SnakeGame) CalculateReward(next_x, next_y int) float64 {
+	x := sn.Body[0].X
+	y := sn.Body[0].Y
+
+	ax := sn.Apple.X
+	ay := sn.Apple.Y
+
+	current_distance := math.Hypot(float64(x-ax), float64(y-ay))
+	next_distance := math.Hypot(float64(next_x-ax), float64(next_y-ay))
+
+	// If snake is moving TO apple then a small reward!
+	if next_distance < current_distance {
+		return 0.5
+	}
+
+	return 0.0
+}
+
 func (sn *SnakeGame) GetState() string {
 	x := sn.Body[0].X
 	y := sn.Body[0].Y
@@ -183,20 +201,34 @@ func (sn *SnakeGame) GetState() string {
 	return sb.String()
 }
 
-func (sn *SnakeGame) CalculateReward(next_x, next_y int) float64 {
+func (sn *SnakeGame) GetStateForNeuralNetwork() []float64 {
 	x := sn.Body[0].X
 	y := sn.Body[0].Y
 
-	ax := sn.Apple.X
-	ay := sn.Apple.Y
+	state := make([]float64, 12)
 
-	current_distance := math.Hypot(float64(x-ax), float64(y-ay))
-	next_distance := math.Hypot(float64(next_x-ax), float64(next_y-ay))
+	state[0] = bool_to_float(sn.Direction == Left)
+	state[1] = bool_to_float(sn.Direction == Right)
+	state[2] = bool_to_float(sn.Direction == Up)
+	state[3] = bool_to_float(sn.Direction == Down)
 
-	// If snake is moving TO apple then a small reward!
-	if next_distance < current_distance {
-		return 0.5
-	}
+	// is LEFT move allowed
+	state[4] = bool_to_float(sn.can_move_to(x-1, y))
+	// is RIGHT move allowed
+	state[5] = bool_to_float(sn.can_move_to(x+1, y))
+	// is UP move allowed
+	state[6] = bool_to_float(sn.can_move_to(x, y-1))
+	// is Down move allowed
+	state[7] = bool_to_float(sn.can_move_to(x, y+1))
 
-	return 0.0
+	// is FOOD on the left
+	state[8] = bool_to_float(x > sn.Apple.X)
+	// is FOOD on the right
+	state[9] = bool_to_float(x < sn.Apple.X)
+	// is FOOD up
+	state[10] = bool_to_float(y > sn.Apple.Y)
+	// is FOOD down
+	state[11] = bool_to_float(y < sn.Apple.Y)
+
+	return state
 }
