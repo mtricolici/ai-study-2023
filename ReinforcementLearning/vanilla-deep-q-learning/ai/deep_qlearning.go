@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/backpropagation"
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_net"
 	"github.com/mtricolici/ai-study-2023/golibs/snake"
 )
@@ -14,6 +15,11 @@ var (
 )
 
 func NewVanillaDeepQLearning(game *snake.SnakeGame, network *neural_net.FeedForwardNeuralNetwork) *VanillaDeepQLearning {
+	game.Reward_apple = 1.0
+	game.Reward_die = -1.0
+	game.Reward_move_to_apple = 0.1
+	game.Reward_move_from_apple = -0.1
+
 	return &VanillaDeepQLearning{
 		network:               network,
 		game:                  game,
@@ -24,7 +30,8 @@ func NewVanillaDeepQLearning(game *snake.SnakeGame, network *neural_net.FeedForw
 		EpsilonDecayRate:      0.01,
 		max_moves_without_eat: 100,
 		// In practice, it is common to use batch sizes in the range of 32 to 256 for Deep Q-learning
-		TrainBatchSize: 32,
+		TrainBatchSize:            32,
+		BackpropagationIterations: 50,
 	}
 }
 
@@ -117,10 +124,31 @@ func (ql *VanillaDeepQLearning) takeAction(action Action) (float64, []float64) {
 }
 
 func (ql *VanillaDeepQLearning) trainNeuralNetwork(replayMemory *ReplayMemory) {
-	samples := replayMemory.Sample(ql.TrainBatchSize)
-	if samples == nil {
+	batch := replayMemory.Sample(ql.TrainBatchSize)
+	if batch == nil {
 		return
 	}
 
-	//TODO: implement training
+	inputs := make([][]float64, ql.TrainBatchSize)
+	targets := make([][]float64, ql.TrainBatchSize)
+
+	// Compute the target Q-values for the batch using the Bellman equation
+	for i, sample := range batch {
+		inputs[i] = sample.state
+
+		targets[i] = ql.network.Predict(sample.state)
+
+		if sample.done {
+			targets[i][int(sample.action)] = sample.reward
+		} else {
+			nextStateMax := args_max(ql.network.Predict(sample.newState))
+			targets[i][int(sample.action)] = sample.reward + ql.DiscountFactor*nextStateMax
+		}
+	}
+
+	// Train the network via back propagation
+	training := backpropagation.NewBackpropagationTraining(ql.network)
+	training.LearningRate = ql.LearningRate
+	training.StopTrainingMaxAvgError = 0.00001
+	training.Train(inputs, targets, ql.BackpropagationIterations)
 }

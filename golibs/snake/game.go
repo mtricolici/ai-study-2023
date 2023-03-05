@@ -15,6 +15,10 @@ func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 	game := SnakeGame{
 		Size:                    size,
 		random_initial_position: randomPosition,
+		Reward_apple:            10.0,
+		Reward_die:              -10.0,
+		Reward_move_to_apple:    0.5,
+		Reward_move_from_apple:  -0.5,
 	}
 	game.Reset()
 	return &game
@@ -115,13 +119,13 @@ func (sn *SnakeGame) NextTick() {
 
 		nextObj, next_x, next_y := sn.getObjectInFront()
 		if nextObj == Body || nextObj == Border {
-			sn.Reward = -10.0
+			sn.Reward = sn.Reward_die
 			sn.GameOver = true
 		} else if nextObj == Apple {
 			apple := Position{X: next_x, Y: next_y}
 			sn.Body = append([]Position{apple}, sn.Body...)
 			sn.ConsumedApples += 1
-			sn.Reward = 10
+			sn.Reward = sn.Reward_apple
 			sn.Moves_since_apple = 0
 			sn.generateRandomApple() // Generate a new apple!
 		} else {
@@ -165,10 +169,10 @@ func (sn *SnakeGame) CalculateReward(next_x, next_y int) float64 {
 
 	// If snake is moving TO apple then a small reward!
 	if next_distance < current_distance {
-		return 0.5
+		return sn.Reward_move_to_apple
 	}
 
-	return 0.0
+	return sn.Reward_move_from_apple
 }
 
 func (sn *SnakeGame) GetState() string {

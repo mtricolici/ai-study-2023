@@ -30,5 +30,6 @@ type VanillaDeepQLearning struct {
 	FinalEpsilon     float64
 	EpsilonDecayRate float64
 
-	TrainBatchSize int
+	TrainBatchSize            int
+	BackpropagationIterations int
 }

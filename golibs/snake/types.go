@@ -35,4 +35,9 @@ type SnakeGame struct {
 	Reward            float64
 
 	random_initial_position bool
+
+	Reward_apple           float64
+	Reward_die             float64
+	Reward_move_to_apple   float64
+	Reward_move_from_apple float64
 }

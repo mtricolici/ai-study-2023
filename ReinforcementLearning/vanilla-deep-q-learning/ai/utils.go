@@ -11,3 +11,13 @@ func args_max_index(slice []float64) int {
 	}
 	return maxIndex
 }
+
+func args_max(slice []float64) float64 {
+	max := slice[0]
+	for i := 1; i < len(slice); i++ {
+		if slice[i] > max {
+			max = slice[i]
+		}
+	}
+	return max
+}
