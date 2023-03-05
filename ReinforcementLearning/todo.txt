@@ -1,7 +1,6 @@
 to implement:
 
 - The Vanilla Deep Q-Learning algorithm
-- Monte Carlo
 - Actor-Critic Methods
 - Temporal Difference (TD) Learning
 - Deep Deterministic Policy Gradient (DDPG)
