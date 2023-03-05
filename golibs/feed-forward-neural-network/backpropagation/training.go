@@ -10,6 +10,7 @@ type BackpropagationTraining struct {
 	network                 *neural_net.FeedForwardNeuralNetwork
 	LearningRate            float64
 	StopTrainingMaxAvgError float64
+	Verbose                 bool
 }
 
 func NewBackpropagationTraining(network *neural_net.FeedForwardNeuralNetwork) *BackpropagationTraining {
@@ -18,6 +19,7 @@ func NewBackpropagationTraining(network *neural_net.FeedForwardNeuralNetwork) *B
 		network:                 network,
 		LearningRate:            0.1,
 		StopTrainingMaxAvgError: 0.01,
+		Verbose:                 true,
 	}
 }
 
@@ -25,15 +27,22 @@ func (t *BackpropagationTraining) Train(
 	inputs [][]float64, targets [][]float64,
 	numEpochs int) {
 
-	log.Printf("Max Iterations: %d, Stop when avgError < %f\n",
-		numEpochs, t.StopTrainingMaxAvgError)
+	if t.Verbose {
+		log.Printf("Max Iterations: %d, Stop when avgError < %f\n",
+			numEpochs, t.StopTrainingMaxAvgError)
+	}
 
 	for epoch := 0; epoch < numEpochs; epoch++ {
 		avgError := t.train_epoch(inputs, targets)
 
-		log.Printf("Epoch %d of %d, Average Error: %f\n", epoch+1, numEpochs, avgError)
+		if t.Verbose {
+			log.Printf("Epoch %d of %d, Average Error: %f\n", epoch+1, numEpochs, avgError)
+		}
+
 		if avgError < t.StopTrainingMaxAvgError {
-			log.Println("Average error is small enough. Stop training")
+			if t.Verbose {
+				log.Println("Average error is small enough. Stop training")
+			}
 			break
 		}
 	}

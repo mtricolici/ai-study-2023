@@ -13,11 +13,11 @@ import (
 
 func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 	// train on very small tables 8x8
-	g := snake.NewSnakeGame(8, false)
+	g := snake.NewSnakeGame(20, true)
 	inputSize := len(g.GetStateForNeuralNetwork())
 	outputSize := 4 // left, right, up, down
 
-	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 10, 10, outputSize})
+	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 10, outputSize})
 	bot := ai.NewVanillaDeepQLearning(g, network)
 
 	fmt.Printf("Training AI for %d games ...\n", numberOfGamesToPlay)
@@ -30,7 +30,7 @@ func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 
 func play_DemoGame(brainFileLocation string) {
 	// demo on a biggger table ;)
-	g := snake.NewSnakeGame(20, false)
+	g := snake.NewSnakeGame(20, true)
 
 	cimport.Create_game(g.Size)
 	cimport.X_create_window()
@@ -47,7 +47,7 @@ func play_DemoGame(brainFileLocation string) {
 	time.Sleep(1 * time.Second)
 	cimport.X_draw_objects()
 	fmt.Println("Game starts in 10 seconds... prepare video recorder! ;)")
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	for !g.GameOver {
 		bot.PredictAndMakeNextMove()
@@ -59,7 +59,7 @@ func play_DemoGame(brainFileLocation string) {
 	}
 
 	fmt.Println("Game over")
-	time.Sleep(10 * time.Second)
+	time.Sleep(1 * time.Second)
 	cimport.Destroy_game()
 }
 
@@ -77,9 +77,9 @@ func main() {
 
 	switch args[0] {
 	case "train":
-		invoke_DeepQLearning(1_000, "/tmp/deepbrain.zzz")
+		invoke_DeepQLearning(8_000, "/home/boris/temp/deepbrain.zzz")
 	case "demo":
-		play_DemoGame("/tmp/deepbrain.zzz")
+		play_DemoGame("/home/boris/temp/deepbrain.zzz")
 	default:
 		show_usage()
 	}

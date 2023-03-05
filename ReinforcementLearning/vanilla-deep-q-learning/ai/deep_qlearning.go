@@ -49,7 +49,7 @@ func (ql *VanillaDeepQLearning) Train(numEpisodes int) {
 
 	sum_moves_per_game := 0.0
 
-	epsilonDecrement := (ql.FinalEpsilon - ql.InitialEpsilon) / float64(numEpisodes-1)
+	epsilonDecrement := (ql.InitialEpsilon - ql.FinalEpsilon) / float64(numEpisodes-1)
 	epsilon := ql.InitialEpsilon
 
 	replayMemory := NewReplayMemory()
@@ -81,8 +81,8 @@ func (ql *VanillaDeepQLearning) Train(numEpisodes int) {
 			avgApples := sum_apples_eaten / float64(i)
 			avgMoves := sum_moves_per_game / float64(i)
 			progress := float64(i) / float64(numEpisodes) * 100.0
-			fmt.Printf("%.2f%% avgScore: %f, maxScore: %f, max-apples: %d, avg-apples: %f, Avg-Moves: %f\n",
-				progress, avgReward, max_reward, max_apples_eaten, avgApples, avgMoves)
+			fmt.Printf("%.2f%% avgScore: %f, maxScore: %f, max-apples: %d, avg-apples: %f, Avg-Moves: %f, Epsilon: %f\n",
+				progress, avgReward, max_reward, max_apples_eaten, avgApples, avgMoves, epsilon)
 		}
 	}
 
@@ -148,6 +148,7 @@ func (ql *VanillaDeepQLearning) trainNeuralNetwork(replayMemory *ReplayMemory) {
 
 	// Train the network via back propagation
 	training := backpropagation.NewBackpropagationTraining(ql.network)
+	training.Verbose = false
 	training.LearningRate = ql.LearningRate
 	training.StopTrainingMaxAvgError = 0.00001
 	training.Train(inputs, targets, ql.BackpropagationIterations)
