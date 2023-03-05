@@ -69,7 +69,7 @@ func main() {
 
 	switch args[0] {
 	case "train":
-		invoke_MonteCarlo(1_000_000, "/tmp/brain.zzz")
+		invoke_MonteCarlo(5_000_000, "/tmp/brain.zzz")
 	case "demo":
 		play_DemoGame("/tmp/brain.zzz")
 	default:
