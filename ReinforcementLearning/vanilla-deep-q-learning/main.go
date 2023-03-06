@@ -22,7 +22,6 @@ func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 100, outputSize})
 	bot := ai.NewVanillaDeepQLearning(g, network)
 
-	fmt.Printf("Training AI for %d games ...\n", numberOfGamesToPlay)
 	bot.Train(numberOfGamesToPlay)
 
 	fmt.Println("Training finished!")

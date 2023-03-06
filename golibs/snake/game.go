@@ -14,7 +14,7 @@ var (
 func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 	game := SnakeGame{
 		Size:                    size,
-		random_initial_position: randomPosition,
+		Random_initial_position: randomPosition,
 		Reward_apple:            10.0,
 		Reward_die:              -10.0,
 		Reward_move_to_apple:    0.5,
@@ -31,7 +31,7 @@ func (sn *SnakeGame) Reset() {
 	sn.Moves_made = 0
 	sn.Moves_since_apple = 0
 
-	if sn.random_initial_position {
+	if sn.Random_initial_position {
 		sn.generateRandomSnakeBody()
 		sn.generateRandomApple()
 	} else {

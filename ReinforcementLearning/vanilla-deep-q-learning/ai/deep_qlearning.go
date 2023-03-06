@@ -42,6 +42,7 @@ func (ql *VanillaDeepQLearning) PredictAndMakeNextMove() {
 
 func (ql *VanillaDeepQLearning) Train(numEpisodes int) {
 	report := NewProgressReport()
+	report.PrintHeader(ql.game, ql, numEpisodes)
 
 	epsilonDecrement := (ql.InitialEpsilon - ql.FinalEpsilon) / float64(numEpisodes-1)
 	epsilon := ql.InitialEpsilon

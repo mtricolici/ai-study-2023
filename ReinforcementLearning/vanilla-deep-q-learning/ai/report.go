@@ -21,6 +21,15 @@ func NewProgressReport() *ProgressReport {
 	return &ProgressReport{}
 }
 
+func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDeepQLearning, numberOfGames int) {
+	fmt.Printf("== Game -> Size: %dx%d. Random: %v\n", game.Size, game.Size, game.Random_initial_position)
+	fmt.Printf("== Deep Q-Learning -> LrnRate: %f, Discount: %f, BatchSize: %d, BackpropagationIterations: %d\n",
+		learning.LearningRate, learning.DiscountFactor, learning.TrainBatchSize, learning.BackpropagationIterations)
+	fmt.Printf("NeuralNetwork hidden layers: %d\n", len(learning.network.Layers)-1)
+	fmt.Printf("Total games to train: %d\n", numberOfGames)
+	fmt.Println("Deep Q-Learning starting ...")
+}
+
 func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score float64, apples int) {
 
 	rp.sum_moves += game.Moves_made

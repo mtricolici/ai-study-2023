@@ -34,7 +34,7 @@ type SnakeGame struct {
 	Moves_since_apple int
 	Reward            float64
 
-	random_initial_position bool
+	Random_initial_position bool
 	Small_State_for_Neural  bool
 
 	Reward_apple           float64
