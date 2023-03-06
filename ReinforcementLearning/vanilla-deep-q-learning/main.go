@@ -14,10 +14,12 @@ import (
 func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 	// train on very small tables 8x8
 	g := snake.NewSnakeGame(8, true)
+	g.Small_State_for_Neural = false // See FULL board
 	inputSize := len(g.GetStateForNeuralNetwork())
 	outputSize := 4 // left, right, up, down
+	fmt.Printf("NeuralNetwork Input size: %d\n", inputSize)
 
-	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 10, outputSize})
+	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 100, outputSize})
 	bot := ai.NewVanillaDeepQLearning(g, network)
 
 	fmt.Printf("Training AI for %d games ...\n", numberOfGamesToPlay)
@@ -30,15 +32,17 @@ func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 
 func play_DemoGame(brainFileLocation string) {
 	// demo on a biggger table ;)
-	g := snake.NewSnakeGame(20, true)
+	g := snake.NewSnakeGame(8, true)
+	g.Small_State_for_Neural = false // See FULL board
 
 	cimport.Create_game(g.Size)
 	cimport.X_create_window()
 
 	inputSize := len(g.GetStateForNeuralNetwork())
+	fmt.Printf("NeuralNetwork Input size: %d\n", inputSize)
 	outputSize := 4 // left, right, up, down
 
-	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 10, 10, outputSize})
+	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 100, outputSize})
 	bot := ai.NewVanillaDeepQLearning(g, network)
 	bot.LoadFromFile(brainFileLocation)
 
@@ -47,7 +51,7 @@ func play_DemoGame(brainFileLocation string) {
 	time.Sleep(1 * time.Second)
 	cimport.X_draw_objects()
 	fmt.Println("Game starts in 10 seconds... prepare video recorder! ;)")
-	time.Sleep(10 * time.Second)
+	// time.Sleep(10 * time.Second)
 	fmt.Println("Game starts in 3 seconds... prepare video recorder! ;)")
 	time.Sleep(3 * time.Second)
 
@@ -55,7 +59,6 @@ func play_DemoGame(brainFileLocation string) {
 		bot.PredictAndMakeNextMove()
 		cimport.UpdateGameData(g)
 		cimport.X_draw_objects()
-		fmt.Printf("state: '%s'\n", g.GetState())
 		fmt.Printf("Direction: %s Reward: %f\n", g.GetDirectionAsString(), g.Reward)
 		time.Sleep(100 * time.Millisecond)
 	}

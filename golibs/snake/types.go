@@ -35,6 +35,7 @@ type SnakeGame struct {
 	Reward            float64
 
 	random_initial_position bool
+	Small_State_for_Neural  bool
 
 	Reward_apple           float64
 	Reward_die             float64

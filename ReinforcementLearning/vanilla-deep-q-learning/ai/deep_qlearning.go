@@ -75,7 +75,7 @@ func (ql *VanillaDeepQLearning) Train(numEpisodes int) {
 		// decrease epsilon over time
 		epsilon -= epsilonDecrement
 
-		if i > 0 && i%(numEpisodes/5) == 0 {
+		if (i > 0 && i%(numEpisodes/5) == 0) || (i == numEpisodes-1) {
 			avgReward := sum_rewards / float64(i) // Avg Reward for played games
 			avgApples := sum_apples_eaten / float64(i)
 			avgMoves := sum_moves_per_game / float64(i)

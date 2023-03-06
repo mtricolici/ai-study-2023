@@ -19,6 +19,7 @@ func NewSnakeGame(size int, randomPosition bool) *SnakeGame {
 		Reward_die:              -10.0,
 		Reward_move_to_apple:    0.5,
 		Reward_move_from_apple:  -0.5,
+		Small_State_for_Neural:  true,
 	}
 	game.Reset()
 	return &game
@@ -206,6 +207,14 @@ func (sn *SnakeGame) GetState() string {
 }
 
 func (sn *SnakeGame) GetStateForNeuralNetwork() []float64 {
+	if sn.Small_State_for_Neural {
+		return sn.getLimittedViewState()
+	}
+
+	return sn.getFullBoardState()
+}
+
+func (sn *SnakeGame) getLimittedViewState() []float64 {
 	x := sn.Body[0].X
 	y := sn.Body[0].Y
 
@@ -233,6 +242,28 @@ func (sn *SnakeGame) GetStateForNeuralNetwork() []float64 {
 	state[10] = bool_to_float(y > sn.Apple.Y)
 	// is FOOD down
 	state[11] = bool_to_float(y < sn.Apple.Y)
+
+	return state
+}
+
+func (sn *SnakeGame) getFullBoardState() []float64 {
+	// input neurons: each element in Size*Size board + 4 inputs for each direction
+	stateSize := sn.Size*sn.Size + 4
+	state := make([]float64, stateSize)
+
+	for _, b := range sn.Body {
+		idx := b.X*sn.Size + b.Y
+		state[idx] = 0.5 // This is body!
+	}
+
+	appleIndex := sn.Apple.X*sn.Size + sn.Apple.Y
+	state[appleIndex] = 1.0 // this is apple!
+
+	// Direction as 4 inputs
+	state[stateSize-4] = bool_to_float(sn.Direction == Left)
+	state[stateSize-3] = bool_to_float(sn.Direction == Right)
+	state[stateSize-2] = bool_to_float(sn.Direction == Up)
+	state[stateSize-1] = bool_to_float(sn.Direction == Down)
 
 	return state
 }
