@@ -43,18 +43,19 @@ func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score fl
 	}
 }
 
-func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent float64) {
+func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon float64) {
 	if rp.shouldPrintProgress(i, numEpisodes, percent) {
 
 		avgMoves := float64(rp.sum_moves) / float64(i)
 		avgScore := rp.sum_scores / float64(i)
 		avgApples := float64(rp.sum_apples) / float64(i)
 
-		fmt.Printf("%.2f%% - games: %8d. Apples{avg: %f, max: %d}. Moves{avg: %f, max: %d} Score{avg: %f, max: %f}\n",
+		fmt.Printf("%.2f%% - games: %8d. Apples{avg: %f, max: %d}. Moves{avg: %f, max: %d} Score{avg: %f, max: %f}. Randomness: %.4f\n",
 			percent, rp.games_played,
 			avgApples, rp.max_apples,
 			avgMoves, rp.max_moves,
-			avgScore, rp.max_score)
+			avgScore, rp.max_score,
+			epsilon)
 
 		// reset max values for next reporting max calculation
 		rp.max_apples = 0

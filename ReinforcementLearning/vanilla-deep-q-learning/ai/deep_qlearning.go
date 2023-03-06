@@ -60,7 +60,7 @@ func (ql *VanillaDeepQLearning) Train(numEpisodes int) {
 		epsilon -= epsilonDecrement
 
 		// Print progress every 5%
-		report.PrintProgress(i, numEpisodes, 5.0)
+		report.PrintProgress(i, numEpisodes, 5.0, epsilon)
 	}
 
 	fmt.Println("Deep-Q-Learning finished.")
