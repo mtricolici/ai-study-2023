@@ -1,7 +1,8 @@
 package neural_net
 
 type FeedForwardNeuralNetwork struct {
-	Layers []Layer
+	Layers   []Layer
+	Topology []int
 }
 
 func NewFeedForwardNeuralNetwork(neurons []int) *FeedForwardNeuralNetwork {
@@ -16,7 +17,8 @@ func NewFeedForwardNeuralNetwork(neurons []int) *FeedForwardNeuralNetwork {
 	}
 
 	return &FeedForwardNeuralNetwork{
-		Layers: layers,
+		Layers:   layers,
+		Topology: neurons,
 	}
 }
 

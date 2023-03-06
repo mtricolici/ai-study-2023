@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/mtricolici/ai-study-2023/golibs/snake"
 )
@@ -22,12 +23,12 @@ func NewProgressReport() *ProgressReport {
 }
 
 func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDeepQLearning, numberOfGames int) {
-	fmt.Printf("== Game -> Size: %dx%d. Random: %v\n", game.Size, game.Size, game.Random_initial_position)
-	fmt.Printf("== Deep Q-Learning -> LrnRate: %f, Discount: %f, BatchSize: %d, BackpropagationIterations: %d\n",
+	fmt.Printf("== Game\n--> Size: %dx%d. Random: %v\n", game.Size, game.Size, game.Random_initial_position)
+	fmt.Printf("== Deep Q-Learning\n--> LrnRate: %f, Discount: %f, BatchSize: %d, BackpropagationIterations: %d\n",
 		learning.LearningRate, learning.DiscountFactor, learning.TrainBatchSize, learning.BackpropagationIterations)
-	fmt.Printf("NeuralNetwork hidden layers: %d\n", len(learning.network.Layers)-1)
+	fmt.Printf("--> NeuralNetwork Neurons per layer: %v\n", learning.network.Topology)
 	fmt.Printf("Total games to train: %d\n", numberOfGames)
-	fmt.Println("Deep Q-Learning starting ...")
+	log.Println("Deep Q-Learning starting ...")
 }
 
 func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score float64, apples int) {
@@ -58,7 +59,7 @@ func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon flo
 		avgScore := rp.sum_scores / float64(rp.games_per_report)
 		avgApples := float64(rp.sum_apples) / float64(rp.games_per_report)
 
-		fmt.Printf("%.2f%% - games: %8d. Apples{avg: %f, max: %d}. Moves{avg: %f, max: %d} Score{avg: %f, max: %f}. Randomness: %.4f\n",
+		log.Printf("%.2f%% - games: %8d. Apples{avg: %f, max: %d}. Moves{avg: %f, max: %d} Score{avg: %f, max: %f}. Randomness: %.4f\n",
 			percent, rp.games_played,
 			avgApples, rp.max_apples,
 			avgMoves, rp.max_moves,
