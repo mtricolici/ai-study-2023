@@ -26,9 +26,8 @@ type VanillaDeepQLearning struct {
 	// how much the agent values future rewards compared to immediate rewards
 	DiscountFactor float64 // gama
 
-	InitialEpsilon   float64
-	FinalEpsilon     float64
-	EpsilonDecayRate float64
+	InitialEpsilon float64
+	FinalEpsilon   float64
 
 	TrainBatchSize            int
 	BackpropagationIterations int
