@@ -247,8 +247,11 @@ func (sn *SnakeGame) getLimittedViewState() []float64 {
 }
 
 func (sn *SnakeGame) getFullBoardState() []float64 {
-	// input neurons: each element in Size*Size board + 4 inputs for each direction
-	stateSize := sn.Size*sn.Size + 4
+	// input neurons:
+	// Size*Size for each square in board
+	// + 4 inputs for each direction
+	// + 1 input that shows how many moves since last apple
+	stateSize := sn.Size*sn.Size + 5
 	state := make([]float64, stateSize)
 
 	for _, b := range sn.Body {
@@ -260,10 +263,12 @@ func (sn *SnakeGame) getFullBoardState() []float64 {
 	state[appleIndex] = 1.0 // this is apple!
 
 	// Direction as 4 inputs
-	state[stateSize-4] = bool_to_float(sn.Direction == Left)
-	state[stateSize-3] = bool_to_float(sn.Direction == Right)
-	state[stateSize-2] = bool_to_float(sn.Direction == Up)
-	state[stateSize-1] = bool_to_float(sn.Direction == Down)
+	state[stateSize-5] = bool_to_float(sn.Direction == Left)
+	state[stateSize-4] = bool_to_float(sn.Direction == Right)
+	state[stateSize-3] = bool_to_float(sn.Direction == Up)
+	state[stateSize-2] = bool_to_float(sn.Direction == Down)
+
+	state[stateSize-1] = float64(sn.Moves_since_apple) / float64(sn.Size*10)
 
 	return state
 }
