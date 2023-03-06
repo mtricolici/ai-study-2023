@@ -7,16 +7,14 @@ import (
 )
 
 type ProgressReport struct {
-	// Variables per training
-	sum_scores float64
-	sum_apples int
-	sum_moves  int
-
-	// Variables per report
-	max_apples   int
-	max_moves    int
-	max_score    float64
-	games_played int
+	sum_scores       float64
+	sum_apples       int
+	sum_moves        int
+	max_apples       int
+	max_moves        int
+	max_score        float64
+	games_played     int
+	games_per_report int
 }
 
 func NewProgressReport() *ProgressReport {
@@ -29,6 +27,7 @@ func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score fl
 	rp.sum_scores += game_score
 	rp.sum_apples += apples
 	rp.games_played += 1
+	rp.games_per_report += 1
 
 	if rp.max_score < game_score {
 		rp.max_score = game_score
@@ -46,9 +45,9 @@ func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score fl
 func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon float64) {
 	if rp.shouldPrintProgress(i, numEpisodes, percent) {
 
-		avgMoves := float64(rp.sum_moves) / float64(i)
-		avgScore := rp.sum_scores / float64(i)
-		avgApples := float64(rp.sum_apples) / float64(i)
+		avgMoves := float64(rp.sum_moves) / float64(rp.games_per_report)
+		avgScore := rp.sum_scores / float64(rp.games_per_report)
+		avgApples := float64(rp.sum_apples) / float64(rp.games_per_report)
 
 		fmt.Printf("%.2f%% - games: %8d. Apples{avg: %f, max: %d}. Moves{avg: %f, max: %d} Score{avg: %f, max: %f}. Randomness: %.4f\n",
 			percent, rp.games_played,
@@ -57,10 +56,14 @@ func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon flo
 			avgScore, rp.max_score,
 			epsilon)
 
-		// reset max values for next reporting max calculation
+		// reset values for next reporting calculation
 		rp.max_apples = 0
 		rp.max_moves = 0
 		rp.max_score = 0
+		rp.sum_apples = 0
+		rp.sum_moves = 0
+		rp.sum_scores = 0
+		rp.games_per_report = 0
 	}
 }
 
