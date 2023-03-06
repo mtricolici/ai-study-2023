@@ -49,31 +49,19 @@ func (ql *VanillaDeepQLearning) predictNextAction() ([]float64, Action) {
 	return state, Action(idx)
 }
 
-func (ql *VanillaDeepQLearning) gameChangeDirection(action Action, debug bool) {
+func (ql *VanillaDeepQLearning) gameChangeDirection(action Action) {
 	switch action {
 	case TurnLeft:
 		ql.game.ChangeDirection(snake.Left)
-		if debug {
-			fmt.Println("-- predict: turn LEFT")
-		}
 
 	case TurnRight:
 		ql.game.ChangeDirection(snake.Right)
-		if debug {
-			fmt.Println("-- predict: turn RIGHT")
-		}
 
 	case TurnDown:
 		ql.game.ChangeDirection(snake.Down)
-		if debug {
-			fmt.Println("-- predict: turn Down")
-		}
 
 	case TurnUp:
 		ql.game.ChangeDirection(snake.Up)
-		if debug {
-			fmt.Println("-- predict: turn Down")
-		}
 
 	default:
 		panic("predict: UNKNOWN action detected")
