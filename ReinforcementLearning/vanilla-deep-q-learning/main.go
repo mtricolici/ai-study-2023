@@ -25,10 +25,25 @@ func createNetwork(game *snake.SnakeGame) *neural_net.FeedForwardNeuralNetwork {
 	return network
 }
 
-func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
+func invoke_NewDeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 	g := createGame()
 	network := createNetwork(g)
 	bot := ai.NewVanillaDeepQLearning(g, network)
+
+	bot.Train(numberOfGamesToPlay)
+
+	fmt.Println("Training finished!")
+	bot.SaveToFile(saveFileName)
+	fmt.Println("bye bye")
+}
+
+func invoke_ContinueDeepQLearning(numberOfGamesToPlay int, saveFileName string) {
+	g := createGame()
+	network := createNetwork(g)
+	bot := ai.NewVanillaDeepQLearning(g, network)
+	bot.InitialEpsilon = 0.3
+	bot.FinalEpsilon = -0.5
+	bot.LoadFromFile(saveFileName)
 
 	bot.Train(numberOfGamesToPlay)
 
@@ -68,7 +83,7 @@ func play_DemoGame(brainFileLocation string) {
 }
 
 func show_usage() {
-	fmt.Println("Bad argument. Please use 'train' or 'demo' argument")
+	fmt.Println("Bad argument. Please use 'train-new', 'train-continue' or 'demo' argument")
 }
 
 func main() {
@@ -80,8 +95,10 @@ func main() {
 	}
 
 	switch args[0] {
-	case "train":
-		invoke_DeepQLearning(10_000, "/home/boris/temp/deepbrain.zzz")
+	case "train-new":
+		invoke_NewDeepQLearning(10_000, "/home/boris/temp/deepbrain.zzz")
+	case "train-continue":
+		invoke_ContinueDeepQLearning(10_000, "/home/boris/temp/deepbrain.zzz")
 	case "demo":
 		play_DemoGame("/home/boris/temp/deepbrain.zzz")
 	default:

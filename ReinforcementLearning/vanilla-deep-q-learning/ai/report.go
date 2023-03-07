@@ -29,7 +29,8 @@ func NewProgressReport() *ProgressReport {
 	l.SetFlags(0)
 	l.SetPrefix(time.Now().Format("15:04:05 "))
 
-	return &ProgressReport{logger: l}
+	return &ProgressReport{
+		logger: l}
 }
 
 func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDeepQLearning, numberOfGames int) {
@@ -83,11 +84,11 @@ func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon flo
 			randomness = 0.0
 		}
 
-		rp.logger.Printf("%2.0f%% Apples{avg:%7.3f, max:%3d}. Moves{avg:%7.3f, max:%3d} Score{avg:%7.3f, max:%7.3f}. Randomness:%6.2f%%\n",
+		rp.logger.Printf("%2.0f%% Apples{avg:%7.3f, max:%3d, sum:%4d}. Moves{avg:%7.3f, max:%3d, sum:%5d} Score{avg:%7.3f, max:%7.3f, sum:%9.3f}. Randomness:%6.2f%%\n",
 			currentPercent,
-			avgApples, rp.max_apples,
-			avgMoves, rp.max_moves,
-			avgScore, rp.max_score,
+			avgApples, rp.max_apples, rp.sum_apples,
+			avgMoves, rp.max_moves, rp.sum_moves,
+			avgScore, rp.max_score, rp.sum_scores,
 			randomness)
 
 		// reset values for next reporting calculation
