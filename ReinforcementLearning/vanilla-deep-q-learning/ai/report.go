@@ -27,7 +27,6 @@ type ProgressReport struct {
 func NewProgressReport() *ProgressReport {
 	l := log.New(os.Stdout, "", log.LstdFlags)
 	l.SetFlags(0)
-	l.SetPrefix(time.Now().Format("15:04:05 "))
 
 	return &ProgressReport{
 		logger: l}
@@ -83,6 +82,8 @@ func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon flo
 		if epsilon < 0 {
 			randomness = 0.0
 		}
+
+		rp.logger.SetPrefix(time.Now().Format("15:04:05 "))
 
 		rp.logger.Printf("%2.0f%% Apples{avg:%7.3f, max:%3d, sum:%4d}. Moves{avg:%7.3f, max:%3d, sum:%5d} Score{avg:%7.3f, max:%7.3f, sum:%9.3f}. Randomness:%6.2f%%\n",
 			currentPercent,
