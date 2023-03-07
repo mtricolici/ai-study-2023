@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/mtricolici/ai-study-2023/golibs/snake"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 type ProgressReport struct {
@@ -39,7 +41,11 @@ func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDe
 		learning.ReplayCapacity,
 		learning.BackpropagationIterations)
 	fmt.Printf("--> NeuralNetwork Neurons per layer: %v\n", learning.network.Topology)
-	fmt.Printf("Total games to train: %d\n", numberOfGames)
+
+	p := message.NewPrinter(language.English)
+	strNumberOfGames := p.Sprintf("%d", numberOfGames)
+
+	fmt.Printf("Total games to train: %s\n", strNumberOfGames)
 	rp.logger.Println("Deep Q-Learning starting ...")
 }
 
