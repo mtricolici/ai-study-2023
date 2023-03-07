@@ -1,5 +1,7 @@
 package neural_net
 
+import "fmt"
+
 type Layer struct {
 	Neurons   []*Neuron
 	numInputs int
@@ -18,7 +20,8 @@ func NewLayer(numNeurons, numInputs int) *Layer {
 
 func (l *Layer) Activate(inputs []float64) []float64 {
 	if l.numInputs != len(inputs) {
-		panic("layer.activate: bad number of inputs")
+		msg := fmt.Sprintf("layer.activate: bad number of inputs. Expected: %d. Got: %d", l.numInputs, len(inputs))
+		panic(msg)
 	}
 
 	outputs := make([]float64, len(l.Neurons))

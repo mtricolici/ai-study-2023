@@ -32,8 +32,12 @@ func NewProgressReport() *ProgressReport {
 
 func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDeepQLearning, numberOfGames int) {
 	fmt.Printf("== Game\n--> Size: %dx%d. Random: %v\n", game.Size, game.Size, game.Random_initial_position)
-	fmt.Printf("== Deep Q-Learning\n--> LrnRate: %f, Discount: %f, BatchSize: %d, BackpropagationIterations: %d\n",
-		learning.LearningRate, learning.DiscountFactor, learning.TrainBatchSize, learning.BackpropagationIterations)
+	fmt.Printf("== Deep Q-Learning\n--> LrnRate: %f, Discount: %f, BatchSize: %d, ReplayCapacity:%d, BackpropagationIterations: %d\n",
+		learning.LearningRate,
+		learning.DiscountFactor,
+		learning.TrainBatchSize,
+		learning.ReplayCapacity,
+		learning.BackpropagationIterations)
 	fmt.Printf("--> NeuralNetwork Neurons per layer: %v\n", learning.network.Topology)
 	fmt.Printf("Total games to train: %d\n", numberOfGames)
 	rp.logger.Println("Deep Q-Learning starting ...")

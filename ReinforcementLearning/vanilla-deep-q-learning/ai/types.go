@@ -30,5 +30,6 @@ type VanillaDeepQLearning struct {
 	FinalEpsilon   float64
 
 	TrainBatchSize            int
+	ReplayCapacity            int
 	BackpropagationIterations int
 }

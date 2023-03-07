@@ -29,8 +29,9 @@ func NewVanillaDeepQLearning(game *snake.SnakeGame, network *neural_net.FeedForw
 		FinalEpsilon:          -0.5,
 		max_moves_without_eat: game.Size * 4,
 		// In practice, it is common to use batch sizes in the range of 32 to 256 for Deep Q-learning
-		TrainBatchSize:            256,
-		BackpropagationIterations: 1,
+		TrainBatchSize:            100,
+		ReplayCapacity:            1000,
+		BackpropagationIterations: 2,
 	}
 }
 
@@ -47,7 +48,7 @@ func (ql *VanillaDeepQLearning) Train(numEpisodes int) {
 	epsilonDecrement := (ql.InitialEpsilon - ql.FinalEpsilon) / float64(numEpisodes-1)
 	epsilon := ql.InitialEpsilon
 
-	replayMemory := NewReplayMemory()
+	replayMemory := NewReplayMemory(ql.ReplayCapacity)
 
 	for i := 0; i < numEpisodes; i++ {
 		// Start a new game!
@@ -105,8 +106,8 @@ func (ql *VanillaDeepQLearning) takeAction(action Action) (float64, []float64) {
 }
 
 func (ql *VanillaDeepQLearning) trainNeuralNetwork(replayMemory *ReplayMemory) {
-	batch := replayMemory.Sample(ql.TrainBatchSize)
-	if batch == nil {
+	samples := replayMemory.GetRandomSamples(ql.TrainBatchSize)
+	if samples == nil {
 		return
 	}
 
@@ -114,7 +115,7 @@ func (ql *VanillaDeepQLearning) trainNeuralNetwork(replayMemory *ReplayMemory) {
 	targets := make([][]float64, ql.TrainBatchSize)
 
 	// Compute the target Q-values for the batch using the Bellman equation
-	for i, sample := range batch {
+	for i, sample := range samples {
 		inputs[i] = sample.state
 
 		targets[i] = ql.network.Predict(sample.state)

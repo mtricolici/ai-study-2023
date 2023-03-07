@@ -81,7 +81,7 @@ func main() {
 
 	switch args[0] {
 	case "train":
-		invoke_DeepQLearning(5_000, "/home/boris/temp/deepbrain.zzz")
+		invoke_DeepQLearning(10_000, "/home/boris/temp/deepbrain.zzz")
 	case "demo":
 		play_DemoGame("/home/boris/temp/deepbrain.zzz")
 	default:

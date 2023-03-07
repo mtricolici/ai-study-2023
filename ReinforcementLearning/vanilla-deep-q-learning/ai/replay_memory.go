@@ -1,7 +1,5 @@
 package ai
 
-import "math/rand"
-
 type Experience struct {
 	state    []float64
 	action   Action
@@ -11,16 +9,23 @@ type Experience struct {
 }
 
 type ReplayMemory struct {
-	buffer []Experience
+	capacity int
+	buffer   []Experience
 }
 
-func NewReplayMemory() *ReplayMemory {
+func NewReplayMemory(capacity int) *ReplayMemory {
 	return &ReplayMemory{
-		buffer: make([]Experience, 0),
+		capacity: capacity,
+		buffer:   make([]Experience, 0, capacity),
 	}
 }
 
 func (rm *ReplayMemory) Add(state []float64, action Action, reward float64, newState []float64, done bool) {
+	if len(rm.buffer) >= rm.capacity {
+		// buffer is full. Remove oldest element from it!
+		rm.buffer = rm.buffer[1:]
+	}
+
 	rm.buffer = append(rm.buffer, Experience{
 		state:    state,
 		action:   action,
@@ -30,15 +35,24 @@ func (rm *ReplayMemory) Add(state []float64, action Action, reward float64, newS
 	})
 }
 
-func (rm *ReplayMemory) Sample(batchSize int) []Experience {
-	if batchSize > len(rm.buffer) {
+func (rm *ReplayMemory) GetRandomSamples(batchSize int) []Experience {
+	totalNumberOfElements := len(rm.buffer)
+	if batchSize > totalNumberOfElements {
 		return nil
 	}
 
-	indices := rand.Perm(len(rm.buffer))[:batchSize]
-	samples := make([]Experience, batchSize)
-	for i, idx := range indices {
-		samples[i] = rm.buffer[idx]
+	samples := make([]Experience, 0, batchSize)
+
+	selected := make(map[int]bool, totalNumberOfElements)
+
+	for len(samples) < batchSize {
+		// Choose a random index
+		idx := rnd.Intn(len(rm.buffer))
+
+		if !selected[idx] {
+			selected[idx] = true
+			samples = append(samples, rm.buffer[idx])
+		}
 	}
 
 	return samples
