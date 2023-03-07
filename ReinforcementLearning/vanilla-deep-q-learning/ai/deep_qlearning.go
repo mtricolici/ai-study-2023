@@ -26,7 +26,7 @@ func NewVanillaDeepQLearning(game *snake.SnakeGame, network *neural_net.FeedForw
 		LearningRate:          0.1,
 		DiscountFactor:        0.9,
 		InitialEpsilon:        1.0,
-		FinalEpsilon:          0.01,
+		FinalEpsilon:          -0.5,
 		max_moves_without_eat: game.Size * 4,
 		// In practice, it is common to use batch sizes in the range of 32 to 256 for Deep Q-learning
 		TrainBatchSize:            256,

@@ -11,15 +11,23 @@ import (
 	"github.com/mtricolici/ai-study-2023/golibs/snake"
 )
 
-func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
-	// train on very small tables 8x8
+func createGame() *snake.SnakeGame {
 	g := snake.NewSnakeGame(8, true)
 	g.Small_State_for_Neural = false // See FULL board
-	inputSize := len(g.GetStateForNeuralNetwork())
-	outputSize := 4 // left, right, up, down
-	fmt.Printf("NeuralNetwork Input size: %d\n", inputSize)
+	return g
+}
 
-	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 100, outputSize})
+func createNetwork(game *snake.SnakeGame) *neural_net.FeedForwardNeuralNetwork {
+	inputSize := len(game.GetStateForNeuralNetwork())
+	hiddenNeurons := 100
+	outputSize := 4 // left, right, up, down
+	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, hiddenNeurons, outputSize})
+	return network
+}
+
+func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
+	g := createGame()
+	network := createNetwork(g)
 	bot := ai.NewVanillaDeepQLearning(g, network)
 
 	bot.Train(numberOfGamesToPlay)
@@ -30,22 +38,14 @@ func invoke_DeepQLearning(numberOfGamesToPlay int, saveFileName string) {
 }
 
 func play_DemoGame(brainFileLocation string) {
-	// demo on a biggger table ;)
-	g := snake.NewSnakeGame(8, true)
-	g.Small_State_for_Neural = false // See FULL board
+	g := createGame()
+	network := createNetwork(g)
+	bot := ai.NewVanillaDeepQLearning(g, network)
+	bot.LoadFromFile(brainFileLocation)
 
 	cimport.Create_game(g.Size)
 	cimport.X_create_window()
 
-	inputSize := len(g.GetStateForNeuralNetwork())
-	fmt.Printf("NeuralNetwork Input size: %d\n", inputSize)
-	outputSize := 4 // left, right, up, down
-
-	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, 100, outputSize})
-	bot := ai.NewVanillaDeepQLearning(g, network)
-	bot.LoadFromFile(brainFileLocation)
-
-	g.Reset()
 	cimport.UpdateGameData(g)
 	time.Sleep(1 * time.Second)
 	cimport.X_draw_objects()
@@ -81,7 +81,7 @@ func main() {
 
 	switch args[0] {
 	case "train":
-		invoke_DeepQLearning(50_000, "/home/boris/temp/deepbrain.zzz")
+		invoke_DeepQLearning(5_000, "/home/boris/temp/deepbrain.zzz")
 	case "demo":
 		play_DemoGame("/home/boris/temp/deepbrain.zzz")
 	default:

@@ -3,6 +3,9 @@ package ai
 import (
 	"fmt"
 	"log"
+	"math"
+	"os"
+	"time"
 
 	"github.com/mtricolici/ai-study-2023/golibs/snake"
 )
@@ -14,12 +17,17 @@ type ProgressReport struct {
 	max_apples       int
 	max_moves        int
 	max_score        float64
-	games_played     int
 	games_per_report int
+
+	logger *log.Logger
 }
 
 func NewProgressReport() *ProgressReport {
-	return &ProgressReport{}
+	l := log.New(os.Stdout, "", log.LstdFlags)
+	l.SetFlags(0)
+	l.SetPrefix(time.Now().Format("15:04:05 "))
+
+	return &ProgressReport{logger: l}
 }
 
 func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDeepQLearning, numberOfGames int) {
@@ -28,7 +36,7 @@ func (rp *ProgressReport) PrintHeader(game *snake.SnakeGame, learning *VanillaDe
 		learning.LearningRate, learning.DiscountFactor, learning.TrainBatchSize, learning.BackpropagationIterations)
 	fmt.Printf("--> NeuralNetwork Neurons per layer: %v\n", learning.network.Topology)
 	fmt.Printf("Total games to train: %d\n", numberOfGames)
-	log.Println("Deep Q-Learning starting ...")
+	rp.logger.Println("Deep Q-Learning starting ...")
 }
 
 func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score float64, apples int) {
@@ -36,7 +44,6 @@ func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score fl
 	rp.sum_moves += game.Moves_made
 	rp.sum_scores += game_score
 	rp.sum_apples += apples
-	rp.games_played += 1
 	rp.games_per_report += 1
 
 	if rp.max_score < game_score {
@@ -55,16 +62,23 @@ func (rp *ProgressReport) CollectStatistics(game *snake.SnakeGame, game_score fl
 func (rp *ProgressReport) PrintProgress(i, numEpisodes int, percent, epsilon float64) {
 	if rp.shouldPrintProgress(i, numEpisodes, percent) {
 
+		currentPercent := float64(i) / float64(numEpisodes) * 100.0
+
 		avgMoves := float64(rp.sum_moves) / float64(rp.games_per_report)
 		avgScore := rp.sum_scores / float64(rp.games_per_report)
 		avgApples := float64(rp.sum_apples) / float64(rp.games_per_report)
 
-		log.Printf("%.2f%% - games: %8d. Apples{avg: %f, max: %d}. Moves{avg: %f, max: %d} Score{avg: %f, max: %f}. Randomness: %.4f\n",
-			percent, rp.games_played,
+		randomness := epsilon * 100
+		if epsilon < 0 {
+			randomness = 0.0
+		}
+
+		rp.logger.Printf("%2.0f%% Apples{avg:%7.3f, max:%3d}. Moves{avg:%7.3f, max:%3d} Score{avg:%7.3f, max:%7.3f}. Randomness:%6.2f%%\n",
+			currentPercent,
 			avgApples, rp.max_apples,
 			avgMoves, rp.max_moves,
 			avgScore, rp.max_score,
-			epsilon)
+			randomness)
 
 		// reset values for next reporting calculation
 		rp.max_apples = 0
@@ -86,9 +100,7 @@ func (rp *ProgressReport) shouldPrintProgress(i, numEpisodes int, percent float6
 		return true
 	}
 
-	threshold := percent / 100.0
-	prevProp := float64(i-1) / float64(numEpisodes)
-	currentProp := float64(i) / float64(numEpisodes)
+	currentPercent := float64(i) / float64(numEpisodes) * 100.0
 
-	return currentProp >= threshold && prevProp < threshold
+	return math.Mod(currentPercent, percent) == 0
 }
