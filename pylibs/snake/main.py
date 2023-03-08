@@ -57,7 +57,8 @@ def draw(screen: Surface, game: SnakeGame):
     draw_text(screen, f"moves:{game.moves_made}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+25))
     draw_text(screen, f"apples:{game.consumed_apples}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+50))
     draw_text(screen, f"game-over:{game.game_over}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+75))
-    draw_text(screen, f"state:{game.get_state()}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+100))
+    draw_text(screen, f"without-apple:{game.moves_since_apple}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+100))
+    draw_text(screen, f"state:{game.get_state()}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+125))
 
 def handle_key(key, game: SnakeGame):
     if key == pygame.K_UP:
