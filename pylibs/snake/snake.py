@@ -147,47 +147,35 @@ class SnakeGame:
 
         return self.reward_move_from_apple
 
-    def _bool_to_float(self, b:bool):
-        if b:
-            return 1.0
-        else:
-            return 0.0
-
-    def _bool_to_str(self, b:bool):
-        if b:
-            return "1"
-        else:
-            return "0"
-
-    
-    def get_state(self):
+    def _get_limited_view_state(self):
         x = self.body[0][0]
         y = self.body[0][1]
-        # is LEFT move allowed
-        state = self._bool_to_str(self._can_move_to(x-1, y))
-        # is RIGHT move allowed
-        state += self._bool_to_str(self._can_move_to(x+1, y))
-        # is UP move allowed
-        state += self._bool_to_str(self._can_move_to(x, y-1))
-        # is DOWN move allowed
-        state += self._bool_to_str(self._can_move_to(x, y+1))
-        # is food on the LEFT
-        state += self._bool_to_str(x > self.apple[0])
-        # is food on the RIGHT
-        state += self._bool_to_str(x < self.apple[0])
-        # is food UP
-        state += self._bool_to_str(y > self.apple[1])
-        # is food DOWN
-        state += self._bool_to_str(y < self.apple[1])
-        return state
+        return [
+            self._can_move_to(x-1, y), # is LEFT move allowed
+            self._can_move_to(x+1, y), # is RIGHT move allowed
+            self._can_move_to(x, y-1), # is UP move allowed
+            self._can_move_to(x, y+1), # is DOWN move allowed
+            x > self.apple[0], # is food on the LEFT
+            x < self.apple[0], # is food on the RIGHT
+            y > self.apple[1], # is food UP
+            y < self.apple[1], # is food DOWN
+            self.direction == Direction.LEFT,
+            self.direction == Direction.RIGHT,
+            self.direction == Direction.UP,
+            self.direction == Direction.DOWN
+        ]
+
+    def get_state(self):
+        return ''.join(['1' if x else '0' for x in self._get_limited_view_state()])
 
     def get_state_for_nn(self):
         if self.small_state_for_neural:
-            return self._get_limited_view_state()
+            return self._get_limited_view_state_as_float_array()
         return self._get_full_board_view_state()
 
-    def _get_limited_view_state(self):
-        raise NotImplementedError()
-    
+    def _get_limited_view_state_as_float_array(self):
+        return [1.0 if x else 0.0 for x in self._get_limited_view_state()]
+
     def _get_full_board_view_state(self):
         raise NotImplementedError()
+
