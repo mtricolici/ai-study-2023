@@ -127,6 +127,10 @@ class SnakeGame:
 
         raise ValueError("SnakeGame._get_object_in_front: Unknown direction detected!")
 
+    def _can_move_to(self, x:int, y:int):
+        obj = self._get_object_at(x, y)
+        return obj == Object.NOTHING or obj == Object.APPLE
+
     def _calculate_reward(self, next_x:int, next_y:int):
         x = self.body[0][0]
         y = self.body[0][1]
@@ -142,9 +146,40 @@ class SnakeGame:
             return self.reward_move_to_apple
 
         return self.reward_move_from_apple
+
+    def _bool_to_float(self, b:bool):
+        if b:
+            return 1.0
+        else:
+            return 0.0
+
+    def _bool_to_str(self, b:bool):
+        if b:
+            return "1"
+        else:
+            return "0"
+
     
     def get_state(self):
-        raise NotImplementedError()
+        x = self.body[0][0]
+        y = self.body[0][1]
+        # is LEFT move allowed
+        state = self._bool_to_str(self._can_move_to(x-1, y))
+        # is RIGHT move allowed
+        state += self._bool_to_str(self._can_move_to(x+1, y))
+        # is UP move allowed
+        state += self._bool_to_str(self._can_move_to(x, y-1))
+        # is DOWN move allowed
+        state += self._bool_to_str(self._can_move_to(x, y+1))
+        # is food on the LEFT
+        state += self._bool_to_str(x > self.apple[0])
+        # is food on the RIGHT
+        state += self._bool_to_str(x < self.apple[0])
+        # is food UP
+        state += self._bool_to_str(y > self.apple[1])
+        # is food DOWN
+        state += self._bool_to_str(y < self.apple[1])
+        return state
 
     def get_state_for_nn(self):
         if self.small_state_for_neural:
