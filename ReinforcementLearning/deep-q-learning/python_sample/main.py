@@ -1,0 +1,21 @@
+#!/usr/bin/env python
+import sys
+from demo_game import demo
+
+from training import train, train_continue
+
+def show_usage():
+    print("Usage examples:")
+    print(f" {sys.argv[0]} train -> invokes new training")
+    print(f" {sys.argv[0]} train continue -> loads from file and continue a training")
+    print(f" {sys.argv[0]} demo -> play a demo game")
+
+if __name__ == "__main__":
+    if len(sys.argv) == 2 and sys.argv[1] == "train":
+        train()
+    elif len(sys.argv) == 3 and sys.argv[1] == "train" and sys.argv[2] == "continue":
+        train_continue()
+    elif len(sys.argv) == 2 and sys.argv[1] == "demo":
+        demo()
+    else:
+        show_usage()
