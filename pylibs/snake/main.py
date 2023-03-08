@@ -47,11 +47,11 @@ def draw(screen: Surface, game: SnakeGame):
         if i==0:
             color = HEAD_COLOR
         pygame.draw.rect(screen, color, pygame.Rect(
-            b[0]*dx+offset_x+2, b[1]*dy+offset_y+2, dx-4, dy-4))
+            b[0]*dx+offset_x+2, b[1]*dy+offset_y+2, dx-3, dy-3))
 
     # draw apple
     pygame.draw.rect(screen, APPLE_COLOR, pygame.Rect(
-        game.apple[0]*dx+offset_x+2, game.apple[1]*dy+offset_y+2, dx-4, dy-4))
+        game.apple[0]*dx+offset_x+2, game.apple[1]*dy+offset_y+2, dx-3, dy-3))
     
     draw_text(screen, f"reward:{game.reward}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y))
     draw_text(screen, f"moves:{game.moves_made}", (200, 200, 0), (GAME_SIZE+offset_x + 5, offset_y+25))
