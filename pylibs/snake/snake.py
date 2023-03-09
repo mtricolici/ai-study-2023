@@ -22,7 +22,7 @@ class SnakeGame:
         self.reward_die = -1.0
         self.reward_move_to_apple = 0.1
         self.reward_move_from_apple = -0.2
-        self.small_state_for_neural = False
+        self.small_state_for_neural = True
         self.reward = 0.0
         self.reset()
     
@@ -60,6 +60,30 @@ class SnakeGame:
             for i in range(len(self.body) - 1, 0, -1):
                 self.body[i] = self.body[i-1]
             self.body[0] = (next_x, next_y)
+    
+    def turn_left(self):
+        if self.direction == Direction.LEFT:
+            self.direction = Direction.DOWN
+        elif self.direction == Direction.RIGHT:
+            self.direction = Direction.UP
+        elif self.direction == Direction.UP:
+            self.direction = Direction.LEFT
+        elif self.direction == Direction.DOWN:
+            self.direction = Direction.RIGHT
+        else:
+            raise ValueError("SnakeGame.turn_left BAD direction found")
+
+    def turn_right(self):
+        if self.direction == Direction.LEFT:
+            self.direction = Direction.UP
+        elif self.direction == Direction.RIGHT:
+            self.direction = Direction.DOWN
+        elif self.direction == Direction.UP:
+            self.direction = Direction.RIGHT
+        elif self.direction == Direction.DOWN:
+            self.direction = Direction.LEFT
+        else:
+            raise ValueError("SnakeGame.turn_right BAD direction found")
     
     def _generate_random_snake_body(self):
         mlt = 1
