@@ -54,26 +54,34 @@ class DeepQLearning:
         if len(self.memory) < self.batch_size:
             return
         minibatch = random.sample(self.memory, self.batch_size)
+
+        memory_states = []
+        for state, action, reward, next_state, done in minibatch:
+            memory_states.append(state) # index 0
+            memory_states.append(next_state) # index 1
+
+        predicted = self.model.predict(memory_states, batch_size=self.batch_size*2, verbose=0)
         states, targets = [], []
+        predicted_index = 0
         for state, action, reward, next_state, done in minibatch:
             target = reward
             if not done:
-                next_actions = self._predict(next_state)
+                next_actions = predicted[predicted_index+1] #self._predict(next_state)
                 target = reward + self.discount_factor * np.amax(next_actions)
-            target_f = self._predict(state)
+            target_f = predicted[predicted_index] #self._predict(state)
             target_f[action] = target
             states.append(state)
             targets.append(target_f)
+            predicted_index+=1
 
-        self._train(states, targets)
+        self.model.fit(
+            np.array(states),
+            np.array(targets),
+            batch_size = self.batch_size,
+            epochs=1, verbose=0)
 
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
-
-    def _train(self, states, targets):
-        start_time = time.time()
-        self.model.fit(np.array(states), np.array(targets), epochs=1, verbose=0)
-        print(f"---_train took : {time.time() - start_time:.4f} seconds")
 
     def train_multiple_games(self, num_epochs):
             print(f"Deep Q-Learning started for {num_epochs} games ...")
@@ -81,12 +89,10 @@ class DeepQLearning:
             interval_epochs = num_epochs * percent_interval // 100
 
             for epoch in range(num_epochs):
-                print(f"==== game {epoch} of {num_epochs}")
                 self.game.reset()
                 state = self.game.get_state_for_nn()
                 done = False
                 
-                start_time = time.time()
                 while not done:
                     action = self._act(state)
                     if action == 0:
@@ -100,14 +106,12 @@ class DeepQLearning:
                     done = self.game.game_over
                     self._remember(state, action, reward, next_state, done)
                     state = next_state
-                print(f"---game end : {time.time() - start_time:.4f} seconds")
                 self._replay()
                 self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
                 if epoch % interval_epochs == 0:
                     percent_complete = (epoch / num_epochs) * 100
-                    print(f"Processing {percent_complete:.0f}% complete")
-                
+                    print(f"Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
                 #self.memory = []
 
     def save(self, file_name:str):
