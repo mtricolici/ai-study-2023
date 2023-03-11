@@ -38,9 +38,14 @@ class Statistics:
         avgReward = self.sum_rewards / self.games
         avgMoves = self.sum_moves / self.games
         avgApples = self.sum_apples / self.games
+
+        exp = epsilon*100
+        if exp < 0: # It may be less than 0 - depends of epsilon_decay
+            exp = 0.0
+
         print(f"->apples(max:{self.max_apples}, avg:{avgApples:.3f})"
             f" moves(max:{self.max_moves}, avg:{avgMoves:.3f})"
-            f" reward(max:{self.max_reward}, avg:{avgReward:.3f}). Exploration: {epsilon*100:.0f}%")
+            f" reward(max:{self.max_reward}, avg:{avgReward:.3f}). Exploration: {exp:.0f}%")
         self.games = 0
         self.max_reward = 0.0
         self.sum_rewards = 0.0

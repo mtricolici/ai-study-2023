@@ -88,7 +88,7 @@ class DeepQLearning:
 
     def train_multiple_games(self, num_epochs):
             print(f"Deep Q-Learning started for {num_epochs} games ...")
-            percent_interval = 10
+            percent_interval = 5
             interval_epochs = num_epochs * percent_interval // 100
 
             stats = Statistics(self.game)
