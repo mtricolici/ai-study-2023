@@ -5,6 +5,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
+from ai.stats import Statistics
 
 current = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.abspath(os.path.join(current, "../../../../pylibs/snake")))
@@ -18,7 +19,6 @@ class DeepQLearning:
     def __init__(self, game:SnakeGame):
         self.game = game
         self.state_size = len(game.get_state_for_nn())
-        self.action_size = OUTPUT_SIZE
         self.learning_rate = 0.001
         self.discount_factor = 0.99
         self.epsilon = 1.0
@@ -30,20 +30,21 @@ class DeepQLearning:
         
     def _build_model(self):
         model = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='relu'),
-            tf.keras.layers.Dense(HIDDEN2_SIZE, activation='relu'),
-            tf.keras.layers.Dense(self.action_size, activation='linear')
+            tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='sigmoid'),
+#            tf.keras.layers.Dense(HIDDEN2_SIZE, activation='relu'),
+            tf.keras.layers.Dense(OUTPUT_SIZE, activation='sigmoid')
         ])
         #model.compile(loss='mse', optimizer='adam')
         model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate))
         return model
 
     def _remember(self, state, action, reward, next_state, done):
+        #TODO: remove old games. Keep just last X games (best games)
         self.memory.append((state, action, reward, next_state, done))
     
     def _act(self, state):
         if np.random.rand() <= self.epsilon:
-            return random.randrange(self.action_size)
+            return random.randrange(OUTPUT_SIZE)
         else:
             return np.argmax(self._predict(state))
 
@@ -88,6 +89,8 @@ class DeepQLearning:
             percent_interval = 10
             interval_epochs = num_epochs * percent_interval // 100
 
+            stats = Statistics(self.game)
+
             for epoch in range(num_epochs):
                 self.game.reset()
                 state = self.game.get_state_for_nn()
@@ -106,12 +109,15 @@ class DeepQLearning:
                     done = self.game.game_over
                     self._remember(state, action, reward, next_state, done)
                     state = next_state
+                    stats.collect() # Collect statistics
+
                 self._replay()
                 self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
                 if epoch % interval_epochs == 0:
                     percent_complete = (epoch / num_epochs) * 100
                     print(f"Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
+                    stats.print()
                 #self.memory = []
 
     def save(self, file_name:str):

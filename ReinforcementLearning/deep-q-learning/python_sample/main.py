@@ -2,7 +2,7 @@
 import os
 # https://stackoverflow.com/questions/35911252/disable-tensorflow-debugging-information
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-os.environ["CUDA_VISIBLE_DEVICES"] = "" # use CPU only
+#os.environ["CUDA_VISIBLE_DEVICES"] = "" # use CPU only
 
 import sys
 from demo_game import demo
