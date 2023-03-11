@@ -1,6 +1,7 @@
 
 
 
+import datetime
 import sys
 import os
 
@@ -37,7 +38,8 @@ class Statistics:
     def print_progress(self, epoch:int, num_epochs:int, interval_epochs:int, epsilon:float):
         if epoch > 0 and epoch % interval_epochs == 0:
             percent_complete = (epoch / num_epochs) * 100
-            print(f"==> Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
+            ct = datetime.datetime.now().strftime("%H:%M:%S")
+            print(f"{ct}==> Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
             self._print(epsilon)
 
     def _print(self, epsilon:float):
