@@ -25,21 +25,23 @@ class DeepQLearning:
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
         self.batch_size=32
+        self.max_memory = 1000
         self.memory = []
         self.model = self._build_model()
         
     def _build_model(self):
         model = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='sigmoid'),
+            tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='relu'),
 #            tf.keras.layers.Dense(HIDDEN2_SIZE, activation='relu'),
-            tf.keras.layers.Dense(OUTPUT_SIZE, activation='sigmoid')
+            tf.keras.layers.Dense(OUTPUT_SIZE, activation='relu')
         ])
         #model.compile(loss='mse', optimizer='adam')
         model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate))
         return model
 
     def _remember(self, state, action, reward, next_state, done):
-        #TODO: remove old games. Keep just last X games (best games)
+        if len(self.memory) >= self.max_memory:
+            self.memory.pop(0)
         self.memory.append((state, action, reward, next_state, done))
     
     def _act(self, state):
