@@ -116,10 +116,10 @@ class DeepQLearning:
                 self._replay()
                 self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
 
-                if epoch % interval_epochs == 0:
+                if epoch > 0 and epoch % interval_epochs == 0:
                     percent_complete = (epoch / num_epochs) * 100
                     print(f"Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
-                    stats.print()
+                    stats.print(self.epsilon)
                 #self.memory = []
 
     def save(self, file_name:str):

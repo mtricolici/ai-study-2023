@@ -34,13 +34,13 @@ class Statistics:
         self.sum_apples += self.game.consumed_apples
 
 
-    def print(self):
+    def print(self, epsilon:float):
         avgReward = self.sum_rewards / self.games
         avgMoves = self.sum_moves / self.games
         avgApples = self.sum_apples / self.games
         print(f"->apples(max:{self.max_apples}, avg:{avgApples:.3f})"
             f" moves(max:{self.max_moves}, avg:{avgMoves:.3f})"
-            f" reward(max:{self.max_reward}, avg:{avgReward:.3f})")
+            f" reward(max:{self.max_reward}, avg:{avgReward:.3f}). Exploration: {epsilon*100:.0f}%")
         self.games = 0
         self.max_reward = 0.0
         self.sum_rewards = 0.0
