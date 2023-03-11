@@ -41,8 +41,6 @@ class Statistics:
         print(f"->apples(max:{self.max_apples}, avg:{avgApples:.3f})"
             f" moves(max:{self.max_moves}, avg:{avgMoves:.3f})"
             f" reward(max:{self.max_reward}, avg:{avgReward:.3f})")
-
-        #print(f"->apples(max:{self.max_apples}, avg:{avgApples:.3f}) moves(max:{self.max_moves}, avg:{avgMoves:.3f}) reward(max:{self.max_reward}, avg:{avgReward:.3f})")
         self.games = 0
         self.max_reward = 0.0
         self.sum_rewards = 0.0
