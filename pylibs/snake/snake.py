@@ -24,6 +24,8 @@ class SnakeGame:
         self.reward_move_from_apple = -0.2
         self.small_state_for_neural = True
         self.reward = 0.0
+         # If > 0 then limit number of moves without eating the apple!
+        self.max_moves_without_apple = 0
         self.reset()
     
     # reset - create new game
@@ -56,10 +58,14 @@ class SnakeGame:
             self.moves_since_apple = 0
             self._generate_random_apple()
         else:
-            self.reward = self._calculate_reward(next_x, next_y)
-            for i in range(len(self.body) - 1, 0, -1):
-                self.body[i] = self.body[i-1]
-            self.body[0] = (next_x, next_y)
+            if self.max_moves_without_apple > 0 and self.moves_since_apple > self.max_moves_without_apple:
+                self.game_over = True
+                self.reward = self.reward_die
+            else:
+                self.reward = self._calculate_reward(next_x, next_y)
+                for i in range(len(self.body) - 1, 0, -1):
+                    self.body[i] = self.body[i-1]
+                self.body[0] = (next_x, next_y)
     
     def turn_left(self):
         if self.direction == Direction.LEFT:
