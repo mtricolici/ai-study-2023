@@ -1,10 +1,10 @@
 from os import path
 import random
-import time
 import numpy as np
 import tensorflow as tf
 import sys
 import os
+import gc
 from ai.stats import Statistics
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -27,7 +27,7 @@ class DeepQLearning:
         self.max_memory = 1000
         self.memory = []
         self.model = self._build_model()
-        
+
     def _build_model(self):
         model = tf.keras.models.Sequential([
             tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='sigmoid'),
@@ -81,6 +81,9 @@ class DeepQLearning:
             memory_states.append(next_state) # index 1
 
         predicted = self.model.predict(memory_states, batch_size=self.batch_size*2, verbose=0)
+        memory_states = None
+        _ = gc.collect()
+
         states, targets = [], []
         predicted_index = 0
         for state, action, reward, next_state, done in minibatch:
@@ -99,6 +102,9 @@ class DeepQLearning:
             np.array(targets),
             batch_size = self.batch_size,
             epochs=1, verbose=0)
+        states = None
+        targets = None
+        _ = gc.collect()
 
     def train_multiple_games(self, num_epochs:int, percent_interval:int):
             print(f"Deep Q-Learning started for {num_epochs} games ...")
@@ -139,4 +145,3 @@ class DeepQLearning:
 
     def load(self, file_name:str):
          self.model.load_weights(file_name)
-

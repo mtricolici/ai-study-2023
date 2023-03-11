@@ -29,6 +29,7 @@ def _train(load:bool, size:int, iterations:int, percent_interval:int, saveFileNa
     ai = deep_qlearn.DeepQLearning(game)
     if load:
         ai.load(saveFileName)
+        ai.initial_epsilon = 0.3
     ai.train_multiple_games(iterations, percent_interval)
     print("Training finished!")
 
