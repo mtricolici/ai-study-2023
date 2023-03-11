@@ -4,10 +4,12 @@ set -e
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." >/dev/null 2>&1 && pwd)"
 
 time docker run --gpus all -it \
+  --net=host \
+  -e DISPLAY=unix$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v $repo_dir:/zzz:ro \
   -v $HOME/temp:/output \
   -w /zzz/ReinforcementLearning/deep-q-learning/python_sample/ \
   --rm \
-  -u $(id -u):$(id -g) \
-  tensorflow/tensorflow:latest-gpu \
+  mykerasimage \
   ./main.py $@

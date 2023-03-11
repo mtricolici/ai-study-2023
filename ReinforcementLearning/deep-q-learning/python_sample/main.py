@@ -21,6 +21,6 @@ if __name__ == "__main__":
     elif len(sys.argv) == 3 and sys.argv[1] == "train" and sys.argv[2] == "continue":
         train_continue()
     elif len(sys.argv) == 2 and sys.argv[1] == "demo":
-        demo()
+        demo(20, "/output/deepql.keras.zzz")
     else:
         show_usage()
