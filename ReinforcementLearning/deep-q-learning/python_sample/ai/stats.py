@@ -20,7 +20,8 @@ class Statistics:
         self.games = 0
 
     def collect(self):
-        self.games += 1
+        if self.game.game_over:
+            self.games += 1
 
         if self.game.reward > self.max_reward:
             self.max_reward = self.game.reward
