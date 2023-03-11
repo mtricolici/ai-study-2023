@@ -180,6 +180,11 @@ class SnakeGame:
     def _get_limited_view_state(self):
         x = self.body[0][0]
         y = self.body[0][1]
+
+        moves_left = 1.0
+        if self.max_moves_without_apple > 0:
+            moves_left = 1.0 - self.moves_since_apple / self.max_moves_without_apple
+
         return [
             self._can_move_to(x-1, y), # is LEFT move allowed
             self._can_move_to(x+1, y), # is RIGHT move allowed
@@ -192,7 +197,10 @@ class SnakeGame:
             self.direction == Direction.LEFT,
             self.direction == Direction.RIGHT,
             self.direction == Direction.UP,
-            self.direction == Direction.DOWN
+            self.direction == Direction.DOWN,
+            moves_left # How many moves without apple remains until game over (normalized to 0 - 1)
+            # 1 - means a lot of moves reamains
+            # 0 - means no moves remains it will die on next move if no apple!
         ]
 
     def get_state(self):
