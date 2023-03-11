@@ -27,8 +27,8 @@ def demo(size:int, saveFileName:str):
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.USEREVENT+1:
+                ai.demo_predict_next_direction()
                 game.next_tick()
-                # TODO: ask 'ai' for next action and change direction
                 win.draw()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:

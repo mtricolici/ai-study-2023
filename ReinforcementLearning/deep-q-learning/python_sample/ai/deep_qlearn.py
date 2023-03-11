@@ -53,6 +53,19 @@ class DeepQLearning:
     def _predict(self, state):
         return self.model.predict(np.array([state]), verbose=0)[0]
 
+    def demo_predict_next_direction(self):
+        if self.game.game_over:
+            return
+        state = self.game.get_state_for_nn()
+        action = np.argmax(self._predict(state))
+        self._change_direction(action)
+
+    def _change_direction(self, action:int):
+        if action == 0:
+            self.game.turn_left()
+        elif action == 1:
+            self.game.turn_right()
+
     def _replay(self):
         if len(self.memory) < self.batch_size:
             return
@@ -100,10 +113,7 @@ class DeepQLearning:
                 
                 while not done:
                     action = self._act(state)
-                    if action == 0:
-                        self.game.turn_left()
-                    elif action == 1:
-                        self.game.turn_right()
+                    self._change_direction(self, action)
                     self.game.next_tick()
 
                     next_state = self.game.get_state_for_nn()
