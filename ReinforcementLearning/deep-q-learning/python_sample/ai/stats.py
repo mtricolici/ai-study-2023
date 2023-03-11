@@ -33,8 +33,13 @@ class Statistics:
         self.sum_moves += self.game.moves_made
         self.sum_apples += self.game.consumed_apples
 
+    def print_progress(self, epoch:int, num_epochs:int, interval_epochs:int, epsilon:float):
+        if epoch > 0 and epoch % interval_epochs == 0:
+            percent_complete = (epoch / num_epochs) * 100
+            print(f"==> Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
+            self._print(epsilon)
 
-    def print(self, epsilon:float):
+    def _print(self, epsilon:float):
         avgReward = self.sum_rewards / self.games
         avgMoves = self.sum_moves / self.games
         avgApples = self.sum_apples / self.games

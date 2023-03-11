@@ -13,30 +13,34 @@ from snake import SnakeGame
 
 OUTPUT_SIZE=3 # Turn Left, Keep Forward, Turn Right
 HIDDEN1_SIZE=60 # Number of neurons in hidden layer 1
-HIDDEN2_SIZE=30 # Number of neurons in hidden layer 2
+#HIDDEN2_SIZE=30 # Number of neurons in hidden layer 2
 
 class DeepQLearning:
     def __init__(self, game:SnakeGame):
         self.game = game
         self.state_size = len(game.get_state_for_nn())
-        self.learning_rate = 0.001
+        self.learning_rate = 0.01
         self.discount_factor = 0.99
-        self.epsilon = 1.0
-        self.epsilon_min = 0.01
-        self.epsilon_decay = 0.995
-        self.batch_size=32
+        self.initial_epsilon = 1.0
+        self.final_epsilon = -0.5
+        self.batch_size=64
         self.max_memory = 1000
         self.memory = []
         self.model = self._build_model()
         
     def _build_model(self):
         model = tf.keras.models.Sequential([
-            tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='relu'),
+            tf.keras.layers.Dense(HIDDEN1_SIZE, input_dim=self.state_size, activation='sigmoid'),
 #            tf.keras.layers.Dense(HIDDEN2_SIZE, activation='relu'),
-            tf.keras.layers.Dense(OUTPUT_SIZE, activation='relu')
+            tf.keras.layers.Dense(OUTPUT_SIZE, activation='sigmoid')
         ])
-        #model.compile(loss='mse', optimizer='adam')
-        model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(learning_rate=self.learning_rate))
+
+        #model_optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
+        model_optimizer = tf.keras.optimizers.SGD(learning_rate=self.learning_rate)
+
+        model.compile(loss='binary_crossentropy',
+                      optimizer=model_optimizer,
+                      metrics=['accuracy'])
         return model
 
     def _remember(self, state, action, reward, next_state, done):
@@ -44,8 +48,8 @@ class DeepQLearning:
             self.memory.pop(0)
         self.memory.append((state, action, reward, next_state, done))
     
-    def _act(self, state):
-        if np.random.rand() <= self.epsilon:
+    def _act(self, state, epsilon:float):
+        if np.random.rand() <= epsilon:
             return random.randrange(OUTPUT_SIZE)
         else:
             return np.argmax(self._predict(state))
@@ -96,41 +100,39 @@ class DeepQLearning:
             batch_size = self.batch_size,
             epochs=1, verbose=0)
 
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
-
-    def train_multiple_games(self, num_epochs):
+    def train_multiple_games(self, num_epochs:int, percent_interval:int):
             print(f"Deep Q-Learning started for {num_epochs} games ...")
-            percent_interval = 5
-            interval_epochs = num_epochs * percent_interval // 100
 
             stats = Statistics(self.game)
+            interval_epochs = num_epochs * percent_interval // 100
+
+            epsilonDecrement = (self.initial_epsilon - self.final_epsilon) / num_epochs
+            epsilon = self.initial_epsilon
 
             for epoch in range(num_epochs):
-                self.game.reset()
-                state = self.game.get_state_for_nn()
-                done = False
-                
-                while not done:
-                    action = self._act(state)
-                    self._change_direction(self, action)
-                    self.game.next_tick()
+                self._play_random_game(epsilon, stats)
+                stats.print_progress(epoch, num_epochs, interval_epochs, epsilon)
+                # Decrement epsilon over time
+                epsilon -= epsilonDecrement
 
-                    next_state = self.game.get_state_for_nn()
-                    reward = self.game.reward
-                    done = self.game.game_over
-                    self._remember(state, action, reward, next_state, done)
-                    state = next_state
-                    stats.collect() # Collect statistics
+    def _play_random_game(self, epsilon:float, stats:Statistics):
+        self.game.reset()
+        state = self.game.get_state_for_nn()
+        done = False
 
-                self._replay()
-                self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+        while not done:
+            action = self._act(state, epsilon)
+            self._change_direction(action)
+            self.game.next_tick()
 
-                if epoch > 0 and epoch % interval_epochs == 0:
-                    percent_complete = (epoch / num_epochs) * 100
-                    print(f"Processing {percent_complete:.0f}% complete. {epoch} of {num_epochs} games.")
-                    stats.print(self.epsilon)
-                #self.memory = []
+            next_state = self.game.get_state_for_nn()
+            reward = self.game.reward
+            done = self.game.game_over
+            self._remember(state, action, reward, next_state, done)
+            state = next_state
+            stats.collect() # Collect statistics
+
+        self._replay()
 
     def save(self, file_name:str):
         self.model.save_weights(file_name)

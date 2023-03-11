@@ -17,7 +17,8 @@ def show_usage():
 
 if __name__ == "__main__":
     if len(sys.argv) == 2 and sys.argv[1] == "train":
-        train(8, 1000, "/output/deepql.keras.zzz")
+        train(size=8, iterations=10000, percent_interval=5, saveFileName="/output/deepql.keras.zzz")
+
     elif len(sys.argv) == 3 and sys.argv[1] == "train" and sys.argv[2] == "continue":
         train_continue()
     elif len(sys.argv) == 2 and sys.argv[1] == "demo":
