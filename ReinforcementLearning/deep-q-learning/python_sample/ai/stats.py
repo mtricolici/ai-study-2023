@@ -4,6 +4,7 @@
 import datetime
 import sys
 import os
+import psutil
 
 current = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.abspath(os.path.join(current, "../../../../pylibs/snake")))
@@ -11,6 +12,7 @@ from snake import SnakeGame
 
 class Statistics:
     def __init__(self, game:SnakeGame):
+        self.process = psutil.Process()
         self.game = game
         self.max_reward = 0.0
         self.sum_rewards = 0.0
@@ -53,7 +55,8 @@ class Statistics:
 
         print(f"->apples(max:{self.max_apples}, avg:{avgApples:.3f})"
             f" moves(max:{self.max_moves}, avg:{avgMoves:.3f})"
-            f" reward(max:{self.max_reward}, avg:{avgReward:.3f}). Exploration: {exp:.0f}%")
+            f" reward(max:{self.max_reward}, avg:{avgReward:.3f})."
+            f" Exploration: {exp:.0f}%  MemUsage: {self.get_memory_usage_mb():.2f} MB")
         self.games = 0
         self.max_reward = 0.0
         self.sum_rewards = 0.0
@@ -61,3 +64,8 @@ class Statistics:
         self.sum_moves = 0
         self.max_apples = 0
         self.sum_apples = 0
+
+    def get_memory_usage_mb(self):
+        mem_info = self.process.memory_info()
+        mem_usage_mb = mem_info.rss / (1024 * 1024)
+        return mem_usage_mb

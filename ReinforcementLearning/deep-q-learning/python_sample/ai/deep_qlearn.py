@@ -120,6 +120,9 @@ class DeepQLearning:
                 stats.print_progress(epoch, num_epochs, interval_epochs, epsilon)
                 # Decrement epsilon over time
                 epsilon -= epsilonDecrement
+                if stats.get_memory_usage_mb() >= 8192:
+                    print("Stop the training!!! Consuming more than 8 GB of ram")
+                    break
 
     def _play_random_game(self, epsilon:float, stats:Statistics):
         self.game.reset()
