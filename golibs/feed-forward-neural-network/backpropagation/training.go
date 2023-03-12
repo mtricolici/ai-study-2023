@@ -84,7 +84,7 @@ func (t *BackpropagationTraining) train_input(
 			errors[i] = array_minus_array(target, outputs[i])
 		} else {
 			size := len(outputs[i])
-			errors[i] = t.calculate_layer_errors(size, &t.network.Layers[i+1], delta[i+1])
+			errors[i] = t.calculate_layer_errors(size, t.network.Layers[i+1], delta[i+1])
 		}
 
 		delta[i] = calculate_delta(errors[i], outputs[i])
@@ -93,9 +93,9 @@ func (t *BackpropagationTraining) train_input(
 	// Update Weights and Biases in reverse order
 	for i := lcount - 1; i >= 0; i-- {
 		if i == 0 {
-			t.update_weights(&t.network.Layers[i], input, delta[i])
+			t.update_weights(t.network.Layers[i], input, delta[i])
 		} else {
-			t.update_weights(&t.network.Layers[i], outputs[i-1], delta[i])
+			t.update_weights(t.network.Layers[i], outputs[i-1], delta[i])
 		}
 	}
 

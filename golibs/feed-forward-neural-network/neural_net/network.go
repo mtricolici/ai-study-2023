@@ -1,7 +1,7 @@
 package neural_net
 
 type FeedForwardNeuralNetwork struct {
-	Layers   []Layer
+	Layers   []*Layer
 	Topology []int
 }
 
@@ -10,16 +10,29 @@ func NewFeedForwardNeuralNetwork(neurons []int, randomWeights bool) *FeedForward
 		panic("NewFeedForwardNeuralNetwork: at least 1 layer is required (2 arguments - number of inputs and number of outputs)")
 	}
 
-	layers := make([]Layer, len(neurons)-1)
+	layers := make([]*Layer, len(neurons)-1)
 
 	for i := 0; i < len(neurons)-1; i++ {
-		layers[i] = *NewLayer(neurons[i+1], neurons[i], randomWeights)
+		layers[i] = NewLayer(neurons[i+1], neurons[i], randomWeights)
 	}
 
 	return &FeedForwardNeuralNetwork{
 		Layers:   layers,
 		Topology: neurons,
 	}
+}
+
+func (n *FeedForwardNeuralNetwork) Clone() *FeedForwardNeuralNetwork {
+	network := &FeedForwardNeuralNetwork{
+		Layers:   make([]*Layer, len(n.Layers)),
+		Topology: n.Topology, // No need to copy this. This is suppose to be const
+	}
+
+	for i, layer := range n.Layers {
+		network.Layers[i] = layer.Clone()
+	}
+
+	return network
 }
 
 func (n *FeedForwardNeuralNetwork) RandomizeWeights() {

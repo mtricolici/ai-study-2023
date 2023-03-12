@@ -27,6 +27,13 @@ func NewNeuron(numInputs int, randomWeights bool) *Neuron {
 	return &neuron
 }
 
+func (n *Neuron) Clone() *Neuron {
+	neuron := NewNeuron(len(n.Weights), false)
+	copy(neuron.Weights, n.Weights)
+	neuron.Bias = n.Bias
+	return neuron
+}
+
 func (n *Neuron) RandomizeWeights() {
 	for i := range n.Weights {
 		n.Weights[i] = _rnd.Float64()*2 - 1

@@ -18,6 +18,19 @@ func NewLayer(numNeurons, numInputs int, randomWeights bool) *Layer {
 	return layer
 }
 
+func (l *Layer) Clone() *Layer {
+	layer := &Layer{
+		NumInputs: l.NumInputs,
+		Neurons:   make([]*Neuron, len(l.Neurons)),
+	}
+
+	for i, neuron := range l.Neurons {
+		layer.Neurons[i] = neuron.Clone()
+	}
+
+	return layer
+}
+
 func (l *Layer) RandomizeWeights() {
 	for _, neuron := range l.Neurons {
 		neuron.RandomizeWeights()
