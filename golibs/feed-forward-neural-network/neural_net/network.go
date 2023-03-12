@@ -22,6 +22,12 @@ func NewFeedForwardNeuralNetwork(neurons []int, randomWeights bool) *FeedForward
 	}
 }
 
+func (n *FeedForwardNeuralNetwork) RandomizeWeights() {
+	for _, layer := range n.Layers {
+		layer.RandomizeWeights()
+	}
+}
+
 func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 	inp := inputs
 	var out []float64

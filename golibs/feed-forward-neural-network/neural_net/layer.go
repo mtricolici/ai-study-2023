@@ -18,6 +18,12 @@ func NewLayer(numNeurons, numInputs int, randomWeights bool) *Layer {
 	return layer
 }
 
+func (l *Layer) RandomizeWeights() {
+	for _, neuron := range l.Neurons {
+		neuron.RandomizeWeights()
+	}
+}
+
 func (l *Layer) Activate(inputs []float64) []float64 {
 	if l.NumInputs != len(inputs) {
 		msg := fmt.Sprintf("layer.activate: bad number of inputs. Expected: %d. Got: %d", l.NumInputs, len(inputs))

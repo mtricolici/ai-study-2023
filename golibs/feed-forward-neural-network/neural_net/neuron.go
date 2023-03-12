@@ -15,18 +15,24 @@ type Neuron struct {
 }
 
 func NewNeuron(numInputs int, randomWeights bool) *Neuron {
-	weights := make([]float64, numInputs)
-	bias := 0.0
-
-	if randomWeights {
-		for i := range weights {
-			weights[i] = _rnd.Float64()*2 - 1
-		}
-
-		bias = _rnd.Float64()*0.01 - 0.005
+	neuron := Neuron{
+		Weights: make([]float64, numInputs),
+		Bias:    0.0,
 	}
 
-	return &Neuron{weights, bias}
+	if randomWeights {
+		neuron.RandomizeWeights()
+	}
+
+	return &neuron
+}
+
+func (n *Neuron) RandomizeWeights() {
+	for i := range n.Weights {
+		n.Weights[i] = _rnd.Float64()*2 - 1
+	}
+
+	n.Bias = _rnd.Float64()*0.01 - 0.005
 }
 
 func (n *Neuron) Activate(inputs []float64) float64 {
