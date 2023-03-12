@@ -34,7 +34,7 @@ func (ga *GA) Run(maxGenerations int) {
 		parent1, parent2 := ga.Population.SelectParents()
 
 		// Perform crossover to produce two offspring
-		child1, child2 := ga.Population.Crossover(parent1, parent2)
+		child1, child2 := ga.Population.Crossover(parent1, parent2, ga.CrossoverRate)
 
 		child1.Mutate(ga.MutationRate)
 		child2.Mutate(ga.MutationRate)

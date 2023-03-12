@@ -36,7 +36,12 @@ func (p *Population) SelectParents() (Individual, Individual) {
 }
 
 // Crossover performs a crossover operation between two parents to produce two offspring.
-func (p *Population) Crossover(parent1 Individual, parent2 Individual) (Individual, Individual) {
+func (p *Population) Crossover(parent1 Individual, parent2 Individual, crossoverRate float64) (Individual, Individual) {
+
+	if rand.Float64() > crossoverRate {
+		return parent1, parent2
+	}
+
 	// Randomly choose a crossover point
 	crossoverPoint := rand.Intn(len(parent1.Genes))
 
