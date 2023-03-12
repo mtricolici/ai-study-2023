@@ -1,8 +1,10 @@
 package genetic
 
 type GeneticAlgorithm struct {
-	MutationRate    float64
-	CrossoverRate   float64
+	MutationRate  float64
+	CrossoverRate float64
+	// Number of best individuals to select for breed for next generation
+	NumberOfParents int
 	FitnessFunction GeneticFitnessFunction
 	Population      *Population
 }
@@ -11,6 +13,7 @@ func NewGeneticAlgorithm(populationSize int, topology []int, fitnessFunction Gen
 	return &GeneticAlgorithm{
 		MutationRate:    0.01,
 		CrossoverRate:   0.8,
+		NumberOfParents: 10,
 		FitnessFunction: fitnessFunction,
 		Population:      NewPopulation(populationSize, topology),
 	}
@@ -36,26 +39,11 @@ func (ga *GeneticAlgorithm) Run(maxGenerations int) *Individual {
 
 // Runs a generation and return the best individual in this generation
 func (ga *GeneticAlgorithm) run_generation() *Individual {
-	// Select parents for mating
-	parent1, parent2 := ga.Population.SelectParents()
 
-	// Perform crossover to produce two offspring
-	child1, child2 := ga.Population.Crossover(parent1, parent2, ga.CrossoverRate)
+	parents := ga.Population.SelectBestIndividuals(ga.NumberOfParents)
+	children := ga.Population.Breed(parents, ga.CrossoverRate, ga.MutationRate, ga.FitnessFunction)
 
-	child1.Mutate(ga.MutationRate)
-	child2.Mutate(ga.MutationRate)
-
-	// Evaluate the fitness of the offspring
-	child1.CalculateFitness(ga.FitnessFunction)
-	child2.CalculateFitness(ga.FitnessFunction)
-
-	// Replace the two worst individuals in the population with the two offspring
-	worstIndex1, worstIndex2 := ga.Population.FindWorstIndividuals()
-	ga.Population.ReplaceIndividual(worstIndex1, child1)
-	ga.Population.ReplaceIndividual(worstIndex2, child2)
-
-	// Evaluate the fitness of the updated population
-	//ga.Population.EvaluatePopulation(ga.FitnessFunction)
+	ga.Population.CreateNewPopulation(parents, children)
 
 	// Find the best individual in the current population
 	return ga.Population.FindBestIndividual()

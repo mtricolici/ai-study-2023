@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	populationSize = 100
-	maxGenerations = 500_000
-	topology       = []int{2, 5, 1}
+	populationSize = 200
+	maxGenerations = 200_000
+	topology       = []int{2, 6, 1}
 
 	xorSamples = [][]float64{
 		{0.0, 0.0},
@@ -45,7 +45,7 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 
 func main() {
 	ga := genetic.NewGeneticAlgorithm(populationSize, topology, xorFitnessFunction)
-	ga.MutationRate = 0.5
+	ga.MutationRate = 0.05
 	ga.CrossoverRate = 0.9
 
 	best := ga.Run(maxGenerations).Network

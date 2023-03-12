@@ -28,7 +28,7 @@ func NewProgressReport(maxGenerations int, ga *GeneticAlgorithm) *ProgressReport
 
 func (rp *ProgressReport) PrintHeader() {
 	rp.loggerSetPrefix()
-	rp.logger.Println("Start Genetic Algorithm training")
+	rp.logger.Printf("Start Genetic Algorithm training. Generations: %d\n", rp.maxGenerations)
 	rp.logger.Printf("--> Population: %d, Mutation: %.0f%%, Crossover: %.0f%%",
 		rp.ga.Population.Size,
 		rp.ga.MutationRate*100.0,

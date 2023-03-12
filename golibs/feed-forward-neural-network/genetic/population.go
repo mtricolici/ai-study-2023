@@ -22,7 +22,7 @@ func (p *Population) Evaluate(fitnessFunction GeneticFitnessFunction) {
 	}
 }
 
-func (p *Population) SelectParents() (*Individual, *Individual) {
+func (p *Population) SelectBestIndividuals(numberOfIndividuals int) []*Individual {
 	indexes := make([]int, len(p.Individuals))
 	for i := range indexes {
 		indexes[i] = i
@@ -32,7 +32,12 @@ func (p *Population) SelectParents() (*Individual, *Individual) {
 		return p.Individuals[indexes[i]].Fitness > p.Individuals[indexes[j]].Fitness
 	})
 
-	return p.Individuals[indexes[0]], p.Individuals[indexes[1]]
+	parents := make([]*Individual, numberOfIndividuals)
+	for i := 0; i < numberOfIndividuals; i++ {
+		parents[i] = p.Individuals[indexes[i]]
+	}
+
+	return parents
 }
 
 func (p *Population) FindBestIndividual() *Individual {
@@ -47,38 +52,75 @@ func (p *Population) FindBestIndividual() *Individual {
 	return bestIndividual
 }
 
-func (p *Population) ReplaceIndividual(index int, newIndividual *Individual) {
-	// Replace the individual at the specified index with the new individual
-	p.Individuals[index] = newIndividual
-}
+func (p *Population) Breed(
+	parents []*Individual,
+	crossoverRate float64,
+	mutationRate float64,
+	fitnessFunction GeneticFitnessFunction) []*Individual {
 
-func (p *Population) FindWorstIndividuals() (int, int) {
-	indexes := make([]int, len(p.Individuals))
-	for i := range indexes {
-		indexes[i] = i
+	children := make([]*Individual, 0)
+	for {
+		parent1, parent2 := p.selectRandomParents(parents)
+
+		if _rnd.Float64() >= crossoverRate {
+			parent1 = parent1.Clone()
+			parent2 = parent2.Clone()
+			parent1.Mutate(mutationRate)
+			parent2.Mutate(mutationRate)
+			parent1.CalculateFitness(fitnessFunction)
+			parent2.CalculateFitness(fitnessFunction)
+
+			children = append(children, parent1, parent2)
+		} else {
+			child := p.crossover(parent1, parent2)
+			child.Mutate(mutationRate)
+			child.CalculateFitness(fitnessFunction)
+			children = append(children, child)
+		}
+
+		if len(children) >= p.Size {
+			break
+		}
 	}
 
-	sort.Slice(indexes, func(i, j int) bool {
-		return p.Individuals[indexes[i]].Fitness < p.Individuals[indexes[j]].Fitness
-	})
-
-	return indexes[0], indexes[1]
+	return children
 }
 
-func (p *Population) Crossover(parent1 *Individual, parent2 *Individual, crossoverRate float64) (*Individual, *Individual) {
-	if _rnd.Float64() >= crossoverRate {
-		// Example: if crossOverRate is 0.8 (i.e. 80% chance)
-		// then 20% of cases do not invoke crossover, just return parents as they are
-		return parent1.Clone(), parent2.Clone()
+func (p *Population) selectRandomParents(parents []*Individual) (*Individual, *Individual) {
+	parent1 := parents[_rnd.Intn(len(parents))]
+	parent2 := parents[_rnd.Intn(len(parents))]
+
+	// make sure parents are different
+	for parent2 == parent1 {
+		parent2 = parents[_rnd.Intn(len(parents))]
+	}
+	return parent1, parent2
+}
+
+func (p *Population) CreateNewPopulation(parents []*Individual, children []*Individual) {
+	p.Individuals = make([]*Individual, p.Size)
+
+	// copy best parents to new population
+	for i := 0; i < len(parents); i++ {
+		p.Individuals[i] = parents[i].Clone()
 	}
 
-	child1 := p.breed(parent1, parent2)
-	child2 := p.breed(parent1, parent2)
+	// copy children to new population
+	ind_index := len(parents)
+	child_index := 0
 
-	return child1, child2
+	for {
+		if ind_index >= p.Size {
+			break
+		}
+
+		p.Individuals[ind_index] = children[child_index] // No need to clone new objects
+		ind_index += 1
+		child_index += 1
+	}
 }
 
-func (p *Population) breed(parent1 *Individual, parent2 *Individual) *Individual {
+func (p *Population) crossover(parent1 *Individual, parent2 *Individual) *Individual {
 
 	if !arraysEqual(parent1.Network.Topology, parent2.Network.Topology) {
 		panic("Population:breed - ERROR: parents have different topology!")
