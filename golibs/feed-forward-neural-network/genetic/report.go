@@ -68,7 +68,7 @@ func (rp *ProgressReport) print(generation int, bestIndividual *Individual) {
 
 	rp.loggerSetPrefix()
 
-	rp.logger.Printf("%3.0f%% - generation %7d, Fitness=> best: %.5f, avg:%.5f, min: %.5f",
+	rp.logger.Printf("%3.0f%% - generation %7d, Fitness=> best: %.8f, avg:%.5f, min: %.5f",
 		currentPercent,
 		generation,
 		bestIndividual.Fitness,

@@ -23,14 +23,16 @@ func (p *Population) EvaluatePopulation(fitnessFunction GeneticFitnessFunction) 
 }
 
 func (p *Population) SelectParents() (*Individual, *Individual) {
-	inds := make([]*Individual, len(p.Individuals))
-	copy(inds, p.Individuals)
+	indexes := make([]int, len(p.Individuals))
+	for i := range indexes {
+		indexes[i] = i
+	}
 
-	sort.Slice(inds, func(i, j int) bool {
-		return inds[i].Fitness > inds[j].Fitness
+	sort.Slice(indexes, func(i, j int) bool {
+		return p.Individuals[indexes[i]].Fitness > p.Individuals[indexes[j]].Fitness
 	})
 
-	return inds[0], inds[1]
+	return p.Individuals[indexes[0]], p.Individuals[indexes[1]]
 }
 
 func (p *Population) FindBestIndividual() *Individual {
@@ -51,29 +53,23 @@ func (p *Population) ReplaceIndividual(index int, newIndividual *Individual) {
 }
 
 func (p *Population) FindWorstIndividuals() (int, int) {
-	// Initialize the indices of the two worst individuals to the first two individuals in the population
-	worstIndex1 := 0
-	worstIndex2 := 1
-
-	// Iterate over the remaining individuals in the population
-	for i := 2; i < len(p.Individuals); i++ {
-		// If the current individual has a lower fitness than both of the worst individuals, update the worst indices
-		if p.Individuals[i].Fitness < p.Individuals[worstIndex1].Fitness {
-			worstIndex2 = worstIndex1
-			worstIndex1 = i
-		} else if p.Individuals[i].Fitness < p.Individuals[worstIndex2].Fitness {
-			worstIndex2 = i
-		}
+	indexes := make([]int, len(p.Individuals))
+	for i := range indexes {
+		indexes[i] = i
 	}
 
-	// Return the indices of the two worst individuals
-	return worstIndex1, worstIndex2
+	sort.Slice(indexes, func(i, j int) bool {
+		return p.Individuals[indexes[i]].Fitness < p.Individuals[indexes[j]].Fitness
+	})
+
+	return indexes[0], indexes[1]
 }
 
 func (p *Population) Crossover(parent1 *Individual, parent2 *Individual, crossoverRate float64) (*Individual, *Individual) {
 	if _rnd.Float64() >= crossoverRate {
 		// Example: if crossOverRate is 0.8 (i.e. 80% chance)
 		// then 20% of cases do not invoke crossover, just return parents as they are
+		//TODO: clone parent1 and parent2
 		return parent1, parent2
 	}
 

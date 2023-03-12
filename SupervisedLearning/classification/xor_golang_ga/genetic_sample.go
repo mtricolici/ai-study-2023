@@ -46,6 +46,7 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 func main() {
 	ga := genetic.NewGeneticAlgorithm(populationSize, topology, xorFitnessFunction)
 	ga.MutationRate = 0.5
+	ga.CrossoverRate = 0.9
 
 	best := ga.Run(maxGenerations).Network
 	fmt.Println("\nTraining complete! Let's test the network")
