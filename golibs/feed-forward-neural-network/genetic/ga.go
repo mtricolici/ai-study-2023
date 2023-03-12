@@ -19,18 +19,14 @@ func NewGeneticAlgorithm(populationSize int, topology []int, fitnessFunction Gen
 func (ga *GeneticAlgorithm) Run(maxGenerations int) *Individual {
 	report := NewProgressReport(maxGenerations, ga)
 
-	ga.Population.EvaluatePopulation(ga.FitnessFunction)
+	ga.Population.Evaluate(ga.FitnessFunction)
 
-	bestIndividual := ga.Population.Individuals[0]
+	var bestIndividual *Individual
 
 	report.PrintHeader()
 
 	for generation := 1; generation <= maxGenerations; generation++ {
-		generationBestIndividual := ga.run_generation()
-
-		if generationBestIndividual.Fitness > bestIndividual.Fitness {
-			bestIndividual = generationBestIndividual
-		}
+		bestIndividual = ga.run_generation()
 
 		report.CollectAndPrint(generation, bestIndividual)
 	}

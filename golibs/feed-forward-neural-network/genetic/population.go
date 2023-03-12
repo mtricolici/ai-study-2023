@@ -16,7 +16,7 @@ func NewPopulation(populationSize int, neurons []int) *Population {
 	return &Population{Individuals: individuals, Size: populationSize}
 }
 
-func (p *Population) EvaluatePopulation(fitnessFunction GeneticFitnessFunction) {
+func (p *Population) Evaluate(fitnessFunction GeneticFitnessFunction) {
 	for i := range p.Individuals {
 		p.Individuals[i].CalculateFitness(fitnessFunction)
 	}
