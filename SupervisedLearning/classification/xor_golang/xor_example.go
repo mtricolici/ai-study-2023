@@ -23,7 +23,7 @@ func main() {
 		{0.0},
 	}
 
-	neuralNetwork := neural_net.NewFeedForwardNeuralNetwork([]int{2, 5, 1})
+	neuralNetwork := neural_net.NewFeedForwardNeuralNetwork([]int{2, 5, 1}, true)
 
 	training := backpropagation.NewBackpropagationTraining(neuralNetwork)
 	training.LearningRate = 0.07

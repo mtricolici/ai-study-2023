@@ -27,22 +27,15 @@ func (t *BackpropagationTraining) Train(
 	inputs [][]float64, targets [][]float64,
 	numEpochs int) {
 
-	if t.Verbose {
-		log.Printf("Max Iterations: %d, Stop when avgError < %f\n",
-			numEpochs, t.StopTrainingMaxAvgError)
-	}
+	t.log("Max Iterations: %d, Stop when avgError < %f\n", numEpochs, t.StopTrainingMaxAvgError)
 
 	for epoch := 0; epoch < numEpochs; epoch++ {
 		avgError := t.train_epoch(inputs, targets)
 
-		if t.Verbose {
-			log.Printf("Epoch %d of %d, Average Error: %f\n", epoch+1, numEpochs, avgError)
-		}
+		t.log("Epoch %d of %d, Average Error: %f\n", epoch+1, numEpochs, avgError)
 
 		if avgError < t.StopTrainingMaxAvgError {
-			if t.Verbose {
-				log.Println("Average error is small enough. Stop training")
-			}
+			t.log("Average error is small enough. Stop training")
 			break
 		}
 	}
@@ -129,5 +122,11 @@ func (t *BackpropagationTraining) update_weights(layer *neural_net.Layer, inputs
 		}
 
 		neuron.Bias += t.LearningRate * delta[neuronIndex]
+	}
+}
+
+func (t *BackpropagationTraining) log(message string, args ...any) {
+	if t.Verbose {
+		log.Printf(message, args...)
 	}
 }

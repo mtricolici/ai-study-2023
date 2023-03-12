@@ -5,19 +5,26 @@ import (
 	"time"
 )
 
+var (
+	_rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
+)
+
 type Neuron struct {
 	Weights []float64
 	Bias    float64
 }
 
-func NewNeuron(numInputs int) *Neuron {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+func NewNeuron(numInputs int, randomWeights bool) *Neuron {
 	weights := make([]float64, numInputs)
-	for i := range weights {
-		weights[i] = r.Float64()*2 - 1
-	}
+	bias := 0.0
 
-	bias := r.Float64()*0.01 - 0.005
+	if randomWeights {
+		for i := range weights {
+			weights[i] = _rnd.Float64()*2 - 1
+		}
+
+		bias = _rnd.Float64()*0.01 - 0.005
+	}
 
 	return &Neuron{weights, bias}
 }
