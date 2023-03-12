@@ -21,7 +21,7 @@ func createNetwork(game *snake.SnakeGame) *neural_net.FeedForwardNeuralNetwork {
 	inputSize := len(game.GetStateForNeuralNetwork())
 	hiddenNeurons := 100
 	outputSize := 4 // left, right, up, down
-	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, hiddenNeurons, outputSize})
+	network := neural_net.NewFeedForwardNeuralNetwork([]int{inputSize, hiddenNeurons, outputSize}, true)
 	return network
 }
 

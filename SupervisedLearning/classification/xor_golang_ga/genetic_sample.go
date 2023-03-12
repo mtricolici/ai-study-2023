@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"math"
 
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/genetic"
@@ -10,7 +9,7 @@ import (
 )
 
 var (
-	populationSize = 300
+	populationSize = 100
 	maxGenerations = 500_000
 	topology       = []int{2, 5, 1}
 
@@ -36,7 +35,9 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 		expectedValue := xorLabels[i][0]
 		value := network.Predict(sample)[0]
 
-		fitness += 1.0 - math.Abs(expectedValue-value)
+		diff := math.Abs(expectedValue - value)
+
+		fitness += 1.0 - diff
 	}
 
 	return fitness
@@ -44,11 +45,10 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 
 func main() {
 	ga := genetic.NewGeneticAlgorithm(populationSize, topology, xorFitnessFunction)
-	ga.MutationRate = 0.2
-	log.Println("Start Genetic Algorithm training")
+	ga.MutationRate = 0.5
 
 	best := ga.Run(maxGenerations).Network
-	log.Println("Training complete! Let's test the network")
+	fmt.Println("\nTraining complete! Let's test the network")
 
 	for i, sample := range xorSamples {
 		result := best.Predict(sample)

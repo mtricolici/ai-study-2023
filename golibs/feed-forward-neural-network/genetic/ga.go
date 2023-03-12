@@ -1,7 +1,5 @@
 package genetic
 
-import "fmt"
-
 type GeneticAlgorithm struct {
 	MutationRate    float64
 	CrossoverRate   float64
@@ -19,23 +17,22 @@ func NewGeneticAlgorithm(populationSize int, topology []int, fitnessFunction Gen
 }
 
 func (ga *GeneticAlgorithm) Run(maxGenerations int) *Individual {
+	report := NewProgressReport(maxGenerations, ga)
 
-	// Evaluate the initial population
 	ga.Population.EvaluatePopulation(ga.FitnessFunction)
 
-	// Track the best individual across all generations
 	bestIndividual := ga.Population.Individuals[0]
 
-	// Run the genetic algorithm for the specified number of generations or until convergence
+	report.PrintHeader()
+
 	for generation := 1; generation <= maxGenerations; generation++ {
 		generationBestIndividual := ga.run_generation()
 
-		// Update the best individual across all generations
 		if generationBestIndividual.Fitness > bestIndividual.Fitness {
 			bestIndividual = generationBestIndividual
 		}
 
-		fmt.Printf("generation %d. Best fitness: %f \n", generation, bestIndividual.Fitness)
+		report.CollectAndPrint(generation, bestIndividual)
 	}
 
 	return bestIndividual
