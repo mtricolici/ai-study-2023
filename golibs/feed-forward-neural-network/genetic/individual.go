@@ -25,6 +25,13 @@ func NewIndividual(neurons []int, randomWeights bool) *Individual {
 	}
 }
 
+func (ind *Individual) Clone() *Individual {
+	return &Individual{
+		Network: ind.Network.Clone(),
+		Fitness: ind.Fitness,
+	}
+}
+
 func (ind *Individual) CalculateFitness(fitnessFunction GeneticFitnessFunction) {
 	ind.Fitness = fitnessFunction(ind.Network)
 }

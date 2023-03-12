@@ -7,10 +7,10 @@ type Population struct {
 	Size        int
 }
 
-func NewPopulation(populationSize int, neurons []int, randomWeights bool) *Population {
+func NewPopulation(populationSize int, neurons []int) *Population {
 	individuals := make([]*Individual, populationSize)
 	for i := 0; i < populationSize; i++ {
-		individuals[i] = NewIndividual(neurons, randomWeights)
+		individuals[i] = NewIndividual(neurons, true)
 	}
 
 	return &Population{Individuals: individuals, Size: populationSize}
@@ -69,8 +69,7 @@ func (p *Population) Crossover(parent1 *Individual, parent2 *Individual, crossov
 	if _rnd.Float64() >= crossoverRate {
 		// Example: if crossOverRate is 0.8 (i.e. 80% chance)
 		// then 20% of cases do not invoke crossover, just return parents as they are
-		//TODO: clone parent1 and parent2
-		return parent1, parent2
+		return parent1.Clone(), parent2.Clone()
 	}
 
 	child1 := p.breed(parent1, parent2)

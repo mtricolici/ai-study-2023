@@ -12,7 +12,7 @@ func NewGeneticAlgorithm(populationSize int, topology []int, fitnessFunction Gen
 		MutationRate:    0.01,
 		CrossoverRate:   0.8,
 		FitnessFunction: fitnessFunction,
-		Population:      NewPopulation(populationSize, topology, true),
+		Population:      NewPopulation(populationSize, topology),
 	}
 }
 
