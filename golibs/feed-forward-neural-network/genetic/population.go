@@ -56,7 +56,9 @@ func (p *Population) Breed(
 	parents []*Individual,
 	crossoverRate float64,
 	mutationRate float64,
-	fitnessFunction GeneticFitnessFunction) []*Individual {
+	fitnessFunction GeneticFitnessFunction) ([]*Individual, int) {
+
+	mutations := 0
 
 	children := make([]*Individual, 0)
 	for {
@@ -65,15 +67,15 @@ func (p *Population) Breed(
 		if _rnd.Float64() >= crossoverRate {
 			parent1 = parent1.Clone()
 			parent2 = parent2.Clone()
-			parent1.Mutate(mutationRate)
-			parent2.Mutate(mutationRate)
+			mutations += parent1.Mutate(mutationRate)
+			mutations += parent2.Mutate(mutationRate)
 			parent1.CalculateFitness(fitnessFunction)
 			parent2.CalculateFitness(fitnessFunction)
 
 			children = append(children, parent1, parent2)
 		} else {
 			child := p.crossover(parent1, parent2)
-			child.Mutate(mutationRate)
+			mutations += child.Mutate(mutationRate)
 			child.CalculateFitness(fitnessFunction)
 			children = append(children, child)
 		}
@@ -83,7 +85,8 @@ func (p *Population) Breed(
 		}
 	}
 
-	return children
+	// Return childer and how many individuals were mutated
+	return children, mutations
 }
 
 func (p *Population) selectRandomParents(parents []*Individual) (*Individual, *Individual) {

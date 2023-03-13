@@ -41,6 +41,18 @@ func (n *FeedForwardNeuralNetwork) RandomizeWeights() {
 	}
 }
 
+func (n *FeedForwardNeuralNetwork) WeightsBiasesCount() (int, int) {
+	wc := 0
+	bc := 0
+	for _, layer := range n.Layers {
+		w, b := layer.WeightsBiasesCount()
+		wc += w
+		bc += b
+	}
+
+	return wc, bc
+}
+
 func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 	inp := inputs
 	var out []float64

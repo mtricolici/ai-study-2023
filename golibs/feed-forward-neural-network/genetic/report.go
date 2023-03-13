@@ -8,10 +8,12 @@ import (
 )
 
 type ProgressReport struct {
-	maxGenerations int
-	PrintPercent   float64
-	ga             *GeneticAlgorithm
-	logger         *log.Logger
+	maxGenerations    int
+	PrintPercent      float64
+	total_generations int
+	total_mutations   int
+	ga                *GeneticAlgorithm
+	logger            *log.Logger
 }
 
 func NewProgressReport(maxGenerations int, ga *GeneticAlgorithm) *ProgressReport {
@@ -20,7 +22,7 @@ func NewProgressReport(maxGenerations int, ga *GeneticAlgorithm) *ProgressReport
 
 	return &ProgressReport{
 		maxGenerations: maxGenerations,
-		PrintPercent:   10.0, // Print progress every 10% of generations
+		PrintPercent:   5.0, // Print progress every 5% of generations
 		ga:             ga,
 		logger:         l,
 	}
@@ -29,20 +31,31 @@ func NewProgressReport(maxGenerations int, ga *GeneticAlgorithm) *ProgressReport
 func (rp *ProgressReport) PrintHeader() {
 	rp.loggerSetPrefix()
 	rp.logger.Printf("Start Genetic Algorithm training. Generations: %d\n", rp.maxGenerations)
-	rp.logger.Printf("--> Population: %d, Mutation: %.0f%%, Crossover: %.0f%%",
+	rp.logger.Printf("--> Population: %d, Mutation: %.2f%%, Crossover: %.2f%%",
 		rp.ga.Population.Size,
 		rp.ga.MutationRate*100.0,
 		rp.ga.CrossoverRate*100.0)
+
+	net := rp.ga.Population.Individuals[0].Network
+	wc, bc := net.WeightsBiasesCount()
+
+	rp.logger.Printf("--> Network Topology: %v. Weights: %d, Biases: %d", net.Topology, wc, bc)
+	rp.logger.Printf("--> total weights + biases in population: %d", (wc+bc)*rp.ga.Population.Size)
 }
 
-func (rp *ProgressReport) CollectAndPrint(generation int, bestIndividual *Individual) {
+func (rp *ProgressReport) CollectAndPrint(generation int, bestIndividual *Individual, mutations_count int) {
+	rp.total_generations += 1
+	rp.total_mutations += mutations_count
+
 	if rp.shouldPrintProgress(generation) {
 		rp.print(generation, bestIndividual)
+		rp.total_generations = 0
+		rp.total_mutations = 0
 	}
 }
 
 func (rp *ProgressReport) shouldPrintProgress(generation int) bool {
-	if generation == rp.maxGenerations {
+	if generation == rp.maxGenerations || generation == 1 {
 		return true
 	}
 
@@ -66,14 +79,18 @@ func (rp *ProgressReport) print(generation int, bestIndividual *Individual) {
 
 	fitnessAvg := fitnessSum / float64(len(rp.ga.Population.Individuals))
 
+	total_individuals := rp.total_generations * rp.ga.Population.Size
+	mutationRate := float64(rp.total_mutations) / float64(total_individuals)
+
 	rp.loggerSetPrefix()
 
-	rp.logger.Printf("%3.0f%% - generation %7d, Fitness=> best: %.8f, avg:%.5f, min: %.5f",
+	rp.logger.Printf("%3.0f%% - generation %7d, Fitness=> best: %f, avg:%.5f, min: %.5f. Mutation: %.4f%%",
 		currentPercent,
 		generation,
 		bestIndividual.Fitness,
 		fitnessAvg,
-		fitnessMin)
+		fitnessMin,
+		mutationRate*100.0)
 }
 
 func (rp *ProgressReport) loggerSetPrefix() {

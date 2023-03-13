@@ -36,11 +36,13 @@ func (ind *Individual) CalculateFitness(fitnessFunction GeneticFitnessFunction) 
 	ind.Fitness = fitnessFunction(ind.Network)
 }
 
-func (ind *Individual) Mutate(mutationRate float64) {
+func (ind *Individual) Mutate(mutationRate float64) int {
+	mutations := 0
 	for _, layer := range ind.Network.Layers {
 		for _, neuron := range layer.Neurons {
 			if _rnd.Float64() < mutationRate {
 				// we need to invoke mutation to either one of weights or bias!
+				mutations = 1
 
 				if _rnd.Intn(2) == 1 {
 					neuron.Bias = ind.mutateFloat(neuron.Bias)
@@ -51,6 +53,8 @@ func (ind *Individual) Mutate(mutationRate float64) {
 			}
 		}
 	}
+
+	return mutations
 }
 
 func (ind *Individual) mutateFloat(originalValue float64) float64 {
@@ -58,7 +62,7 @@ func (ind *Individual) mutateFloat(originalValue float64) float64 {
 	mutation := (_rnd.Float64() * 2.0) - 1.0
 
 	// Add a small amount of noise
-	newValue := originalValue + mutation*0.1
+	newValue := originalValue + mutation*0.01
 
 	// Check value to be in range -1 .. 1
 	if newValue > 1.0 {

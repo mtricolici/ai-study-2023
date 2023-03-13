@@ -29,22 +29,23 @@ func (ga *GeneticAlgorithm) Run(maxGenerations int) *Individual {
 	report.PrintHeader()
 
 	for generation := 1; generation <= maxGenerations; generation++ {
-		bestIndividual = ga.run_generation()
+		besti, mutations_count := ga.run_generation()
+		bestIndividual = besti
 
-		report.CollectAndPrint(generation, bestIndividual)
+		report.CollectAndPrint(generation, bestIndividual, mutations_count)
 	}
 
 	return bestIndividual
 }
 
 // Runs a generation and return the best individual in this generation
-func (ga *GeneticAlgorithm) run_generation() *Individual {
+func (ga *GeneticAlgorithm) run_generation() (*Individual, int) {
 
 	parents := ga.Population.SelectBestIndividuals(ga.NumberOfParents)
-	children := ga.Population.Breed(parents, ga.CrossoverRate, ga.MutationRate, ga.FitnessFunction)
+	children, mutations_count := ga.Population.Breed(parents, ga.CrossoverRate, ga.MutationRate, ga.FitnessFunction)
 
 	ga.Population.CreateNewPopulation(parents, children)
 
 	// Find the best individual in the current population
-	return ga.Population.FindBestIndividual()
+	return ga.Population.FindBestIndividual(), mutations_count
 }

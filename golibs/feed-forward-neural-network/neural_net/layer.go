@@ -37,6 +37,16 @@ func (l *Layer) RandomizeWeights() {
 	}
 }
 
+func (l *Layer) WeightsBiasesCount() (int, int) {
+	wc := 0
+	bc := 0
+	for _, neuron := range l.Neurons {
+		wc += len(neuron.Weights)
+		bc += 1 // each neuron has 1 bias
+	}
+	return wc, bc
+}
+
 func (l *Layer) Activate(inputs []float64) []float64 {
 	if l.NumInputs != len(inputs) {
 		msg := fmt.Sprintf("layer.activate: bad number of inputs. Expected: %d. Got: %d", l.NumInputs, len(inputs))

@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	populationSize = 200
-	maxGenerations = 200_000
+	populationSize = 300
+	maxGenerations = 500_000
 	topology       = []int{2, 6, 1}
 
 	xorSamples = [][]float64{
@@ -35,18 +35,19 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 		expectedValue := xorLabels[i][0]
 		value := network.Predict(sample)[0]
 
-		diff := math.Abs(expectedValue - value)
+		diff := math.Abs(expectedValue-value) * 100.0
 
-		fitness += 1.0 - diff
+		fitness += 100.0 - diff
 	}
 
-	return fitness
+	return fitness // math.Pow(1.6, float64(fitness))
 }
 
 func main() {
 	ga := genetic.NewGeneticAlgorithm(populationSize, topology, xorFitnessFunction)
-	ga.MutationRate = 0.05
-	ga.CrossoverRate = 0.9
+	ga.MutationRate = 0.01
+	ga.CrossoverRate = 0.92
+	ga.NumberOfParents = 6
 
 	best := ga.Run(maxGenerations).Network
 	fmt.Println("\nTraining complete! Let's test the network")
