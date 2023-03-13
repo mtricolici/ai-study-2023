@@ -12,6 +12,7 @@ type ProgressReport struct {
 	PrintPercent      float64
 	total_generations int
 	total_mutations   int
+	total_aliens      int
 	ga                *GeneticAlgorithm
 	logger            *log.Logger
 }
@@ -43,14 +44,16 @@ func (rp *ProgressReport) PrintHeader() {
 	rp.logger.Printf("--> total weights + biases in population: %d", (wc+bc)*rp.ga.Population.Size)
 }
 
-func (rp *ProgressReport) CollectAndPrint(generation int, bestIndividual *Individual, mutations_count int) {
+func (rp *ProgressReport) CollectAndPrint(generation int, bestIndividual *Individual, mutations_count int, aliens_count int) {
 	rp.total_generations += 1
 	rp.total_mutations += mutations_count
+	rp.total_aliens += aliens_count
 
 	if rp.shouldPrintProgress(generation) {
 		rp.print(generation, bestIndividual)
 		rp.total_generations = 0
 		rp.total_mutations = 0
+		rp.total_aliens = 0
 	}
 }
 
@@ -81,16 +84,18 @@ func (rp *ProgressReport) print(generation int, bestIndividual *Individual) {
 
 	total_individuals := rp.total_generations * rp.ga.Population.Size
 	mutationRate := float64(rp.total_mutations) / float64(total_individuals)
+	aliensRate := float64(rp.total_aliens) / float64(total_individuals)
 
 	rp.loggerSetPrefix()
 
-	rp.logger.Printf("%3.0f%% - generation %7d, Fitness=> best: %f, avg:%.5f, min: %.5f. Mutation: %.4f%%",
+	rp.logger.Printf("%3.0f%% - generation %7d, Fitness=> best: %f, avg:%.5f, min: %.5f. Mutation: %.2f%%, RandomNew: %.2f%%",
 		currentPercent,
 		generation,
 		bestIndividual.Fitness,
 		fitnessAvg,
 		fitnessMin,
-		mutationRate*100.0)
+		mutationRate*100.0,
+		aliensRate*100.0)
 }
 
 func (rp *ProgressReport) loggerSetPrefix() {

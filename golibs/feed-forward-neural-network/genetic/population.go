@@ -56,9 +56,11 @@ func (p *Population) Breed(
 	parents []*Individual,
 	crossoverRate float64,
 	mutationRate float64,
-	fitnessFunction GeneticFitnessFunction) ([]*Individual, int) {
+	randomInitRate float64,
+	fitnessFunction GeneticFitnessFunction) ([]*Individual, int, int) {
 
 	mutations := 0
+	aliens := 0
 
 	children := make([]*Individual, 0)
 	for {
@@ -80,13 +82,24 @@ func (p *Population) Breed(
 			children = append(children, child)
 		}
 
+		if _rnd.Float64() < randomInitRate {
+			// Generate a totally NEW random individual for next generation
+			alien := parent1.Clone()
+			alien.Network.RandomizeWeights()
+			alien.CalculateFitness(fitnessFunction)
+
+			children = append(children, alien)
+			aliens += 1
+		}
+
 		if len(children) >= p.Size {
 			break
 		}
 	}
 
-	// Return childer and how many individuals were mutated
-	return children, mutations
+	return children,
+		mutations, // how many individuals with mutation
+		aliens // how many totally new individuals
 }
 
 func (p *Population) selectRandomParents(parents []*Individual) (*Individual, *Individual) {
