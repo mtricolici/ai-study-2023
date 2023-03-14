@@ -65,3 +65,12 @@ func (n *Neuron) SetWeights(weights []float64) {
 		n.Weights[i] = weights[i+1]
 	}
 }
+
+func (n *Neuron) GetWeights() []float64 {
+	w := make([]float64, n.GetWeightsCount())
+	w[0] = n.Bias
+	for i := range n.Weights {
+		w[i+1] = n.Weights[i]
+	}
+	return w
+}

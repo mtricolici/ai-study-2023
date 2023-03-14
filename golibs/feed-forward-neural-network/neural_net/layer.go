@@ -76,3 +76,11 @@ func (l *Layer) SetWeights(weights []float64) {
 	}
 
 }
+
+func (l *Layer) GetWeights() []float64 {
+	result := make([]float64, 0)
+	for _, neuron := range l.Neurons {
+		result = append(result, neuron.GetWeights()...)
+	}
+	return result
+}

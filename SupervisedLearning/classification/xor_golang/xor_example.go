@@ -65,4 +65,5 @@ func main() {
 	log.Println("test fitness function:")
 	ff := xorFitnessFunction(neuralNetwork)
 	log.Printf("best fitness: %f", ff)
+	log.Printf("best weights:\n%v", neuralNetwork.GetWeights())
 }

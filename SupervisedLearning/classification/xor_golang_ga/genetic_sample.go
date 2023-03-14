@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	populationSize = 500
+	populationSize = 100
 	maxGenerations = 100_000
-	topology       = []int{2, 6, 1}
+	topology       = []int{2, 5, 1}
 
 	xorSamples = [][]float64{
 		{0.0, 0.0},
@@ -77,4 +77,7 @@ func main() {
 		fmt.Printf("%.0f xor %.0f expected %.0f. Actual: %.2f\n",
 			sample[0], sample[1], xorLabels[i][0], result[0])
 	}
+
+	fmt.Printf("best weights:\n%v\n", bestNetwork.GetWeights())
+	fmt.Printf("best.GetGenes():\n%v\n", best.GetGenes())
 }

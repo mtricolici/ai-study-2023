@@ -75,3 +75,11 @@ func (n *FeedForwardNeuralNetwork) SetWeights(weights []float64) {
 		layer.SetWeights(weights[start:end])
 	}
 }
+
+func (n *FeedForwardNeuralNetwork) GetWeights() []float64 {
+	result := make([]float64, 0)
+	for _, layer := range n.Layers {
+		result = append(result, layer.GetWeights()...)
+	}
+	return result
+}
