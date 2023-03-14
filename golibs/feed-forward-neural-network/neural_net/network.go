@@ -64,5 +64,14 @@ func (n *FeedForwardNeuralNetwork) GetWeightsCount() int {
 }
 
 func (n *FeedForwardNeuralNetwork) SetWeights(weights []float64) {
-	panic("Network.SetWeights() Not implemented")
+	if n.GetWeightsCount() != len(weights) {
+		panic("Network.SetWeights() bad number of weights")
+	}
+
+	for i, layer := range n.Layers {
+		count := layer.GetWeightsCount()
+		start := i * count
+		end := start + count
+		layer.SetWeights(weights[start:end])
+	}
 }
