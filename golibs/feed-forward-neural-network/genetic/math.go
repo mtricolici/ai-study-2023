@@ -8,7 +8,7 @@ import (
 
 func randGaussianDistribution(value float64) float64 {
 	//newValue := rand.NormFloat64()*0.1 + value
-	newValue := utils.CryptoRandomFloat()*0.1 + value
+	newValue := utils.CryptoRandomFloatRange(-1.0, 1.0)*0.1 + value
 
 	if newValue < -1.0 {
 		return -1.0
