@@ -10,7 +10,7 @@ import (
 
 var (
 	populationSize = 300
-	maxGenerations = 500_000
+	maxGenerations = 50_000
 	topology       = []int{2, 5, 1}
 
 	xorSamples = [][]float64{
@@ -34,7 +34,7 @@ func calculateWeightsCountForTopology() int {
 }
 
 func xorFitnessFunction(weights []float64) float64 {
-	fitness := 0.0
+	fitness := 1.0
 
 	network := neural_net.NewFeedForwardNeuralNetwork(topology, false)
 	network.SetWeights(weights)
@@ -43,12 +43,12 @@ func xorFitnessFunction(weights []float64) float64 {
 		expectedValue := xorLabels[i][0]
 		value := network.Predict(sample)[0]
 
-		diff := math.Abs(expectedValue-value) * 100.0
+		diff := math.Abs(expectedValue - value)
 
-		fitness += 100.0 - diff
+		fitness -= diff
 	}
 
-	return fitness // math.Pow(1.6, float64(fitness))
+	return fitness
 }
 
 func main() {
@@ -58,11 +58,13 @@ func main() {
 	ga.TournamentSize = 5
 	ga.CrossoverRate = 0.8
 	ga.MutationRate = 0.01
-	ga.MutateGaussianDistribution = true
-	ga.FitnessThreshold = 9_999_999 //TODO: define this
+	ga.MutateGaussianDistribution = false
+	ga.FitnessThreshold = 1.0 - 0.0001
 	ga.FitnessFunc = xorFitnessFunction
+	ga.MaxGenerations = maxGenerations
+	ga.Report.Percent = 5
 
-	best := ga.Run(maxGenerations)
+	best := ga.Run()
 	fmt.Println("\nTraining complete! Let's test the network")
 
 	bestNetwork := neural_net.NewFeedForwardNeuralNetwork(topology, false)

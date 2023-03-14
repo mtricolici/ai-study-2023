@@ -14,14 +14,18 @@ type GeneticAlgorithm struct {
 	FitnessThreshold           float64
 	FitnessFunc                GeneticFitnessFunc
 	MutateGaussianDistribution bool
-	population                 Population
-	generation                 int
+	Population                 Population
+
+	Generation     int
+	MaxGenerations int
+
+	Report *ProgressReport
 }
 
-func NewGeneticAlgorithm(populationSize, geneLength int) GeneticAlgorithm {
-	return GeneticAlgorithm{
-		population:                 NewPopulation(populationSize, geneLength),
-		generation:                 0,
+func NewGeneticAlgorithm(populationSize, geneLength int) *GeneticAlgorithm {
+	ga := GeneticAlgorithm{
+		Population:                 NewPopulation(populationSize, geneLength),
+		MaxGenerations:             100,
 		Elitism:                    populationSize / 10,
 		TournamentSize:             populationSize / 10,
 		MutationRate:               0.01,
@@ -29,47 +33,55 @@ func NewGeneticAlgorithm(populationSize, geneLength int) GeneticAlgorithm {
 		MutateGaussianDistribution: false,
 		FitnessFunc:                nil,
 	}
+
+	ga.Report = NewReport(&ga)
+	return &ga
 }
 
-func (ga *GeneticAlgorithm) Run(maxGenerations int) Individual {
+func (ga *GeneticAlgorithm) Run() Individual {
 	ga.verifyInputParameters()
 
-	ga.generation = 1
+	ga.Generation = 1
 
-	for ga.generation < maxGenerations {
+	ga.Report.PrintHeader()
+
+	for ga.Generation < ga.MaxGenerations {
 
 		ga.runOneGeneration()
 
-		bestIndividual := ga.population.individuals[0]
+		bestIndividual := ga.Population.Individuals[0]
 		if bestIndividual.GetFitness() >= ga.FitnessThreshold {
 			fmt.Println("best.fitness >= threshold !!! stop genetic evolution ;)")
 			return bestIndividual
 		}
 
-		fmt.Printf("Generation %d best fitness=%f\n", ga.generation, bestIndividual.GetFitness())
+		ga.Report.CollectAndPrint()
+		// fmt.Printf("Generation %d best fitness=%f\n", ga.Generation, bestIndividual.GetFitness())
 
-		ga.generation++
+		ga.Generation++
 	}
 
-	ga.population.Sort()
-	return ga.population.individuals[0]
+	ga.Population.Sort()
+	ga.Report.Print()
+
+	return ga.Population.Individuals[0]
 }
 
 func (ga *GeneticAlgorithm) runOneGeneration() {
 
-	ga.population.CalculateFitness(ga.FitnessFunc)
-	ga.population.Sort() // sort by fitness descendently
+	ga.Population.CalculateFitness(ga.FitnessFunc)
+	ga.Population.Sort() // sort by fitness descendently
 
 	// for ex ga.Elitism=3
 	// find 3 best individuals and add them to next generation
 	newIndividuals := make([]Individual, ga.Elitism)
 	for i := 0; i < ga.Elitism; i++ {
-		newIndividuals[i] = ga.population.individuals[i].Clone()
+		newIndividuals[i] = ga.Population.Individuals[i].Clone()
 	}
 
-	for len(newIndividuals) < ga.population.GetSize() {
-		parent1 := ga.population.SelectTournament(ga.TournamentSize)
-		parent2 := ga.population.SelectTournament(ga.TournamentSize)
+	for len(newIndividuals) < ga.Population.GetSize() {
+		parent1 := ga.Population.SelectTournament(ga.TournamentSize)
+		parent2 := ga.Population.SelectTournament(ga.TournamentSize)
 		if rand.Float64() < ga.CrossoverRate {
 			child := parent1.Crossover(parent2)
 			child.Mutate(ga.MutationRate, ga.MutateGaussianDistribution)
@@ -80,7 +92,8 @@ func (ga *GeneticAlgorithm) runOneGeneration() {
 		}
 	}
 
-	ga.population.Replace(newIndividuals)
+	ga.Population.Replace(newIndividuals)
+	ga.Population.Sort()
 }
 
 func (ga *GeneticAlgorithm) verifyInputParameters() {
@@ -92,11 +105,11 @@ func (ga *GeneticAlgorithm) verifyInputParameters() {
 		panic("GA.FitnessFunc not defined!")
 	}
 
-	if ga.Elitism < 2 || ga.Elitism >= ga.population.GetSize() {
+	if ga.Elitism < 2 || ga.Elitism >= ga.Population.GetSize() {
 		panic("GA.Elitism bad value!!")
 	}
 
-	if ga.TournamentSize < 2 || ga.TournamentSize >= ga.population.GetSize() {
+	if ga.TournamentSize < 2 || ga.TournamentSize >= ga.Population.GetSize() {
 		panic("GA.TournamentSize bad value!!")
 	}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Population struct {
-	individuals []Individual
+	Individuals []Individual
 }
 
 func NewPopulation(populationSize, geneLength int) Population {
@@ -14,30 +14,30 @@ func NewPopulation(populationSize, geneLength int) Population {
 	for i := range individuals {
 		individuals[i] = NewIndividual(geneLength)
 	}
-	return Population{individuals: individuals}
+	return Population{Individuals: individuals}
 }
 
 func (pop *Population) GetSize() int {
-	return len(pop.individuals)
+	return len(pop.Individuals)
 }
 
 func (pop *Population) CalculateFitness(f GeneticFitnessFunc) {
-	for i := range pop.individuals {
-		pop.individuals[i].CalculateFitness(f)
+	for i := range pop.Individuals {
+		pop.Individuals[i].CalculateFitness(f)
 	}
 }
 
 func (pop *Population) Sort() {
-	sort.Slice(pop.individuals, func(i, j int) bool {
-		return pop.individuals[i].GetFitness() > pop.individuals[j].GetFitness()
+	sort.Slice(pop.Individuals, func(i, j int) bool {
+		return pop.Individuals[i].GetFitness() > pop.Individuals[j].GetFitness()
 	})
 }
 
 func (pop *Population) SelectTournament(tournamentSize int) Individual {
 	selected := make([]Individual, tournamentSize)
 	for i := 0; i < tournamentSize; i++ {
-		randIndex := rand.Intn(len(pop.individuals))
-		selected[i] = pop.individuals[randIndex]
+		randIndex := rand.Intn(len(pop.Individuals))
+		selected[i] = pop.Individuals[randIndex]
 	}
 
 	sort.Slice(selected, func(i, j int) bool {
@@ -64,6 +64,6 @@ func (pop *Population) Replace(newIndividuals []Individual) {
 	// replace population with new individuals (may ignore last elements if size is bigger)
 	// Not a problem to ignore last - they're worst
 	for i := 0; i < populationSize; i++ {
-		pop.individuals[i] = newIndividuals[i]
+		pop.Individuals[i] = newIndividuals[i]
 	}
 }
