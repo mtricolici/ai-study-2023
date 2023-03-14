@@ -11,7 +11,7 @@ import (
 var (
 	populationSize = 300
 	maxGenerations = 500_000
-	topology       = []int{2, 6, 1}
+	topology       = []int{2, 5, 1}
 
 	xorSamples = [][]float64{
 		{0.0, 0.0},
@@ -28,8 +28,16 @@ var (
 	}
 )
 
-func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
+func calculateWeightsCountForTopology() int {
+	network := neural_net.NewFeedForwardNeuralNetwork(topology, false)
+	return len(network.GetWeights())
+}
+
+func xorFitnessFunction(weights []float64) float64 {
 	fitness := 0.0
+
+	network := neural_net.NewFeedForwardNeuralNetwork(topology, false)
+	network.SetWeights(weights)
 
 	for i, sample := range xorSamples {
 		expectedValue := xorLabels[i][0]
@@ -44,16 +52,24 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 }
 
 func main() {
-	ga := genetic.NewGeneticAlgorithm(populationSize, topology, xorFitnessFunction)
+	genesCount := calculateWeightsCountForTopology()
+	ga := genetic.NewGeneticAlgorithm(populationSize, genesCount)
+	ga.Elitism = 5
+	ga.TournamentSize = 5
+	ga.CrossoverRate = 0.8
 	ga.MutationRate = 0.01
-	ga.CrossoverRate = 0.92
-	ga.NumberOfParents = 6
+	ga.MutateGaussianDistribution = true
+	ga.FitnessThreshold = 9_999_999 //TODO: define this
+	ga.FitnessFunc = xorFitnessFunction
 
-	best := ga.Run(maxGenerations).Network
+	best := ga.Run(maxGenerations)
 	fmt.Println("\nTraining complete! Let's test the network")
 
+	bestNetwork := neural_net.NewFeedForwardNeuralNetwork(topology, false)
+	bestNetwork.SetWeights(best.GetGenes())
+
 	for i, sample := range xorSamples {
-		result := best.Predict(sample)
+		result := bestNetwork.Predict(sample)
 
 		fmt.Printf("%.0f xor %.0f expected %.0f. Actual: %.2f\n",
 			sample[0], sample[1], xorLabels[i][0], result[0])
