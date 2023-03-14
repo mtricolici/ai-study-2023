@@ -60,5 +60,13 @@ func (n *Neuron) GetWeightsCount() int {
 }
 
 func (n *Neuron) SetWeights(weights []float64) {
-	panic("Layer.SetWeights() Not implemented")
+	if len(weights) != n.GetWeightsCount() {
+		panic("Neuron.SetWeights() FAILURE. bad number of weights")
+	}
+
+	n.Bias = weights[0]
+
+	for i := range n.Weights {
+		n.Weights[i] = weights[i+1]
+	}
 }

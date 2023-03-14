@@ -59,5 +59,20 @@ func (l *Layer) GetWeightsCount() int {
 }
 
 func (l *Layer) SetWeights(weights []float64) {
-	panic("Layer.SetWeights() Not implemented")
+	layer_weights_count := l.GetWeightsCount()
+	if len(weights) != layer_weights_count {
+		panic("Layer.SetWeights() FAILURE. bad number of weights")
+	}
+
+	// all neurons have the same weights size!
+	neurons_count := len(l.Neurons)
+	neuron_weights_count := layer_weights_count / neurons_count
+
+	for i, neuron := range l.Neurons {
+		idx_start := i * neuron_weights_count
+		idx_end := idx_start + neuron_weights_count
+		neuron_weights := weights[idx_start:idx_end]
+		neuron.SetWeights(neuron_weights)
+	}
+
 }
