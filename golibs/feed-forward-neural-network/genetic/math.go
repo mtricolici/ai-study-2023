@@ -1,24 +1,12 @@
 package genetic
 
 import (
+	"math/rand"
 	"strconv"
-
-	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/utils"
 )
 
 func randGaussianDistribution(value float64) float64 {
-	//newValue := rand.NormFloat64()*0.1 + value
-	newValue := utils.CryptoRandomFloatRange(-1.0, 1.0)*0.1 + value
-
-	if newValue < -1.0 {
-		return -1.0
-	}
-
-	if newValue > 1 {
-		return 1.0
-	}
-
-	return newValue
+	return rand.NormFloat64()*0.1 + value
 }
 
 func groupDigits(num int) string {
