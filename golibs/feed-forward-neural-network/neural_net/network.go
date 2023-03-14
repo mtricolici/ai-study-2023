@@ -53,10 +53,6 @@ func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 	return out
 }
 
-func (n *FeedForwardNeuralNetwork) SetWeights(weights []float64) {
-	panic("Network.SetWeights() Not implemented")
-}
-
 func (n *FeedForwardNeuralNetwork) GetWeightsCount() int {
 	count := 0
 
@@ -67,6 +63,6 @@ func (n *FeedForwardNeuralNetwork) GetWeightsCount() int {
 	return count
 }
 
-func (n *FeedForwardNeuralNetwork) GetWeights() []float64 {
-	panic("Network.GetWeights() Not implemented")
+func (n *FeedForwardNeuralNetwork) SetWeights(weights []float64) {
+	panic("Network.SetWeights() Not implemented")
 }
