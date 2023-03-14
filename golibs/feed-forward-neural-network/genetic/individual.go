@@ -19,6 +19,10 @@ func NewIndividual(length int) Individual {
 	return Individual{genes: genes, __fitnessCalculated: false}
 }
 
+func (ind *Individual) GetGenesCount() int {
+	return len(ind.genes)
+}
+
 func (ind *Individual) GetGenes() []float64 {
 	return ind.genes
 }

@@ -28,10 +28,11 @@ func NewReport(ga *GeneticAlgorithm) *ProgressReport {
 func (rp *ProgressReport) PrintHeader() {
 	rp.logger.SetPrefix(time.Now().Format("15:04:05 "))
 	rp.logger.Printf("Starting GA with max-generations: %d\n", rp.ga.MaxGenerations)
-	rp.logger.Printf("Population: %d, Mutation: %.2f%%, CrossOver: %.2f%%\n",
+	rp.logger.Printf("Population: %d, Mutation: %.2f%%, CrossOver: %.2f%%, RandomSeedRate: %.2f%%\n",
 		rp.ga.Population.GetSize(),
 		rp.ga.MutationRate*100.0,
-		rp.ga.CrossoverRate*100.0)
+		rp.ga.CrossoverRate*100.0,
+		rp.ga.RandomSeedRate*100.0)
 }
 
 func (rp *ProgressReport) CollectAndPrint() {

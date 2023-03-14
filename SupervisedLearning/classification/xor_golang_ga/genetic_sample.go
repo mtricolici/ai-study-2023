@@ -58,6 +58,7 @@ func main() {
 	ga.TournamentSize = 8
 	ga.CrossoverRate = 0.8
 	ga.MutationRate = 0.05
+	ga.RandomSeedRate = 0.05
 	ga.MutateGaussianDistribution = true
 	ga.FitnessThreshold = 1.0 - 0.001 // Ideal value is 1.0
 	ga.FitnessFunc = xorFitnessFunction

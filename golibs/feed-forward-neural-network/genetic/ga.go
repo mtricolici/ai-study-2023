@@ -7,10 +7,12 @@ import (
 
 type GeneticAlgorithm struct {
 	// How many of best individuals move to next generation
-	Elitism                    int
-	TournamentSize             int
-	MutationRate               float64
-	CrossoverRate              float64
+	Elitism        int
+	TournamentSize int
+	MutationRate   float64
+	CrossoverRate  float64
+	// New Random Individuals added during GA without crossover or mutation. Totally new individuals
+	RandomSeedRate             float64
 	FitnessThreshold           float64
 	FitnessFunc                GeneticFitnessFunc
 	MutateGaussianDistribution bool
@@ -30,6 +32,7 @@ func NewGeneticAlgorithm(populationSize, geneLength int) *GeneticAlgorithm {
 		TournamentSize:             populationSize / 10,
 		MutationRate:               0.01,
 		CrossoverRate:              0.81,
+		RandomSeedRate:             0.3,
 		MutateGaussianDistribution: false,
 		FitnessFunc:                nil,
 	}
@@ -88,7 +91,13 @@ func (ga *GeneticAlgorithm) runOneGeneration() {
 			child.CalculateFitness(ga.FitnessFunc)
 			newIndividuals = append(newIndividuals, child)
 		} else {
-			newIndividuals = append(newIndividuals, parent1.Clone(), parent2.Clone())
+			if rand.Float64() < ga.RandomSeedRate {
+				child := NewIndividual(parent1.GetGenesCount())
+				child.CalculateFitness(ga.FitnessFunc)
+				newIndividuals = append(newIndividuals, child)
+			} else {
+				newIndividuals = append(newIndividuals, parent1.Clone(), parent2.Clone())
+			}
 		}
 	}
 
