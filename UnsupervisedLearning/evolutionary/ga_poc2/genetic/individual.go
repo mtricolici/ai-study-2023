@@ -48,10 +48,16 @@ func (ind *Individual) GetFitness() float64 {
 	return ind.__fitness
 }
 
-func (ind *Individual) Mutate(rate float64) {
+func (ind *Individual) Mutate(rate float64, gaussianDistribution bool) {
 	for i := range ind.genes {
 		if rand.Float64() < rate {
-			ind.genes[i] = rand.Float64()
+
+			if gaussianDistribution {
+				ind.genes[i] = randGaussianDistribution(ind.genes[i])
+			} else {
+				ind.genes[i] = rand.Float64()
+			}
+
 			ind.__fitnessCalculated = false
 		}
 	}

@@ -7,26 +7,27 @@ import (
 
 type GeneticAlgorithm struct {
 	// How many of best individuals move to next generation
-	Elitism          int
-	TournamentSize   int
-	MutationRate     float64
-	CrossoverRate    float64
-	FitnessThreshold float64
-	FitnessFunc      GeneticFitnessFunc
-
-	population Population
-	generation int
+	Elitism                    int
+	TournamentSize             int
+	MutationRate               float64
+	CrossoverRate              float64
+	FitnessThreshold           float64
+	FitnessFunc                GeneticFitnessFunc
+	MutateGaussianDistribution bool
+	population                 Population
+	generation                 int
 }
 
 func NewGeneticAlgorithm(populationSize, geneLength int) GeneticAlgorithm {
 	return GeneticAlgorithm{
-		population:     NewPopulation(populationSize, geneLength),
-		generation:     0,
-		Elitism:        populationSize / 10,
-		TournamentSize: populationSize / 10,
-		MutationRate:   0.01,
-		CrossoverRate:  0.81,
-		FitnessFunc:    nil,
+		population:                 NewPopulation(populationSize, geneLength),
+		generation:                 0,
+		Elitism:                    populationSize / 10,
+		TournamentSize:             populationSize / 10,
+		MutationRate:               0.01,
+		CrossoverRate:              0.81,
+		MutateGaussianDistribution: false,
+		FitnessFunc:                nil,
 	}
 }
 
@@ -41,6 +42,7 @@ func (ga *GeneticAlgorithm) Run(maxGenerations int) Individual {
 
 		bestIndividual := ga.population.individuals[0]
 		if bestIndividual.GetFitness() >= ga.FitnessThreshold {
+			fmt.Println("best.fitness >= threshold !!! stop genetic evolution ;)")
 			return bestIndividual
 		}
 
@@ -70,7 +72,7 @@ func (ga *GeneticAlgorithm) runOneGeneration() {
 		parent2 := ga.population.SelectTournament(ga.TournamentSize)
 		if rand.Float64() < ga.CrossoverRate {
 			child := parent1.Crossover(parent2)
-			child.Mutate(ga.MutationRate)
+			child.Mutate(ga.MutationRate, ga.MutateGaussianDistribution)
 			child.CalculateFitness(ga.FitnessFunc)
 			newIndividuals = append(newIndividuals, child)
 		} else {

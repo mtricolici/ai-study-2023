@@ -31,10 +31,11 @@ func main() {
 	ga.TournamentSize = 5
 	ga.CrossoverRate = 0.8
 	ga.MutationRate = 0.01
-	ga.FitnessThreshold = 18.0
+	ga.MutateGaussianDistribution = true
+	ga.FitnessThreshold = calculateFitness(target) - 0.001
 	ga.FitnessFunc = calculateFitness
 
-	best := ga.Run(10000)
+	best := ga.Run(5000)
 
 	fmt.Printf("target fitness=%f\n", calculateFitness(target))
 	fmt.Printf("best fitness=%f\n", best.GetFitness())
