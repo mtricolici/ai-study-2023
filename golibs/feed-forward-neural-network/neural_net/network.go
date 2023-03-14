@@ -41,18 +41,6 @@ func (n *FeedForwardNeuralNetwork) RandomizeWeights() {
 	}
 }
 
-func (n *FeedForwardNeuralNetwork) WeightsBiasesCount() (int, int) {
-	wc := 0
-	bc := 0
-	for _, layer := range n.Layers {
-		w, b := layer.WeightsBiasesCount()
-		wc += w
-		bc += b
-	}
-
-	return wc, bc
-}
-
 func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 	inp := inputs
 	var out []float64
@@ -67,6 +55,16 @@ func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 
 func (n *FeedForwardNeuralNetwork) SetWeights(weights []float64) {
 	panic("Network.SetWeights() Not implemented")
+}
+
+func (n *FeedForwardNeuralNetwork) GetWeightsCount() int {
+	count := 0
+
+	for _, layer := range n.Layers {
+		count += layer.GetWeightsCount()
+	}
+
+	return count
 }
 
 func (n *FeedForwardNeuralNetwork) GetWeights() []float64 {

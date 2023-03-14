@@ -54,3 +54,11 @@ func (n *Neuron) Activate(inputs []float64) float64 {
 
 	return sigmoid(sum)
 }
+
+func (n *Neuron) GetWeightsCount() int {
+	return len(n.Weights) + 1 // 1 for bias
+}
+
+func (n *Neuron) SetWeights(weights []float64) {
+	panic("Layer.SetWeights() Not implemented")
+}

@@ -30,7 +30,7 @@ var (
 
 func calculateWeightsCountForTopology() int {
 	network := neural_net.NewFeedForwardNeuralNetwork(topology, false)
-	return len(network.GetWeights())
+	return network.GetWeightsCount()
 }
 
 func xorFitnessFunction(weights []float64) float64 {
