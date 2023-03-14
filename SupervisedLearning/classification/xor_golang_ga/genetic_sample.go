@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	populationSize = 300
-	maxGenerations = 50_000
+	populationSize = 100
+	maxGenerations = 5_000_000
 	topology       = []int{2, 5, 1}
 
 	xorSamples = [][]float64{
@@ -58,11 +58,11 @@ func main() {
 	ga.TournamentSize = 5
 	ga.CrossoverRate = 0.8
 	ga.MutationRate = 0.01
-	ga.MutateGaussianDistribution = false
+	ga.MutateGaussianDistribution = true
 	ga.FitnessThreshold = 1.0 - 0.0001
 	ga.FitnessFunc = xorFitnessFunction
 	ga.MaxGenerations = maxGenerations
-	ga.Report.Percent = 5
+	ga.Report.Percent = 2
 
 	best := ga.Run()
 	fmt.Println("\nTraining complete! Let's test the network")
