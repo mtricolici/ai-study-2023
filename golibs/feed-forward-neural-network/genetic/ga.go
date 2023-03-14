@@ -56,6 +56,7 @@ func (ga *GeneticAlgorithm) Run() Individual {
 		bestIndividual := ga.Population.Individuals[0]
 		if bestIndividual.GetFitness() >= ga.FitnessThreshold {
 			fmt.Println("best.fitness >= threshold !!! stop genetic evolution ;)")
+			fmt.Printf("Total generations: %d\n", ga.Generation)
 			return bestIndividual
 		}
 
