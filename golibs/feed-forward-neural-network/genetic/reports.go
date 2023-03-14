@@ -46,7 +46,7 @@ func (rp *ProgressReport) Print() {
 	bestFitness := rp.ga.Population.Individuals[0].GetFitness()
 
 	rp.logger.SetPrefix(time.Now().Format("15:04:05 "))
-	rp.logger.Printf("%3.0f%% Generation %8d - Fitness (best: %f)",
+	rp.logger.Printf("%3.0f%% Generation %8d - Fitness (best: %.9f)",
 		progress,
 		rp.ga.Generation,
 		bestFitness)

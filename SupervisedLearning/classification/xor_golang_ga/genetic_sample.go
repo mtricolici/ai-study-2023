@@ -10,7 +10,7 @@ import (
 
 var (
 	populationSize = 100
-	maxGenerations = 5_000_000
+	maxGenerations = 1_000_000
 	topology       = []int{2, 5, 1}
 
 	xorSamples = [][]float64{
@@ -45,7 +45,7 @@ func xorFitnessFunction(weights []float64) float64 {
 
 		diff := math.Abs(expectedValue - value)
 
-		fitness -= diff
+		fitness -= diff * diff
 	}
 
 	return fitness
@@ -54,15 +54,15 @@ func xorFitnessFunction(weights []float64) float64 {
 func main() {
 	genesCount := calculateWeightsCountForTopology()
 	ga := genetic.NewGeneticAlgorithm(populationSize, genesCount)
-	ga.Elitism = 5
-	ga.TournamentSize = 5
+	ga.Elitism = 10
+	ga.TournamentSize = 8
 	ga.CrossoverRate = 0.8
-	ga.MutationRate = 0.01
+	ga.MutationRate = 0.05
 	ga.MutateGaussianDistribution = true
-	ga.FitnessThreshold = 1.0 - 0.0001
+	ga.FitnessThreshold = 1.0 - 0.001 // Ideal value is 1.0
 	ga.FitnessFunc = xorFitnessFunction
 	ga.MaxGenerations = maxGenerations
-	ga.Report.Percent = 2
+	ga.Report.Percent = 5
 
 	best := ga.Run()
 	fmt.Println("\nTraining complete! Let's test the network")

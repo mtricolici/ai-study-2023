@@ -26,7 +26,7 @@ var (
 )
 
 func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
-	fitness := 0.0
+	fitness := 1.0
 
 	for i, sample := range xorSamples {
 		expectedValue := xorLabels[i][0]
@@ -35,10 +35,10 @@ func xorFitnessFunction(network *neural_net.FeedForwardNeuralNetwork) float64 {
 		diff := math.Abs(expectedValue - value)
 		fmt.Printf("==diff=%f\n", 1.0-diff)
 
-		fitness += math.Pow(10.0, 4*(1.0-diff))
+		fitness -= diff * diff
 	}
 
-	return fitness // math.Pow(1.6, float64(fitness))
+	return fitness
 }
 
 func main() {
