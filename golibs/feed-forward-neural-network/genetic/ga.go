@@ -2,7 +2,8 @@ package genetic
 
 import (
 	"fmt"
-	"math/rand"
+
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/utils"
 )
 
 type GeneticAlgorithm struct {
@@ -85,13 +86,13 @@ func (ga *GeneticAlgorithm) runOneGeneration() {
 	for len(newIndividuals) < ga.Population.GetSize() {
 		parent1 := ga.Population.SelectTournament(ga.TournamentSize)
 		parent2 := ga.Population.SelectTournament(ga.TournamentSize)
-		if rand.Float64() < ga.CrossoverRate {
+		if utils.CryptoRandomFloat() < ga.CrossoverRate {
 			child := parent1.Crossover(parent2)
 			child.Mutate(ga.MutationRate, ga.MutateGaussianDistribution)
 			child.CalculateFitness(ga.FitnessFunc)
 			newIndividuals = append(newIndividuals, child)
 		} else {
-			if rand.Float64() < ga.RandomSeedRate {
+			if utils.CryptoRandomFloat() < ga.RandomSeedRate {
 				child := NewIndividual(parent1.GetGenesCount())
 				child.CalculateFitness(ga.FitnessFunc)
 				newIndividuals = append(newIndividuals, child)

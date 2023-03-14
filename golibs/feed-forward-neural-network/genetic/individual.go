@@ -1,6 +1,6 @@
 package genetic
 
-import "math/rand"
+import "github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/utils"
 
 type GeneticFitnessFunc func([]float64) float64
 
@@ -13,7 +13,7 @@ type Individual struct {
 func NewIndividual(length int) Individual {
 	genes := make([]float64, length)
 	for i := 0; i < length; i++ {
-		genes[i] = rand.Float64()
+		genes[i] = utils.CryptoRandomFloatRange(-1.0, 1.0)
 	}
 
 	return Individual{genes: genes, __fitnessCalculated: false}
@@ -54,12 +54,12 @@ func (ind *Individual) GetFitness() float64 {
 
 func (ind *Individual) Mutate(rate float64, gaussianDistribution bool) {
 	for i := range ind.genes {
-		if rand.Float64() < rate {
+		if utils.CryptoRandomFloat() < rate {
 
 			if gaussianDistribution {
 				ind.genes[i] = randGaussianDistribution(ind.genes[i])
 			} else {
-				ind.genes[i] = rand.Float64()
+				ind.genes[i] = utils.CryptoRandomFloatRange(-1.0, 1.0)
 			}
 
 			ind.__fitnessCalculated = false
@@ -71,7 +71,7 @@ func (ind *Individual) Mutate(rate float64, gaussianDistribution bool) {
 func (ind *Individual) Crossover(other Individual) Individual {
 	childGenes := make([]float64, len(ind.genes))
 	for i := range ind.genes {
-		if rand.Float64() < 0.5 {
+		if utils.CryptoRandomFloat() < 0.5 {
 			childGenes[i] = ind.genes[i]
 		} else {
 			childGenes[i] = other.genes[i]

@@ -1,8 +1,9 @@
 package genetic
 
 import (
-	"math/rand"
 	"sort"
+
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/utils"
 )
 
 type Population struct {
@@ -36,7 +37,7 @@ func (pop *Population) Sort() {
 func (pop *Population) SelectTournament(tournamentSize int) Individual {
 	selected := make([]Individual, tournamentSize)
 	for i := 0; i < tournamentSize; i++ {
-		randIndex := rand.Intn(len(pop.Individuals))
+		randIndex := utils.CryptoRandomInt(len(pop.Individuals))
 		selected[i] = pop.Individuals[randIndex]
 	}
 

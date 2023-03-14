@@ -1,12 +1,7 @@
 package neural_net
 
 import (
-	"math/rand"
-	"time"
-)
-
-var (
-	_rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/utils"
 )
 
 type Neuron struct {
@@ -36,10 +31,10 @@ func (n *Neuron) Clone() *Neuron {
 
 func (n *Neuron) RandomizeWeights() {
 	for i := range n.Weights {
-		n.Weights[i] = _rnd.Float64()*2 - 1
+		n.Weights[i] = utils.CryptoRandomFloatRange(-1.0, 1.0)
 	}
 
-	n.Bias = _rnd.Float64()*0.01 - 0.005
+	n.Bias = utils.CryptoRandomFloat()*0.01 - 0.005
 }
 
 func (n *Neuron) Activate(inputs []float64) float64 {

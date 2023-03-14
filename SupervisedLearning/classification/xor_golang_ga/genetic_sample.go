@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	populationSize = 1000
-	maxGenerations = 1_000_000
+	populationSize = 500
+	maxGenerations = 100_000
 	topology       = []int{2, 6, 1}
 
 	xorSamples = [][]float64{
@@ -56,8 +56,8 @@ func main() {
 	ga := genetic.NewGeneticAlgorithm(populationSize, genesCount)
 	ga.Elitism = 10
 	ga.TournamentSize = 8
-	ga.CrossoverRate = 0.7
-	ga.MutationRate = 0.3
+	ga.CrossoverRate = 0.8
+	ga.MutationRate = 0.02
 	ga.RandomSeedRate = 0.4
 	ga.MutateGaussianDistribution = true
 	ga.FitnessThreshold = 1.0 - 0.001 // Ideal value is 1.0

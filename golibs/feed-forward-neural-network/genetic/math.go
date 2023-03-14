@@ -1,18 +1,17 @@
 package genetic
 
 import (
-	"math/rand"
 	"strconv"
+
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/utils"
 )
 
 func randGaussianDistribution(value float64) float64 {
-	newValue := rand.NormFloat64()*0.05 + value
-	//newValue := rand.Float64()*0.1 + value
-	// it converges very fast with NormFloat64() instead of Float64()
-	// I don't know why :D
+	//newValue := rand.NormFloat64()*0.1 + value
+	newValue := utils.CryptoRandomFloat()*0.1 + value
 
-	if newValue < 0 {
-		return 0.0
+	if newValue < -1.0 {
+		return -1.0
 	}
 
 	if newValue > 1 {
