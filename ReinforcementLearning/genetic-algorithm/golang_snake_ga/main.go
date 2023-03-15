@@ -99,7 +99,8 @@ func show_usage() {
 }
 
 func play_DemoGame() {
-	panic("Not implemented yet :(")
+	network := neural_net.NewFeedForwardNeuralNetworkFromFile(saveNetworkLocation)
+	fmt.Printf("weights: %v\n", network.GetWeights())
 }
 
 func main() {

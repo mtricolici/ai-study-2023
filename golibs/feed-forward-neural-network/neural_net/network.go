@@ -28,6 +28,27 @@ func NewFeedForwardNeuralNetwork(neurons []int, randomWeights bool) *FeedForward
 	}
 }
 
+func NewFeedForwardNeuralNetworkFromFile(fileName string) *FeedForwardNeuralNetwork {
+	network := FeedForwardNeuralNetwork{}
+
+	fmt.Printf("Loading NeuralNetwork from '%s' ...\n", fileName)
+
+	file, err := os.Open(fileName)
+	if err != nil {
+		panic("Failed to load NeuralNetwork from file :" + err.Error())
+	}
+	defer file.Close()
+
+	decoder := gob.NewDecoder(file)
+
+	// Decode QTable from file
+	if err := decoder.Decode(&network); err != nil {
+		panic("Failed to decode data from file:" + err.Error())
+	}
+
+	return &network
+}
+
 func (n *FeedForwardNeuralNetwork) Clone() *FeedForwardNeuralNetwork {
 	network := &FeedForwardNeuralNetwork{
 		Layers:   make([]*Layer, len(n.Layers)),
