@@ -272,3 +272,33 @@ func (sn *SnakeGame) getFullBoardState() []float64 {
 
 	return state
 }
+
+func (sn *SnakeGame) TurnLeft() {
+	switch sn.Direction {
+	case Up:
+		sn.Direction = Left
+	case Down:
+		sn.Direction = Right
+	case Right:
+		sn.Direction = Up
+	case Left:
+		sn.Direction = Down
+	default:
+		panic("Snake.TurnLeft - unknown current direction detected!")
+	}
+}
+
+func (sn *SnakeGame) TurnRight() {
+	switch sn.Direction {
+	case Up:
+		sn.Direction = Right
+	case Down:
+		sn.Direction = Left
+	case Right:
+		sn.Direction = Down
+	case Left:
+		sn.Direction = Up
+	default:
+		panic("Snake.TurnRight - unknown current direction detected!")
+	}
+}

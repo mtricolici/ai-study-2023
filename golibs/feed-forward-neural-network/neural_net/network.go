@@ -53,6 +53,21 @@ func (n *FeedForwardNeuralNetwork) Predict(inputs []float64) []float64 {
 	return out
 }
 
+func (n *FeedForwardNeuralNetwork) PredictMaxIndex(inputs []float64) int {
+	output := n.Predict(inputs)
+	idx := 0
+	max := output[0]
+
+	for i := 1; i < len(output); i++ {
+		if max < output[i] {
+			max = output[i]
+			idx = i
+		}
+	}
+
+	return idx
+}
+
 func (n *FeedForwardNeuralNetwork) GetWeightsCount() int {
 	count := 0
 
