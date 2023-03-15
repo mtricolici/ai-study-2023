@@ -13,7 +13,7 @@ import (
 
 var (
 	// Genetic Algorihm parameters
-	populationSize     = 100
+	populationSize     = 200
 	maxGenerations     = 500_000
 	numberOfGames2Play = 5
 	fitnessThreshold   = 500.0 // score when GA stop training
@@ -37,13 +37,13 @@ var (
 	game                         *snake.SnakeGame
 	game_size                    = 8
 	game_random_position         = true
-	game_max_moves_without_apple = 30
+	game_max_moves_without_apple = game_size * 3
 
-	score_apple           = 3.0   // reward for eating an apple
+	score_apple           = 10.0  // reward for eating an apple
 	score_move_from_apple = -0.2  // reward move from apple
 	score_move_to_apple   = 0.1   // reward move to apple
 	score_die             = -30.0 // score for game end
-	score_move_in_circles = -50.0 // score if moves in circles without eating
+	score_move_in_circles = -10.0 // score if moves in circles without eating
 )
 
 func initializeGame() {
