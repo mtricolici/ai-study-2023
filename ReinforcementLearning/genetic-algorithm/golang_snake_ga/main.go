@@ -13,12 +13,12 @@ import (
 
 var (
 	// Genetic Algorihm parameters
-	populationSize     = 50
-	maxGenerations     = 50_000
+	populationSize     = 100
+	maxGenerations     = 500_000
 	numberOfGames2Play = 5
-	fitnessThreshold   = 50.0 // score when GA stop training
-	ga_elitism         = 10   // How many best individuals move to next generation
-	ga_tournamentSize  = 8    // Nr of best individs to select for breeding
+	fitnessThreshold   = 500.0 // score when GA stop training
+	ga_elitism         = 10    // How many best individuals move to next generation
+	ga_tournamentSize  = 8     // Nr of best individs to select for breeding
 	ga_crossoverRate   = 0.8
 	ga_mutationRate    = 0.02
 	ga_randomSeedRate  = 0.3
