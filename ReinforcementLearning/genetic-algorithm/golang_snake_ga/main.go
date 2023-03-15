@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"snakega/cimport"
+	"time"
 
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/genetic"
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_net"
@@ -100,7 +102,38 @@ func show_usage() {
 
 func play_DemoGame() {
 	network := neural_net.NewFeedForwardNeuralNetworkFromFile(saveNetworkLocation)
-	fmt.Printf("weights: %v\n", network.GetWeights())
+
+	cimport.Create_game(game.Size)
+	cimport.X_create_window()
+
+	cimport.UpdateGameData(game)
+	time.Sleep(1 * time.Second)
+	cimport.X_draw_objects()
+	fmt.Println("Game starts in 10 seconds... prepare video recorder! ;)")
+	// time.Sleep(10 * time.Second)
+	fmt.Println("Game starts in 3 seconds... prepare video recorder! ;)")
+	time.Sleep(3 * time.Second)
+
+	for !game.GameOver {
+		action := network.PredictMaxIndex(game.GetStateForNeuralNetwork())
+		switch action {
+		case 0:
+			game.TurnLeft()
+		case 1:
+			game.TurnRight()
+		case 2: // Continue in the same direction
+		}
+		game.NextTick() // Make the move!
+
+		cimport.UpdateGameData(game)
+		cimport.X_draw_objects()
+		fmt.Printf("Direction: %s Reward: %f\n", game.GetDirectionAsString(), game.Reward)
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	fmt.Println("Game over")
+	time.Sleep(1 * time.Second)
+	cimport.Destroy_game()
 }
 
 func main() {
