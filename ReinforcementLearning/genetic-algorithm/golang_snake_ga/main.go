@@ -13,12 +13,11 @@ import (
 
 var (
 	// Genetic Algorihm parameters
-	populationSize     = 200
-	maxGenerations     = 500_000
-	numberOfGames2Play = 5
-	fitnessThreshold   = 500.0 // score when GA stop training
-	ga_elitism         = 10    // How many best individuals move to next generation
-	ga_tournamentSize  = 8     // Nr of best individs to select for breeding
+	populationSize     = 300
+	maxGenerations     = 10_000
+	numberOfGames2Play = 10
+	ga_elitism         = 10 // How many best individuals move to next generation
+	ga_tournamentSize  = 10 // Nr of best individs to select for breeding
 	ga_crossoverRate   = 0.8
 	ga_mutationRate    = 0.02
 	ga_randomSeedRate  = 0.3
@@ -84,7 +83,7 @@ func invokeGeneticTraining() {
 	ga.MutationRate = ga_mutationRate
 	ga.RandomSeedRate = ga_randomSeedRate
 	ga.MutateGaussianDistribution = ga_mutateGaussian
-	ga.FitnessThreshold = fitnessThreshold
+	ga.FitnessThreshold = nil // no stop condition
 	ga.FitnessFunc = snakeFitnessFunction
 	ga.MaxGenerations = maxGenerations
 	ga.Report.SecondsToReport = ga_report_seconds

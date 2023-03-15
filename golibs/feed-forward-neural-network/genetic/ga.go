@@ -14,7 +14,7 @@ type GeneticAlgorithm struct {
 	CrossoverRate  float64
 	// New Random Individuals added during GA without crossover or mutation. Totally new individuals
 	RandomSeedRate             float64
-	FitnessThreshold           float64
+	FitnessThreshold           *float64
 	FitnessFunc                GeneticFitnessFunc
 	MutateGaussianDistribution bool
 	Population                 Population
@@ -34,6 +34,7 @@ func NewGeneticAlgorithm(populationSize, geneLength int) *GeneticAlgorithm {
 		MutationRate:               0.01,
 		CrossoverRate:              0.81,
 		RandomSeedRate:             0.3,
+		FitnessThreshold:           nil, // No threshold defined by default
 		MutateGaussianDistribution: false,
 		FitnessFunc:                nil,
 	}
@@ -54,10 +55,13 @@ func (ga *GeneticAlgorithm) Run() Individual {
 		ga.runOneGeneration()
 
 		bestIndividual := ga.Population.Individuals[0]
-		if bestIndividual.GetFitness() >= ga.FitnessThreshold {
-			fmt.Println("best.fitness >= threshold !!! stop genetic evolution ;)")
-			fmt.Printf("Total generations: %d\n", ga.Generation)
-			return bestIndividual
+
+		if ga.FitnessThreshold != nil {
+			if bestIndividual.GetFitness() >= *ga.FitnessThreshold {
+				fmt.Println("best.fitness >= threshold !!! stop genetic evolution ;)")
+				fmt.Printf("Total generations: %d\n", ga.Generation)
+				return bestIndividual
+			}
 		}
 
 		ga.Report.CollectAndPrint()
@@ -108,10 +112,6 @@ func (ga *GeneticAlgorithm) runOneGeneration() {
 }
 
 func (ga *GeneticAlgorithm) verifyInputParameters() {
-	if ga.FitnessThreshold == 0.0 {
-		panic("GA.FitnessThreshold not defined!")
-	}
-
 	if ga.FitnessFunc == nil {
 		panic("GA.FitnessFunc not defined!")
 	}
