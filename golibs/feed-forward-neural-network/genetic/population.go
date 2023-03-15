@@ -18,6 +18,25 @@ func NewPopulation(populationSize, geneLength int) Population {
 	return Population{Individuals: individuals}
 }
 
+func NewPopulationFromWeights(weights []float64, populationSize int) Population {
+	best := NewIndividualFromWeights(weights)
+
+	individuals := make([]Individual, populationSize)
+
+	// add 3 copies of best
+	individuals[0] = best
+	individuals[1] = best.Clone()
+	individuals[2] = best.Clone()
+
+	for i := 3; i < populationSize; i++ {
+		clone := best.Clone()
+		clone.Mutate(0.2, true)
+		individuals[i] = clone
+	}
+
+	return Population{Individuals: individuals}
+}
+
 func (pop *Population) GetSize() int {
 	return len(pop.Individuals)
 }

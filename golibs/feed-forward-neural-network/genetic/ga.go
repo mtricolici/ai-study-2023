@@ -43,6 +43,24 @@ func NewGeneticAlgorithm(populationSize, geneLength int) *GeneticAlgorithm {
 	return &ga
 }
 
+func ContinueGenericAlgorithm(weights []float64, populationSize int) *GeneticAlgorithm {
+	ga := GeneticAlgorithm{
+		Population:                 NewPopulationFromWeights(weights, populationSize),
+		MaxGenerations:             100,
+		Elitism:                    populationSize / 10,
+		TournamentSize:             populationSize / 10,
+		MutationRate:               0.01,
+		CrossoverRate:              0.81,
+		RandomSeedRate:             0.3,
+		FitnessThreshold:           nil, // No threshold defined by default
+		MutateGaussianDistribution: false,
+		FitnessFunc:                nil,
+	}
+
+	ga.Report = NewReport(&ga)
+	return &ga
+}
+
 func (ga *GeneticAlgorithm) Run() Individual {
 	ga.verifyInputParameters()
 

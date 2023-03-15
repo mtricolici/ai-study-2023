@@ -96,8 +96,30 @@ func invokeGeneticTraining() {
 	network.SaveToFile(saveNetworkLocation)
 }
 
+func continueGenericTraining() {
+	network := neural_net.NewFeedForwardNeuralNetworkFromFile(saveNetworkLocation)
+	ga := genetic.ContinueGenericAlgorithm(network.GetWeights(), populationSize)
+	ga.Elitism = ga_elitism
+	ga.TournamentSize = ga_tournamentSize
+	ga.CrossoverRate = ga_crossoverRate
+	ga.MutationRate = ga_mutationRate
+	ga.RandomSeedRate = ga_randomSeedRate
+	ga.MutateGaussianDistribution = ga_mutateGaussian
+	ga.FitnessThreshold = nil // no stop condition
+	ga.FitnessFunc = snakeFitnessFunction
+	ga.MaxGenerations = maxGenerations
+	ga.Report.SecondsToReport = ga_report_seconds
+
+	best := ga.Run()
+	fmt.Println("\nTraining complete!")
+	fmt.Printf("Best fitness: %f\n", best.GetFitness())
+	network = neural_net.NewFeedForwardNeuralNetwork(topology, false)
+	network.SetWeights(best.GetGenes())
+	network.SaveToFile(saveNetworkLocation)
+}
+
 func show_usage() {
-	fmt.Println("Bad argument. Please use 'train' or 'demo' argument")
+	fmt.Println("Bad argument. Please use 'train', 'train-continue' or 'demo' argument")
 }
 
 func play_DemoGame() {
@@ -112,7 +134,7 @@ func play_DemoGame() {
 	fmt.Println("Game starts in 10 seconds... prepare video recorder! ;)")
 	// time.Sleep(10 * time.Second)
 	fmt.Println("Game starts in 3 seconds... prepare video recorder! ;)")
-	time.Sleep(3 * time.Second)
+	time.Sleep(0 * time.Second)
 
 	for !game.GameOver {
 		action := network.PredictMaxIndex(game.GetStateForNeuralNetwork())
@@ -149,6 +171,8 @@ func main() {
 	switch args[0] {
 	case "train":
 		invokeGeneticTraining()
+	case "train-continue":
+		continueGenericTraining()
 	case "demo":
 		play_DemoGame()
 	default:

@@ -19,6 +19,12 @@ func NewIndividual(length int) Individual {
 	return Individual{genes: genes, __fitnessCalculated: false}
 }
 
+func NewIndividualFromWeights(weights []float64) Individual {
+	genes := make([]float64, len(weights))
+	copy(genes, weights)
+	return Individual{genes: genes, __fitnessCalculated: false}
+}
+
 func (ind *Individual) GetGenesCount() int {
 	return len(ind.genes)
 }
