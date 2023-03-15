@@ -123,6 +123,8 @@ func show_usage() {
 }
 
 func play_DemoGame() {
+	game_size = 14
+	initializeGame()
 	network := neural_net.NewFeedForwardNeuralNetworkFromFile(saveNetworkLocation)
 
 	cimport.Create_game(game.Size)
