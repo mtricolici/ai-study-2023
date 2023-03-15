@@ -1,5 +1,11 @@
 package neural_net
 
+import (
+	"encoding/gob"
+	"fmt"
+	"os"
+)
+
 type FeedForwardNeuralNetwork struct {
 	Layers   []*Layer
 	Topology []int
@@ -97,4 +103,21 @@ func (n *FeedForwardNeuralNetwork) GetWeights() []float64 {
 		result = append(result, layer.GetWeights()...)
 	}
 	return result
+}
+
+func (n *FeedForwardNeuralNetwork) SaveToFile(fileName string) {
+	fmt.Printf("NeuralNetwork save to '%s' ...\n", fileName)
+
+	file, err := os.Create(fileName)
+	if err != nil {
+		panic("Failed to save NeuralNetwork to file :" + err.Error())
+	}
+	defer file.Close()
+
+	encoder := gob.NewEncoder(file)
+
+	// Encode and save NeuralNetwork to a file
+	if err := encoder.Encode(n); err != nil {
+		panic("Failed to encode brain:" + err.Error())
+	}
 }

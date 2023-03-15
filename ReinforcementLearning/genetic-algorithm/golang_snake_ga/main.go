@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/genetic"
 	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_net"
@@ -28,6 +29,7 @@ var (
 	topology            []int
 	networkWeightsCount int
 	snakeLimitedView    bool = true // snake does not view entire board
+	saveNetworkLocation      = "/home/boris/temp/genetic.brain.zzz"
 
 	// Snake Game Parameters and variables
 	game                         *snake.SnakeGame
@@ -71,8 +73,7 @@ func snakeFitnessFunction(weights []float64) float64 {
 	return score
 }
 
-func main() {
-	initializeGame()
+func invokeGeneticTraining() {
 	ga := genetic.NewGeneticAlgorithm(populationSize, networkWeightsCount)
 	ga.Elitism = ga_elitism
 	ga.TournamentSize = ga_tournamentSize
@@ -88,6 +89,37 @@ func main() {
 	best := ga.Run()
 	fmt.Println("\nTraining complete!")
 	fmt.Printf("Best fitness: %f\n", best.GetFitness())
+	network := neural_net.NewFeedForwardNeuralNetwork(topology, false)
+	network.SetWeights(best.GetGenes())
+	network.SaveToFile(saveNetworkLocation)
+}
+
+func show_usage() {
+	fmt.Println("Bad argument. Please use 'train' or 'demo' argument")
+}
+
+func play_DemoGame() {
+	panic("Not implemented yet :(")
+}
+
+func main() {
+	initializeGame()
+
+	args := os.Args[1:] // Skip the first argument
+
+	if len(args) != 1 {
+		show_usage()
+		return
+	}
+
+	switch args[0] {
+	case "train":
+		invokeGeneticTraining()
+	case "demo":
+		play_DemoGame()
+	default:
+		show_usage()
+	}
 }
 
 // Plays a snake game AI guided and return total score
