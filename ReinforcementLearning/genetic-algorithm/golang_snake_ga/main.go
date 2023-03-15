@@ -23,10 +23,10 @@ var (
 	ga_mutationRate    = 0.02
 	ga_randomSeedRate  = 0.3
 	ga_mutateGaussian  = true
-	ga_report_seconds  = 10 // Print progress every 10 seconds
+	ga_report_seconds  = 25 // Print progress every 25 seconds
 
 	// Neural Network parameters
-	hiddenLayerNeurons  = 10
+	hiddenLayerNeurons  = 20
 	outputNeurons       = 3 // Turn Left, Keep Forward, Turn Right
 	topology            []int
 	networkWeightsCount int
@@ -43,6 +43,7 @@ var (
 	score_move_from_apple = -0.2  // reward move from apple
 	score_move_to_apple   = 0.1   // reward move to apple
 	score_die             = -30.0 // score for game end
+	score_move_in_circles = -50.0 // score if moves in circles without eating
 )
 
 func initializeGame() {
@@ -162,7 +163,7 @@ func playSnakeGame(network *neural_net.FeedForwardNeuralNetwork) float64 {
 
 	game.Reset() // << Start new game
 
-	for !game.GameOver && game.Moves_since_apple < game_max_moves_without_apple {
+	for !game.GameOver {
 		state := game.GetStateForNeuralNetwork()
 		action := network.PredictMaxIndex(state)
 
@@ -173,9 +174,14 @@ func playSnakeGame(network *neural_net.FeedForwardNeuralNetwork) float64 {
 			game.TurnRight()
 		case 2: // Continue in the same direction
 		}
-
 		game.NextTick() // Make the move!
-		score += game.Reward
+
+		if !game.GameOver && game.Moves_since_apple >= game_max_moves_without_apple {
+			score += score_move_in_circles // Punish for moving in circes without eating an apple!
+			game.GameOver = true           // End this pain
+		} else {
+			score += game.Reward
+		}
 	}
 
 	return score
