@@ -63,7 +63,7 @@ func main() {
 	ga.FitnessThreshold = 1.0 - 0.001 // Ideal value is 1.0
 	ga.FitnessFunc = xorFitnessFunction
 	ga.MaxGenerations = maxGenerations
-	ga.Report.Percent = 5
+	ga.Report.SecondsToReport = 5
 
 	best := ga.Run()
 	fmt.Println("\nTraining complete! Let's test the network")

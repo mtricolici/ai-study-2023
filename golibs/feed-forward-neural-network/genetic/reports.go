@@ -2,16 +2,15 @@ package genetic
 
 import (
 	"log"
-	"math"
 	"os"
 	"time"
 )
 
 type ProgressReport struct {
-	Percent float64
-
-	ga     *GeneticAlgorithm
-	logger *log.Logger
+	SecondsToReport int
+	lastPrintTime   time.Time
+	ga              *GeneticAlgorithm
+	logger          *log.Logger
 }
 
 func NewReport(ga *GeneticAlgorithm) *ProgressReport {
@@ -19,9 +18,9 @@ func NewReport(ga *GeneticAlgorithm) *ProgressReport {
 	l.SetFlags(0)
 
 	return &ProgressReport{
-		Percent: 10.0,
-		ga:      ga,
-		logger:  l,
+		SecondsToReport: 10,
+		ga:              ga,
+		logger:          l,
 	}
 }
 
@@ -33,11 +32,13 @@ func (rp *ProgressReport) PrintHeader() {
 		rp.ga.MutationRate*100.0,
 		rp.ga.CrossoverRate*100.0,
 		rp.ga.RandomSeedRate*100.0)
+	rp.lastPrintTime = time.Now()
 }
 
 func (rp *ProgressReport) CollectAndPrint() {
 	if rp.shouldPrintProgress() {
 		rp.Print()
+		rp.lastPrintTime = time.Now()
 	}
 }
 
@@ -58,7 +59,7 @@ func (rp *ProgressReport) shouldPrintProgress() bool {
 		return true
 	}
 
-	currentPercent := float64(rp.ga.Generation) / float64(rp.ga.MaxGenerations) * 100.0
+	timeDiff := time.Since(rp.lastPrintTime)
 
-	return math.Mod(currentPercent, rp.Percent) == 0
+	return timeDiff >= time.Duration(rp.SecondsToReport)*time.Second
 }

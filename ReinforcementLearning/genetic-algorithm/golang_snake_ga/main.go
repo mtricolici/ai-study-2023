@@ -10,8 +10,8 @@ import (
 
 var (
 	// Genetic Algorihm parameters
-	populationSize     = 100
-	maxGenerations     = 1_000
+	populationSize     = 50
+	maxGenerations     = 50_000
 	numberOfGames2Play = 5
 	fitnessThreshold   = 50.0 // score when GA stop training
 	ga_elitism         = 10   // How many best individuals move to next generation
@@ -20,19 +20,20 @@ var (
 	ga_mutationRate    = 0.02
 	ga_randomSeedRate  = 0.3
 	ga_mutateGaussian  = true
-	ga_report_percent  = 1.0
+	ga_report_seconds  = 10 // Print progress every 10 seconds
 
 	// Neural Network parameters
-	hiddenLayerNeurons  = 30
+	hiddenLayerNeurons  = 10
 	outputNeurons       = 3 // Turn Left, Keep Forward, Turn Right
 	topology            []int
 	networkWeightsCount int
 	snakeLimitedView    bool = true // snake does not view entire board
 
 	// Snake Game Parameters and variables
-	game                 *snake.SnakeGame
-	game_size            = 8
-	game_random_position = true
+	game                         *snake.SnakeGame
+	game_size                    = 8
+	game_random_position         = true
+	game_max_moves_without_apple = 30
 
 	score_apple           = 3.0   // reward for eating an apple
 	score_move_from_apple = -0.2  // reward move from apple
@@ -82,11 +83,11 @@ func main() {
 	ga.FitnessThreshold = fitnessThreshold
 	ga.FitnessFunc = snakeFitnessFunction
 	ga.MaxGenerations = maxGenerations
-	ga.Report.Percent = ga_report_percent
+	ga.Report.SecondsToReport = ga_report_seconds
 
 	best := ga.Run()
 	fmt.Println("\nTraining complete!")
-	fmt.Printf("Best fitness: %f", best.GetFitness())
+	fmt.Printf("Best fitness: %f\n", best.GetFitness())
 }
 
 // Plays a snake game AI guided and return total score
@@ -95,7 +96,7 @@ func playSnakeGame(network *neural_net.FeedForwardNeuralNetwork) float64 {
 
 	game.Reset() // << Start new game
 
-	for !game.GameOver {
+	for !game.GameOver && game.Moves_since_apple < game_max_moves_without_apple {
 		state := game.GetStateForNeuralNetwork()
 		action := network.PredictMaxIndex(state)
 
