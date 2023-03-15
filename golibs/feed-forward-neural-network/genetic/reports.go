@@ -32,6 +32,7 @@ func (rp *ProgressReport) PrintHeader() {
 		rp.ga.MutationRate*100.0,
 		rp.ga.CrossoverRate*100.0,
 		rp.ga.RandomSeedRate*100.0)
+	rp.logger.Printf("Individ genes: %d\n", rp.ga.Population.Individuals[0].GetGenesCount())
 	rp.lastPrintTime = time.Now()
 }
 

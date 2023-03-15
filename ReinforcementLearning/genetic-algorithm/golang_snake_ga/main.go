@@ -14,18 +14,18 @@ import (
 var (
 	// Genetic Algorihm parameters
 	populationSize     = 300
-	maxGenerations     = 10_000
-	numberOfGames2Play = 10
+	maxGenerations     = 1_000
+	numberOfGames2Play = 30
 	ga_elitism         = 10 // How many best individuals move to next generation
 	ga_tournamentSize  = 10 // Nr of best individs to select for breeding
 	ga_crossoverRate   = 0.8
 	ga_mutationRate    = 0.02
-	ga_randomSeedRate  = 0.3
+	ga_randomSeedRate  = 0.2
 	ga_mutateGaussian  = true
 	ga_report_seconds  = 25 // Print progress every 25 seconds
 
 	// Neural Network parameters
-	hiddenLayerNeurons  = 20
+	hiddenLayerNeurons  = 15
 	outputNeurons       = 3 // Turn Left, Keep Forward, Turn Right
 	topology            []int
 	networkWeightsCount int
@@ -151,6 +151,9 @@ func play_DemoGame() {
 		cimport.X_draw_objects()
 		fmt.Printf("Direction: %s Reward: %f\n", game.GetDirectionAsString(), game.Reward)
 		time.Sleep(100 * time.Millisecond)
+		if game.GameOver {
+			game.Reset()
+		}
 	}
 
 	fmt.Println("Game over")
