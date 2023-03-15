@@ -1,6 +1,9 @@
 package neural_net
 
-import "github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/random"
+import (
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_math"
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/random"
+)
 
 type Neuron struct {
 	Weights []float64
@@ -45,7 +48,7 @@ func (n *Neuron) Activate(inputs []float64) float64 {
 		sum += inputs[i] * n.Weights[i]
 	}
 
-	return sigmoid(sum)
+	return neural_math.Sigmoid(sum)
 }
 
 func (n *Neuron) GetWeightsCount() int {
