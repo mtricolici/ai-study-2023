@@ -4,8 +4,11 @@ go 1.20
 
 replace github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network => ../../../golibs/feed-forward-neural-network
 
+replace github.com/mtricolici/ai-study-2023/golibs/recurrent-neural-network => ../../../golibs/recurrent-neural-network
+
 require (
 	github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network v0.0.0
+	github.com/mtricolici/ai-study-2023/golibs/recurrent-neural-network v0.0.0
 	gonum.org/v1/gonum v0.12.0
 	gonum.org/v1/plot v0.12.0
 )

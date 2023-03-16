@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regression_sample1/regression/linear"
 	"regression_sample1/regression/polynomial"
+	"regression_sample1/regression/recurrentnn"
 	"regression_sample1/utils"
 )
 
@@ -23,6 +24,9 @@ func main() {
 
 	pl := polynomial.NewPolynomialRegression(2)
 	pl.TrainAndTest(inputDates, inputValues)
+
+	rr := recurrentnn.NewRecurrentNNRegression(10, 64)
+	rr.TrainAndTest(inputValues)
 
 	fmt.Println("Done!")
 }

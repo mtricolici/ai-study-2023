@@ -33,3 +33,9 @@ func (net *VanillaRecurrentNetwork) Forward(input []float64) []float64 {
 	}
 	return x
 }
+
+func (net *VanillaRecurrentNetwork) ResetState() {
+	for _, layer := range net.Layers {
+		layer.Memory = make([]float64, layer.NumNeurons)
+	}
+}
