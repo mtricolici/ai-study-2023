@@ -1,8 +1,19 @@
 to implement:
 
-- The Vanilla Deep Q-Learning algorithm
 - Actor-Critic Methods
 - Temporal Difference (TD) Learning
 - Deep Deterministic Policy Gradient (DDPG)
 - Proximal Policy Optimization (PPO)
-
+- Trust Region Policy Optimization (TRPO)
+- Asynchronous Advantage Actor-Critic (A3C)
+- Twin Delayed Deep Deterministic Policy Gradient (TD3): TD3 is a variation of DDPG that uses two critics instead of one, which helps to reduce overestimation of the Q-values.
+- Soft Actor-Critic (SAC): SAC is a policy gradient method that uses an entropy regularizer to encourage exploration.
+- Deep Reinforcement Fuzzy Q-Learning (DRFQL): DRFQL is a fuzzy logic-based reinforcement learning algorithm that combines Q-learning with fuzzy logic.
+- Deep Reinforcement Learning from Demonstrations (DRLfD): DRLfD is a method that combines reinforcement learning with supervised learning.
+- Upper Confidence Bound (UCB): UCB is a bandit-based algorithm that has been used in game-playing applications. 
+  It balances exploration and exploitation to learn the optimal strategy.
+- Trust-PCL (Proximal Curvature-based Learning): an actor-critic method that uses the curvature of the policy function to regularize the update step
+- Model-based Reinforcement Learning: learn a model of the environment and use it to simulate future states and rewards. This can be helpful in situations where the environment is complex or stochastic.
+- Model-free Hierarchical Reinforcement Learning: learn policies at multiple levels of abstraction, which can make learning more efficient and effective. Model-free hierarchical RL methods do not require a model of the environment.
+- Evolution Strategies: Evolution strategies are a type of optimization method that use a population of policies to search for the optimal solution.
+- Gradient-based Policy Optimization: learn the policy directly, rather than learning the value function. They can be more sample efficient than value-based methods and have been used successfully in game-playing environments.
