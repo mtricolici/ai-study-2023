@@ -26,7 +26,7 @@ func NewLayer(numNeurons, numInputs int, randomWeights bool) *Layer {
 	}
 }
 
-func (l *Layer) Activate(inputs []float64) []float64 {
+func (l *Layer) Forward(inputs []float64) []float64 {
 	if l.NumInputs != len(inputs) {
 		msg := fmt.Sprintf("layer.activate: bad number of inputs. Expected: %d. Got: %d", l.NumInputs, len(inputs))
 		panic(msg)
@@ -37,7 +37,7 @@ func (l *Layer) Activate(inputs []float64) []float64 {
 	combinedInput := append(inputs, l.Memory...)
 
 	for i, neuron := range l.Neurons {
-		outputs[i] = neuron.Activate(combinedInput)
+		outputs[i] = neuron.Forward(combinedInput)
 	}
 
 	// remember outputs

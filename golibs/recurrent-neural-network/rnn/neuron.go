@@ -31,9 +31,9 @@ func (n *Neuron) RandomizeWeights() {
 	n.Bias = random.NormFloat64()
 }
 
-func (n *Neuron) Activate(inputs []float64) float64 {
+func (n *Neuron) Forward(inputs []float64) float64 {
 	if len(inputs) != len(n.Weights) {
-		panic("neuron.activate error: number of inputs does not match number of weights")
+		panic("Neuron.Forward error: number of inputs does not match number of weights")
 	}
 
 	sum := n.Bias
