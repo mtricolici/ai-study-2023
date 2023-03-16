@@ -134,9 +134,9 @@ func play_DemoGame() {
 	time.Sleep(1 * time.Second)
 	cimport.X_draw_objects()
 	fmt.Println("Game starts in 10 seconds... prepare video recorder! ;)")
-	// time.Sleep(10 * time.Second)
+	time.Sleep(10 * time.Second)
 	fmt.Println("Game starts in 3 seconds... prepare video recorder! ;)")
-	time.Sleep(0 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	for !game.GameOver {
 		action := network.PredictMaxIndex(game.GetStateForNeuralNetwork())
