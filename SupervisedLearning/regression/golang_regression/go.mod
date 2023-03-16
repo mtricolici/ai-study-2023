@@ -2,7 +2,13 @@ module regression_sample1
 
 go 1.20
 
-require gonum.org/v1/plot v0.12.0
+replace github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network => ../../../golibs/feed-forward-neural-network
+
+require (
+	github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network v0.0.0
+	gonum.org/v1/gonum v0.12.0
+	gonum.org/v1/plot v0.12.0
+)
 
 require (
 	git.sr.ht/~sbinet/gg v0.3.1 // indirect
@@ -13,5 +19,4 @@ require (
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	golang.org/x/image v0.0.0-20220902085622-e7cb96979f69 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gonum.org/v1/gonum v0.12.0
 )

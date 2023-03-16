@@ -1,28 +1,33 @@
 package neural
 
 import (
-	"regression_sample1/neuralnet"
 	"regression_sample1/utils"
+
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/backpropagation"
+	"github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network/neural_net"
 )
 
 type NeuralRegression struct {
 	batchSize                int
 	numEpochs                int
-	learningRate             float64
-	stopTrainingMaxAvgError  float64
 	normalizeValueMultiplier float64
-	network                  *neuralnet.FeedForwardNeuralNetwork
+	network                  *neural_net.FeedForwardNeuralNetwork
+	training                 *backpropagation.BackpropagationTraining
 }
 
 func NewNeuralRegression(batchSize, hiddenNeurons int) *NeuralRegression {
-	network := neuralnet.NewFeedForwardNeuralNetwork(batchSize, hiddenNeurons, 1)
+	topology := []int{batchSize, hiddenNeurons, 1}
+	network := neural_net.NewFeedForwardNeuralNetwork(topology, true)
+	training := backpropagation.NewBackpropagationTraining(network)
+	training.LearningRate = 0.08
+	training.StopTrainingMaxAvgError = 0.001
+
 	return &NeuralRegression{
 		batchSize:                batchSize,
 		numEpochs:                1000,
-		learningRate:             0.08,
-		stopTrainingMaxAvgError:  0.001,
 		normalizeValueMultiplier: 0.5,
 		network:                  network,
+		training:                 training,
 	}
 }
 
@@ -55,7 +60,7 @@ func (nr *NeuralRegression) Train(inputValues []float64) {
 		inputIndex++
 	}
 
-	nr.network.Train(trainingInputs, trainingLabels, nr.numEpochs, nr.learningRate, nr.stopTrainingMaxAvgError)
+	nr.training.Train(trainingInputs, trainingLabels, nr.numEpochs)
 }
 
 func (nr *NeuralRegression) Predict(inputValues []float64, predictionsCount int) []float64 {
