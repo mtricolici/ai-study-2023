@@ -8,12 +8,12 @@ Examples of Neural Network types:
    Also, can be used for problems where the input data has a high degree of redundancy or noise,
    learns to filter out irrelevant information and focus on the most important features
 
-2. Convolutional Neural Network (CNN)
-   used for image and video recognition where convolutional layers are used to extract features from the input data
-
-3. Recurrent Neural Network (RNN)
+2. Recurrent Neural Network (RNN)
    used for sequence data, such as time series data, where information can flow in both directions
    the network has memory of previous inputs.
+
+3. Convolutional Neural Network (CNN)
+   used for image and video recognition where convolutional layers are used to extract features from the input data
 
 4. Long Short-Term Memory (LSTM) Network
    A type of recurrent neural network that is designed to handle long-term dependencies in sequence data
