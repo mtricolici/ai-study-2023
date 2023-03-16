@@ -25,8 +25,9 @@ func NewRecurrentNNRegression(timeSteps, hiddenNeurons int) *RecurrentNNRegressi
 	training.TimeSteps = timeSteps
 
 	return &RecurrentNNRegression{
-		network:  network,
-		training: training,
+		network:   network,
+		training:  training,
+		timeSteps: timeSteps,
 	}
 }
 
