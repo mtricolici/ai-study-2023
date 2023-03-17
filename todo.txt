@@ -1,3 +1,2 @@
-- Q-Learning
-- Deep Q-Networks (DQN)
-- Genetic Algorithms (GA)
+- Elman and Jordan networks
+
