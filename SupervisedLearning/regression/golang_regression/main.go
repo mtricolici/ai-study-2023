@@ -28,10 +28,11 @@ func main() {
 	//rr := recurrentnn.NewRecurrentNNRegression(10, 64)
 	//rr.TrainAndTest(inputValues)
 
-	er := elmanr.NewElmanRegression(20, 20)
-	er.NumEpochs = 1000
+	er := elmanr.NewElmanRegression(30, 100)
+	er.NumEpochs = 8000
 	er.PredictionsCount = 200
-	er.Network.LearningRate = 0.1
+	er.Network.LearningRate = 0.08
+	er.Network.TrainingReportSeconds = 5 // print training progress every 15 seconds
 	er.TrainAndTest(inputValues)
 
 	fmt.Println("Done!")

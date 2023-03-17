@@ -2,6 +2,7 @@ package elman
 
 import (
 	"fmt"
+	"time"
 )
 
 // Elman recurrent neural network
@@ -12,6 +13,8 @@ type ElmanNetwork struct {
 	layer2  *Layer
 
 	LearningRate float64
+
+	TrainingReportSeconds int
 }
 
 func NewElmanNetwork(numInputs, numHiddenNeurons, numOutputs int) *ElmanNetwork {
@@ -19,10 +22,11 @@ func NewElmanNetwork(numInputs, numHiddenNeurons, numOutputs int) *ElmanNetwork 
 	layer2_input_size := numHiddenNeurons + numHiddenNeurons
 
 	return &ElmanNetwork{
-		LearningRate: 0.03,
-		layer1:       NewLayer(numInputs, numHiddenNeurons),
-		layer2:       NewLayer(layer2_input_size, numOutputs),
-		context:      make([]float64, numHiddenNeurons),
+		LearningRate:          0.03,
+		TrainingReportSeconds: 3,
+		layer1:                NewLayer(numInputs, numHiddenNeurons),
+		layer2:                NewLayer(layer2_input_size, numOutputs),
+		context:               make([]float64, numHiddenNeurons),
 	}
 }
 
@@ -54,21 +58,38 @@ func (en *ElmanNetwork) ResetContext() {
 }
 
 func (en *ElmanNetwork) Train(inputs [][]float64, targets [][]float64, epochs int) {
-	fmt.Printf("Elman BPTT starting. \nLearningRate %f\n", en.LearningRate)
+	fmt.Println("Elman Network training paramters:")
+	fmt.Printf("-->LearnRate: %2.0f, Epochs: %d\n", en.LearningRate*100.0, epochs)
+	fmt.Println("Backpropagation through time training in progress ...")
+
+	lastPrint := time.Now()
+	var avgError float64
+
 	for epoch := 0; epoch < epochs; epoch++ {
 		en.ResetContext()
 
-		sum_errors := 0.0
-		for i := range inputs {
-			sum_errors += en.train_iteration(inputs[i], targets[i])
-		}
+		avgError = en.train_one_epoch(inputs, targets)
 
-		avgEror := sum_errors / float64(len(inputs))
-		fmt.Printf("epoch %6d. AvgError: %f\n", epoch, avgEror)
+		if time.Since(lastPrint) > time.Duration(en.TrainingReportSeconds)*time.Second {
+			progress := float64(epoch+1) / float64(epochs) * 100
+			fmt.Printf("progress %3.0f%% ==> AvgError: %f\n", progress, avgError)
+			lastPrint = time.Now()
+		}
 	}
+
+	fmt.Printf("Training Finished. AvgError: %f\n", avgError)
 }
 
-func (en *ElmanNetwork) train_iteration(input []float64, target []float64) float64 {
+func (en *ElmanNetwork) train_one_epoch(inputs, targets [][]float64) float64 {
+	sum_errors := 0.0
+	for i := range inputs {
+		sum_errors += en.train_one_input(inputs[i], targets[i])
+	}
+
+	return sum_errors / float64(len(inputs))
+}
+
+func (en *ElmanNetwork) train_one_input(input []float64, target []float64) float64 {
 	// Forward pass
 	output1, output2 := en.forward(input)
 
