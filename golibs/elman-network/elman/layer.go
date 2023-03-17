@@ -36,3 +36,12 @@ func (l *Layer) Activate(inputs []float64) []float64 {
 	}
 	return outputs
 }
+
+func (l *Layer) UpdateWeights(gradient, inputs []float64, learningRate float64) {
+	for i, neuron := range l.Neurons {
+		for w := range neuron.Weights {
+			neuron.Weights[w] += learningRate * gradient[i] * inputs[w]
+		}
+		neuron.Bias += learningRate * gradient[i]
+	}
+}

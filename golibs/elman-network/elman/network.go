@@ -79,24 +79,15 @@ func (en *ElmanNetwork) train_iteration(input []float64, target []float64) float
 
 	// 2. Update weights for the output layer
 	input2 := append(output1, en.context...)
-	en.updateWeights(gradient2, input2, en.layer2)
+	en.layer2.UpdateWeights(gradient2, input2, en.LearningRate)
 
 	// 3. Calculate error and gradient for layer1
 	error1 := calculate_hidden_error(en.layer1, en.layer2, error2)
 	gradient1 := calculate_gradient(output1, error1)
 
 	// 4. Update weights for layer1
-	en.updateWeights(gradient1, input, en.layer1)
+	en.layer1.UpdateWeights(gradient1, input, en.LearningRate)
 
 	// 5 return AVG output error for this input
 	return calculate_avg_error(target, output2)
-}
-
-func (en *ElmanNetwork) updateWeights(gradient, inputs []float64, layer *Layer) {
-	for i, neuron := range layer.Neurons {
-		for w := range neuron.Weights {
-			neuron.Weights[w] += en.LearningRate * gradient[i] * inputs[w]
-		}
-		neuron.Bias += en.LearningRate * gradient[i]
-	}
 }
