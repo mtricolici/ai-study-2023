@@ -1,6 +1,10 @@
 package elman
 
-import "github.com/mtricolici/ai-study-2023/golibs/elman-network/emath"
+import (
+	"math"
+
+	"github.com/mtricolici/ai-study-2023/golibs/elman-network/emath"
+)
 
 func calculate_gradient(output, errors []float64) []float64 {
 	size := len(output)
@@ -40,7 +44,7 @@ func calculate_avg_error(target, output []float64) float64 {
 
 	for i := 0; i < len(target); i++ {
 		diff := target[i] - output[i]
-		error_sum += diff * diff
+		error_sum += math.Abs(diff)
 
 	}
 

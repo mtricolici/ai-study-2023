@@ -59,7 +59,7 @@ func (en *ElmanNetwork) ResetContext() {
 
 func (en *ElmanNetwork) Train(inputs [][]float64, targets [][]float64, epochs int) {
 	fmt.Println("Elman Network training paramters:")
-	fmt.Printf("-->LearnRate: %2.0f, Epochs: %d\n", en.LearningRate*100.0, epochs)
+	fmt.Printf("-->LearnRate: %.2f, Epochs: %d\n", en.LearningRate, epochs)
 	fmt.Println("Backpropagation through time training in progress ...")
 
 	lastPrint := time.Now()
