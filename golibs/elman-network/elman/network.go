@@ -2,8 +2,6 @@ package elman
 
 import (
 	"fmt"
-
-	"github.com/mtricolici/ai-study-2023/golibs/elman-network/emath"
 )
 
 // Elman recurrent neural network
@@ -58,16 +56,19 @@ func (en *ElmanNetwork) ResetContext() {
 func (en *ElmanNetwork) Train(inputs [][]float64, targets [][]float64, epochs int) {
 	fmt.Printf("Elman BPTT starting. \nLearningRate %f\n", en.LearningRate)
 	for epoch := 0; epoch < epochs; epoch++ {
+		en.ResetContext()
+
+		sum_errors := 0.0
 		for i := range inputs {
-			en.ResetContext()
-			en.train_iteration(inputs[i], targets[i])
-			//TODO: calculate and print AVG error
-			//fmt.Printf("ElmanBPTT %d\n", epoch)
+			sum_errors += en.train_iteration(inputs[i], targets[i])
 		}
+
+		avgEror := sum_errors / float64(len(inputs))
+		fmt.Printf("epoch %6d. AvgError: %f\n", epoch, avgEror)
 	}
 }
 
-func (en *ElmanNetwork) train_iteration(input []float64, target []float64) {
+func (en *ElmanNetwork) train_iteration(input []float64, target []float64) float64 {
 	// Forward pass
 	output1, output2 := en.forward(input)
 
@@ -86,39 +87,9 @@ func (en *ElmanNetwork) train_iteration(input []float64, target []float64) {
 
 	// 4. Update weights for layer1
 	en.updateWeights(gradient1, input, en.layer1)
-}
 
-func calculate_error(target, output []float64) []float64 {
-	size := len(output)
-	errors := make([]float64, size)
-
-	for i := 0; i < size; i++ {
-		errors[i] = target[i] - output[i]
-	}
-
-	return errors
-}
-
-func calculate_hidden_error(currentLayer, nextLayer *Layer, nextErrors []float64) []float64 {
-	errors := make([]float64, currentLayer.NumNeurons)
-
-	for i := 0; i < currentLayer.NumNeurons; i++ {
-		errors[i] = 0.0
-		for j := 0; j < nextLayer.NumNeurons; j++ {
-			errors[i] += nextLayer.Neurons[j].Weights[i] * nextErrors[j]
-		}
-	}
-
-	return errors
-}
-
-func calculate_gradient(output, errors []float64) []float64 {
-	size := len(output)
-	gradient := make([]float64, size)
-	for i := 0; i < size; i++ {
-		gradient[i] = errors[i] * emath.SigmoidDerivative(output[i])
-	}
-	return gradient
+	// 5 return AVG output error for this input
+	return calculate_avg_error(target, output2)
 }
 
 func (en *ElmanNetwork) updateWeights(gradient, inputs []float64, layer *Layer) {
