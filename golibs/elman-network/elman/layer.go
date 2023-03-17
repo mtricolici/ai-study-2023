@@ -1,5 +1,7 @@
 package elman
 
+import "fmt"
+
 type Layer struct {
 	Neurons    []*Neuron
 	NumInputs  int
@@ -21,6 +23,13 @@ func NewLayer(numInputs, numNeurons int) *Layer {
 }
 
 func (l *Layer) Activate(inputs []float64) []float64 {
+	if l.NumInputs != len(inputs) {
+		msg := fmt.Sprintf(
+			"Layer:Activate() BAD input. Expected: %d got %d",
+			l.NumInputs, len(inputs))
+		panic(msg)
+	}
+
 	outputs := make([]float64, len(l.Neurons))
 	for i, neuron := range l.Neurons {
 		outputs[i] = neuron.Activate(inputs)

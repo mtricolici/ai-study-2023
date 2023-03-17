@@ -1,6 +1,10 @@
 package elman
 
-import "github.com/mtricolici/ai-study-2023/golibs/elman-network/emath"
+import (
+	"fmt"
+
+	"github.com/mtricolici/ai-study-2023/golibs/elman-network/emath"
+)
 
 // Elman recurrent neural network
 type ElmanNetwork struct {
@@ -30,6 +34,13 @@ func (en *ElmanNetwork) Predict(input []float64) []float64 {
 }
 
 func (en *ElmanNetwork) forward(input []float64) ([]float64, []float64) {
+	if en.layer1.NumInputs != len(input) {
+		msg := fmt.Sprintf(
+			"ElmanNetwork:forward() BAD input. Expected: %d got %d",
+			en.layer1.NumInputs, len(input))
+		panic(msg)
+	}
+
 	output1 := en.layer1.Activate(input)
 
 	layer2_Input := append(output1, en.context...)
@@ -45,16 +56,18 @@ func (en *ElmanNetwork) ResetContext() {
 }
 
 func (en *ElmanNetwork) Train(inputs [][]float64, targets [][]float64, epochs int) {
+	fmt.Printf("Elman BPTT starting. \nLearningRate %f\n", en.LearningRate)
 	for epoch := 0; epoch < epochs; epoch++ {
 		for i := range inputs {
+			en.ResetContext()
 			en.train_iteration(inputs[i], targets[i])
+			//TODO: calculate and print AVG error
+			//fmt.Printf("ElmanBPTT %d\n", epoch)
 		}
 	}
 }
 
 func (en *ElmanNetwork) train_iteration(input []float64, target []float64) {
-	en.ResetContext()
-
 	// Forward pass
 	output1, output2 := en.forward(input)
 
