@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"regression_sample1/regression/elmanr"
 	"regression_sample1/regression/linear"
 	"regression_sample1/regression/polynomial"
-	"regression_sample1/regression/recurrentnn"
 	"regression_sample1/utils"
 )
 
@@ -25,8 +25,14 @@ func main() {
 	pl := polynomial.NewPolynomialRegression(2)
 	pl.TrainAndTest(inputDates, inputValues)
 
-	rr := recurrentnn.NewRecurrentNNRegression(10, 64)
-	rr.TrainAndTest(inputValues)
+	//rr := recurrentnn.NewRecurrentNNRegression(10, 64)
+	//rr.TrainAndTest(inputValues)
+
+	er := elmanr.NewElmanRegression(20, 20)
+	er.NumEpochs = 1000
+	er.PredictionsCount = 200
+	er.Network.LearningRate = 0.1
+	er.TrainAndTest(inputValues)
 
 	fmt.Println("Done!")
 }

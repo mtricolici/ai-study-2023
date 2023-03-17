@@ -6,9 +6,12 @@ replace github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network =
 
 replace github.com/mtricolici/ai-study-2023/golibs/recurrent-neural-network => ../../../golibs/recurrent-neural-network
 
+replace github.com/mtricolici/ai-study-2023/golibs/elman-network => ../../../golibs/elman-network
+
 require (
 	github.com/mtricolici/ai-study-2023/golibs/feed-forward-neural-network v0.0.0
 	github.com/mtricolici/ai-study-2023/golibs/recurrent-neural-network v0.0.0
+	github.com/mtricolici/ai-study-2023/golibs/elman-network v0.0.0
 	gonum.org/v1/gonum v0.12.0
 	gonum.org/v1/plot v0.12.0
 )
