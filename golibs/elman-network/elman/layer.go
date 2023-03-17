@@ -38,10 +38,14 @@ func (l *Layer) Activate(inputs []float64) []float64 {
 }
 
 func (l *Layer) UpdateWeights(gradient, inputs []float64, learningRate float64) {
+	if len(gradient) != l.NumNeurons {
+		msg := fmt.Sprintf(
+			"Layer:UpdateWeights() BAD gradient. Expected: %d got %d",
+			l.NumInputs, len(gradient))
+		panic(msg)
+	}
+
 	for i, neuron := range l.Neurons {
-		for w := range neuron.Weights {
-			neuron.Weights[w] += learningRate * gradient[i] * inputs[w]
-		}
-		neuron.Bias += learningRate * gradient[i]
+		neuron.UpdateWeights(inputs, gradient[i], learningRate)
 	}
 }

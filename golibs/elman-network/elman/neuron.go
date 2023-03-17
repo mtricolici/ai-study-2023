@@ -34,3 +34,17 @@ func (n *Neuron) Activate(inputs []float64) float64 {
 	}
 	return emath.Sigmoid(sum)
 }
+
+func (n *Neuron) UpdateWeights(inputs []float64, gradient, learningRate float64) {
+	if len(n.Weights) != len(inputs) {
+		msg := fmt.Sprintf(
+			"Neuron:UpdateWeights() BAD inputs. Expected: %d got %d",
+			len(n.Weights), len(inputs))
+		panic(msg)
+	}
+
+	for i := range n.Weights {
+		n.Weights[i] += learningRate * gradient * inputs[i]
+	}
+	n.Bias += learningRate * gradient
+}
