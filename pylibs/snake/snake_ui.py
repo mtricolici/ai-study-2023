@@ -17,7 +17,8 @@ BODY_COLOR = (0,0,100)
 class SnakeWindow:
     def __init__(self, game:SnakeGame, caption:str):
         self.game = game
-        pygame.init()
+        pygame.display.init()
+        pygame.font.init()
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption(caption)
 
