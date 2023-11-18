@@ -26,6 +26,6 @@ docker run -it --rm \
   -v $(pwd):/app \
   $IMG \
   python /app/main.py \
-    /app/images/source.jpg \
-    /app/images/output.jpg
+    /app/images/source.png \
+    /app/images/output.png
 
