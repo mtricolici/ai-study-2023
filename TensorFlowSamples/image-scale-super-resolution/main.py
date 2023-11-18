@@ -1,16 +1,30 @@
 #!/usr/bin/env/python
-
 import sys
+from super_image import EdsrModel, ImageLoader
+from PIL import Image
 
-def main():
-  if len(sys.argv) != 3:
-    print("Usage: 2 arguments required! input and output image path")
-    sys.exit(1)
-  input_image_path = sys.argv[1]
-  output_image_path = sys.argv[2]
+def super_resolve(input_path, output_path):
+    # Load the pre-trained EDSR model
+    model = EdsrModel.from_pretrained('eugenesiow/edsr-base', scale=2)
 
-  print("Input image:", input_image_path)
-  print("Output image:", output_image_path)
+    # Open the image using PIL
+    image = Image.open(input_path)
+
+    # Load the image for the model
+    lr = ImageLoader.load_image(image)
+
+    # Perform super-resolution
+    preds = model(lr)
+
+    ImageLoader.save_image(preds, output_path) 
 
 if __name__ == "__main__":
-  main()
+    if len(sys.argv) != 3:
+        print("Usage: python script.py <input_path> <output_path>")
+        sys.exit(1)
+
+    input_path = sys.argv[1]
+    output_path = sys.argv[2]
+
+    super_resolve(input_path, output_path)
+

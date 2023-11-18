@@ -5,6 +5,8 @@ ARG GROUP_ID
 
 RUN groupadd -g $GROUP_ID python && \
     useradd -m -u $USER_ID -g $GROUP_ID python && \
-    pip install tensorflow-hub
+    apt-get update -qqy && \
+    apt-get install -qqy --no-install-recommends libgl1 libglib2.0-0 && \
+    pip install tensorflow-hub Pillow super-image
 
 USER python
