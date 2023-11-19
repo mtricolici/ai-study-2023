@@ -27,5 +27,5 @@ docker run -it --rm \
   $IMG \
   python /app/main.py \
     /app/images/source.png \
-    /app/images/output.png
+    /app/images/output.png || echo "Error: $?"
 
