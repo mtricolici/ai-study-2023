@@ -137,6 +137,39 @@ def adjust_saturation(image, saturation_factor=0.8):
 
     return adjusted_image
 ##################################################################
+def add_grain_effect(image, intensity=10):
+    # Get the dimensions of the image
+    height, width, channels = image.shape
+
+    # Generate random noise with the same dimensions as the image
+    noise = np.random.normal(0, intensity, (height, width, channels))
+
+    # Add the noise to the image
+    noisy_image = image + noise
+
+    # Ensure that pixel values are within the valid range [0, 255]
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+
+    return noisy_image
+##################################################################
+def adjust_brightness(image, factor=0.8):
+    """
+        factor: Brightness adjustment factor.
+            - 1.0 for no change.
+            - Values greater than 1.0 will increase brightness.
+            - Values less than 1.0 will decrease brightness.
+    """
+    # Convert the BGR image to the HSV color space
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Multiply the Value (brightness) channel by the factor
+    hsv_image[:, :, 2] = np.clip(hsv_image[:, :, 2] * factor, 0, 255)
+
+    # Convert the modified HSV image back to BGR
+    adjusted_image = cv2.cvtColor(hsv_image, cv2.COLOR_HSV2BGR)
+
+    return adjusted_image
+##################################################################
 
 def main():
     if len(sys.argv) != 3:
@@ -155,15 +188,18 @@ def main():
             sys.exit(1)
 
         # Add various effects to the image
-#        img = add_chromatic_aberration(img)
-#        img = add_scan_lines(img)
+        img = add_chromatic_aberration(img)
+        img = add_scan_lines(img)
 #        img = apply_vintage_effect(img)
-#        img = add_flicker_effect(img)
-#        img = add_gaussian_noise_distortion(img)
+        img = add_flicker_effect(img)
+        img = add_gaussian_noise_distortion(img)
 
-#        img = sharpen_image(img)
-#        img = add_color_bleeding(img)
+        img = adjust_brightness(img, factor=1.2)
+        img = sharpen_image(img, level=9)
         img = adjust_saturation(img)
+        img = add_grain_effect(img)
+
+        img = add_color_bleeding(img)
 
         # Save the modified image
         cv2.imwrite(output_image_path, img)
