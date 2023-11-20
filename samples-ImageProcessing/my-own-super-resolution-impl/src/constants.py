@@ -17,3 +17,7 @@ SAVE_BEST_ONLY = False
 DATASET_DIR = '/dataset'
 SMALL_SUFFIX = 'small'
 BIG_SUFFIX = 'big'
+
+DEMO_INPUT_FILE = '/output/input.png'
+DEMO_OUTPUT_FILE = '/output/scaled.png'
+
