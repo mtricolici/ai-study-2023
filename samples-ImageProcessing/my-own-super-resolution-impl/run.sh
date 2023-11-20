@@ -24,7 +24,7 @@ fi
 
 mkdir -p output
 
-docker run -it --rm \
+docker run --gpus all -it --rm \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \

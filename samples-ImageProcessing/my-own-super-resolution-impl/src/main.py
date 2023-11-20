@@ -1,5 +1,6 @@
 #!/usr/bin/env/python
 import argparse
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 from model import edsr_model
@@ -11,7 +12,7 @@ from constants import *
 #########################################################
 def main():
   parser = argparse.ArgumentParser(description='Super Resolution EDSR demo')
-  parser.add_argument('command', choices=['train', 'continue', 'demo'], help='The command to execute')
+  parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
 
   args = parser.parse_args()
 
@@ -34,6 +35,14 @@ def main():
   elif args.command == 'demo':
     model = load_model(MODEL_SAVE_PATH)
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE, resize_input=True)
+
+  elif args.command == 'info':
+    if tf.config.list_physical_devices('GPU'):
+      print("Available GPUs:")
+      for gpu in tf.config.list_physical_devices('GPU'):
+        print(gpu)
+    else:
+      print("GPU is not available :((")
 
 #########################################################
 
