@@ -26,13 +26,15 @@ def main():
   elif args.command == 'continue':
     print("Loading existed model from disk ...")
 
-    model = load_model(MODEL_SAVE_PATH)
+    # safe-mode is needed otherwise it can't deserialize lambda functions :(
+    model = load_model(MODEL_SAVE_PATH, safe_mode=False)
     train(model)
 
     print("training finished")
 
   elif args.command == 'demo':
-    model = load_model(MODEL_SAVE_PATH)
+    # safe-mode is needed otherwise it can't deserialize lambda functions :(
+    model = load_model(MODEL_SAVE_PATH, safe_mode=False)
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE, split=False)
 
   elif args.command == 'info':
