@@ -1,3 +1,4 @@
 *.so
+*.swp
 __pycache__
 SupervisedLearning/regression/golang_regression/*.png
