@@ -4,15 +4,7 @@ import cv2
 import tensorflow as tf
 
 from constants import *
-
-#########################################################
-def load_image(path):
-#  img = cv2.imread(path)
-#  img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  img = tf.io.read_file(path)
-  img = tf.image.decode_png(img, channels=3)
-  img = tf.image.convert_image_dtype(img, tf.float32)
-  return img
+from image import load_image
 
 #########################################################
 def dataset_loader():
@@ -29,8 +21,6 @@ def dataset_loader():
       batch_input.append(load_image(small_files[idx]))
       batch_output.append(load_image(big_files[idx]))
 
-    #batch_x = np.array(batch_input, dtype='float32') / 255.0
-    #batch_y = np.array(batch_output, dtype='float32') / 255.0
     batch_x = tf.stack(batch_input)
     batch_y = tf.stack(batch_output)
 
