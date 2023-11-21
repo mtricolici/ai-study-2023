@@ -18,7 +18,6 @@ def main():
 
   if args.command == 'train':
     print("Starting new training...")
-
     model = edsr_model(num_res_blocks=16, num_filters=64)
     train(model)
 

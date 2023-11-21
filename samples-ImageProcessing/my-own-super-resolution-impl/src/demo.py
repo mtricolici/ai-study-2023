@@ -79,9 +79,7 @@ def scale_image(model, input_path, output_path, split=True):
 
     final_image = combine_chunks(scaled_chunks, (original_h, original_w))
   else:
-    # Resize the image to INPUT_SIZE using Lanczos resampling
-    # Model is expecting an exact size as input!
-    if (original_w, original_h) != INPUT_SIZE:
+    if not DYNAMIC_MODEL and (original_w, original_h) != INPUT_SIZE:
       img = tf.image.resize(img, INPUT_SIZE[::-1], method=tf.image.ResizeMethod.LANCZOS3)
 
     img = tf.expand_dims(img, axis=0) # Add batch dimension

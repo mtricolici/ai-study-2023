@@ -4,9 +4,14 @@ from tensorflow.keras.models import Model
 
 from constants import *
 
+#########################################################
 def edsr_model(num_res_blocks=16, num_filters=64):
-    # Input layer
-    input_layer = Input(shape=(INPUT_SIZE[1], INPUT_SIZE[0], 3), name='input_layer')
+    if DYNAMIC_MODEL:
+        # Any image size is accepted as input!
+        input_layer = Input(shape=(None, None, 3), name='input_layer')
+    else:
+        # Exact size is accepted as input
+        input_layer = Input(shape=(INPUT_SIZE[1], INPUT_SIZE[0], 3), name='input_layer')
 
     # First convolution
     x = Conv2D(num_filters, 3, padding='same', name='conv_initial')(input_layer)
@@ -23,6 +28,7 @@ def edsr_model(num_res_blocks=16, num_filters=64):
     model = Model(inputs=input_layer, outputs=x)
     return model
 
+#########################################################
 def residual_block(input_tensor, num_filters, name):
     """
     Create a residual block for EDSR.
@@ -38,4 +44,6 @@ def residual_block(input_tensor, num_filters, name):
     x = Conv2D(num_filters, 3, padding='same', name=f'{name}_conv2')(x)
     x = Add(name=f'{name}_add')([input_tensor, x])
     return x
+
+#########################################################
 
