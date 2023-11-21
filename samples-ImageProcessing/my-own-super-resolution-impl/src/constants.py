@@ -9,7 +9,7 @@ EPOCH = 1
 STEPS_PER_EPOCH = 400
 LEARNING_RATE = 0.001
 
-MODEL_SAVE_PATH = '/output/edsr-model.h5'
+MODEL_SAVE_PATH = '/output/edsr-model.keras'
 SAVE_BEST_ONLY = True
 
 # dataset directory should have files of type
