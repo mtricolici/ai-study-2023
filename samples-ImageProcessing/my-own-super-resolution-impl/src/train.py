@@ -14,6 +14,8 @@ def train(model):
         epochs=EPOCH,
         steps_per_epoch=STEPS_PER_EPOCH,
         callbacks=[checkpoint])
+
+      model.save(MODEL_SAVE_PATH)
     except KeyboardInterrupt:
       model.save(MODEL_SAVE_PATH)
       print('Model saved to: "{}./*"'.format(MODEL_SAVE_PATH))
