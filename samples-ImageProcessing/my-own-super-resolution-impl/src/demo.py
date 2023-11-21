@@ -36,20 +36,59 @@ def split_image(img):
   return chunks
 
 #########################################################
-def scale_image(model, input_path, output_path):
+def combine_chunks(chunks, original_size):
+  oh, ow = original_size
+  tw, th = INPUT_SIZE
+
+  # Calculate number of chunks per row and per column
+  nx, ny = ow // tw, oh // th
+  if ow % tw != 0: nx += 1
+  if oh % th != 0: ny += 1
+
+  # Combine chunks row-wise and then column-wise
+  rows = []
+  for i in range(0, len(chunks), nx):
+    row_chunks = chunks[i:i + nx]
+    # Make sure all chunks in a row are the same height
+    row_height = min(chunk.shape[0] for chunk in row_chunks)
+    row_chunks = [chunk[:row_height, :, :] for chunk in row_chunks]
+    row = tf.concat(row_chunks, axis=1)
+    rows.append(row)
+
+  combined_image = tf.concat(rows, axis=0)
+
+  # Crop the combined image to match the original size
+  #combined_image = combined_image[:oh, :ow, :]
+  return combined_image
+
+#########################################################
+
+def scale_image(model, input_path, output_path, split=True):
   img = load_image(input_path)
+  original_h, original_w = img.shape[:2]
 
-  chunks = split_image(img)
-  scaled_chunks = []
+  if split:
+    chunks = split_image(img)
+    scaled_chunks = []
 
-  for chunk in chunks:
-    chunk = tf.expand_dims(chunk, axis=0) # Add batch dimension
-    out = model.predict(chunk)
-    out = tf.squeeze(out, axis=0) # Remove batch dimension
-    scaled_chunks.append(out)
+    for chunk in chunks:
+      chunk = tf.expand_dims(chunk, axis=0) # Add batch dimension
+      out = model.predict(chunk)
+      out = tf.squeeze(out, axis=0) # Remove batch dimension
+      scaled_chunks.append(out)
 
-  for i, sc in enumerate(scaled_chunks):
-    save_image(sc, f"/output/chunk-{i+1:02}.png")
+    final_image = combine_chunks(scaled_chunks, (original_h, original_w))
+  else:
+    # Resize the image to INPUT_SIZE using Lanczos resampling
+    # Model is expecting an exact size as input!
+    if (original_w, original_h) != INPUT_SIZE:
+      img = tf.image.resize(img, INPUT_SIZE[::-1], method=tf.image.ResizeMethod.LANCZOS3)
+
+    img = tf.expand_dims(img, axis=0) # Add batch dimension
+    final_image = model.predict(img)
+    final_image = tf.squeeze(final_image, axis=0)  # Remove batch dimension
+
+  save_image(final_image, output_path)
 
 #########################################################
 

@@ -34,7 +34,7 @@ def main():
 
   elif args.command == 'demo':
     model = load_model(MODEL_SAVE_PATH)
-    scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
+    scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE, split=False)
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):
