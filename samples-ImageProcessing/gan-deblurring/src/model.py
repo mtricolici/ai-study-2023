@@ -78,7 +78,6 @@ class MyGanModel:
       blurred_images, sharp_images = dataset_loader()
 
       # Generate deblurred images
-      print("Calling self.generator.predict ...")
       deblurred_images = self.generator.predict(blurred_images)
 
       # Labels for real and fake images
@@ -96,7 +95,7 @@ class MyGanModel:
       # The generator tries to make the discriminator label the deblurred images as real
       g_loss = self.gan.train_on_batch(blurred_images, real_labels)
 
-      if step % 100 == 0:
+      if step % 100 == 0 or step == STEPS_PER_EPOCH - 1:
         print(f"Step {step}, Generator Loss: {g_loss}, Discriminator Loss: {d_loss}")
   #########################################################
 
