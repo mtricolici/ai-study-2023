@@ -5,6 +5,7 @@ from tensorflow.keras.models import load_model
 
 from constants import *
 from dataset import dataset_loader
+from image import load_image, save_image
 
 class MyGanModel:
 
@@ -98,4 +99,13 @@ class MyGanModel:
       if step % 100 == 0 or step == STEPS_PER_EPOCH - 1:
         print(f"Step {step}, Generator Loss: {g_loss}, Discriminator Loss: {d_loss}")
   #########################################################
+  def process_image(self, input_path, output_path):
+    self.check_initialized()
+    img = load_image(input_path)
+    img = np.expand_dims(img, axis=0)  # Add batch dimension
+
+    out = self.generator.predict(img)
+
+    out = tf.squeeze(out, axis=0)  # Remove batch dimension
+    save_image(out, output_path)
 

@@ -31,7 +31,10 @@ def main():
     print("training finished")
 
   elif args.command == 'demo':
-    print("TODO: not implemented")
+    model = MyGanModel()
+    print("Loading existed model from disk ...")
+    model.load()
+    model.process_image(DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'demo-many':
     print("TODO: not implemented")
