@@ -3,6 +3,7 @@ from tensorflow.keras import layers, Model
 from tensorflow.keras.models import load_model
 
 from constants import *
+from dataset import dataset_loader
 
 class MyGanModel:
 
@@ -63,5 +64,23 @@ class MyGanModel:
     self.generator = load_model(f"{MODEL_SAVE_PATH}/model-generator.keras")
     self.discriminator = load_model(f"{MODEL_SAVE_PATH}/model-discriminator.keras")
     self.gan = load_model(f"{MODEL_SAVE_PATH}/model-gan.keras")
+  #########################################################
+  def train(self):
+    data_loader = dataset_loader()
+    for epoch in range(EPOCH):
+      print(f"Epoch {epoch+1}/{EPOCH}")
+      self.train_one_epoch(data_loader)
+      self.save()
+
+  #########################################################
+  def train_one_epoch(self, data_loader):
+    for step in range(STEPS_PER_EPOCH):
+      batch_input, batch_output = next(data_loader)
+
+      g_loss = 0.1
+      d_loss = 0.1
+
+      if step % 100 == 0:
+        print(f"Step {step}, Generator Loss: {g_loss}, Discriminator Loss: {d_loss}")
   #########################################################
 

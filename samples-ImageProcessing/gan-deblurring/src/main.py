@@ -18,16 +18,14 @@ def main():
     print("Starting new training...")
     model = MyGanModel()
     model.create()
-    #TODO: implement training
-    model.save()
-
+    model.train()
     print("training finished")
 
   elif args.command == 'continue':
     model = MyGanModel()
     print("Loading existed model from disk ...")
     model.load()
-    #TODO: implement training
+    model.train()
     print("training finished")
 
   elif args.command == 'demo':

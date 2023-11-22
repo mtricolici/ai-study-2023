@@ -8,6 +8,7 @@ from image import load_image
 
 #########################################################
 def dataset_loader():
+  print(">>>dataset_loader called!")
   good_files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if GOOD_SUFFIX in file]
   bad_files = [file.replace(GOOD_SUFFIX, BAD_SUFFIX) for file in good_files]
   num_files = len(good_files)
@@ -23,10 +24,11 @@ def dataset_loader():
     for idx in indices:
       batch_input.append(load_image(bad_files[idx]))
       batch_output.append(load_image(good_files[idx]))
+#      print(f">>>>dataset: {bad_files[idx]} => {good_files[idx]}")
 
-    batch_x = tf.stack(batch_input)
-    batch_y = tf.stack(batch_output)
+    #batch_x = tf.stack(batch_input)
+    #batch_y = tf.stack(batch_output)
 
-    yield (batch_x, batch_y)
+    yield (batch_input, batch_output)
 #########################################################
 
