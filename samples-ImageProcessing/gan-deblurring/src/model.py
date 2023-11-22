@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, Model
 from tensorflow.keras.models import load_model
@@ -66,19 +67,34 @@ class MyGanModel:
     self.gan = load_model(f"{MODEL_SAVE_PATH}/model-gan.keras")
   #########################################################
   def train(self):
-    data_loader = dataset_loader()
     for epoch in range(EPOCH):
       print(f"Epoch {epoch+1}/{EPOCH}")
-      self.train_one_epoch(data_loader)
+      self.train_one_epoch()
       self.save()
 
   #########################################################
-  def train_one_epoch(self, data_loader):
+  def train_one_epoch(self):
     for step in range(STEPS_PER_EPOCH):
-      batch_input, batch_output = next(data_loader)
+      blurred_images, sharp_images = dataset_loader()
 
-      g_loss = 0.1
-      d_loss = 0.1
+      # Generate deblurred images
+      print("Calling self.generator.predict ...")
+      deblurred_images = self.generator.predict(blurred_images)
+
+      # Labels for real and fake images
+      real_labels = np.ones((sharp_images.shape[0], 1))
+      fake_labels = np.zeros((deblurred_images.shape[0], 1))
+
+      # Train the discriminator
+      # Real sharp images are labeled as real
+      d_loss_real = self.discriminator.train_on_batch(sharp_images, real_labels)
+      # Deblurred images are labeled as fake
+      d_loss_fake = self.discriminator.train_on_batch(deblurred_images, fake_labels)
+      d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+
+      # Train the generator
+      # The generator tries to make the discriminator label the deblurred images as real
+      g_loss = self.gan.train_on_batch(blurred_images, real_labels)
 
       if step % 100 == 0:
         print(f"Step {step}, Generator Loss: {g_loss}, Discriminator Loss: {d_loss}")
