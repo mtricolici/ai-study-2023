@@ -28,6 +28,7 @@ docker run --gpus all -it --rm \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
+  -v $HOME/temp/many-images:/many-images \
   -v $HOME/temp/dataset:/dataset \
   $IMG \
   python /app/main.py $@ || echo "Error: $?"

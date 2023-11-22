@@ -11,6 +11,9 @@ def dataset_loader():
   small_files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if SMALL_SUFFIX in file]
   big_files = [file.replace(SMALL_SUFFIX, BIG_SUFFIX) for file in small_files]
   num_files = len(small_files)
+  if num_files == 0:
+    print("NO Files in dataset???")
+    os.exit(1)
 
   while True:
     indices = np.random.choice(num_files, BATCH_SIZE)

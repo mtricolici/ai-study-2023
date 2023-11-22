@@ -5,14 +5,14 @@ from tensorflow.keras.models import load_model
 
 from model import edsr_model
 from train import train
-from demo import scale_image
+from demo import scale_image, scale_all
 from constants import *
 
 
 #########################################################
 def main():
   parser = argparse.ArgumentParser(description='Super Resolution EDSR demo')
-  parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
+  parser.add_argument('command', choices=['train', 'continue', 'demo', 'demo-many', 'info'], help='The command to execute')
 
   args = parser.parse_args()
 
@@ -36,6 +36,10 @@ def main():
     # safe-mode is needed otherwise it can't deserialize lambda functions :(
     model = load_model(MODEL_SAVE_PATH, safe_mode=False)
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE, split=False)
+
+  elif args.command == 'demo-many':
+    model = load_model(MODEL_SAVE_PATH, safe_mode=False)
+    scale_all(model, '/many-images')
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):
