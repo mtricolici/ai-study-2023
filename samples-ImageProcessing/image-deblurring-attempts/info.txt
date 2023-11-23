@@ -1,0 +1,17 @@
+Several machine learning models can be used to train a system to unblur images. Here are a few options:
+
+- Convolutional Neural Networks (CNNs):
+CNNs are particularly well-suited for image processing tasks like deblurring due to their ability to capture spatial patterns and relationships in images.
+
+- Generative Adversarial Networks (GANs):
+GANs excel at generating realistic images, making them a good choice for deblurring tasks.
+
+- Autoencoders:
+Autoencoders are a type of neural network that learns to encode an input image into a latent representation and then reconstruct the original image from that representation.
+
+- Deep Image Prior (DIP):
+DIP is a deep learning approach that utilizes a prior distribution over natural images to guide the deblurring process.
+
+- Neural Style Transfer:
+Neural style transfer techniques can be adapted for deblurring tasks. These methods learn to transfer the style of reference images, such as sharpness and texture
+
