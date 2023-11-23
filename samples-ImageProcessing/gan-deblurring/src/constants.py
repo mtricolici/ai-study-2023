@@ -16,7 +16,7 @@ SAVE_BEST_ONLY = True
 # When we do predict with a batch - all images in a batch should be the same size!
 
 DATASET_DIR = '/dataset'
-RESOLUTIONS_COUNT = 5
+RESOLUTIONS_COUNT = 1
 GOOD_SUFFIX = 'good'
 BAD_SUFFIX  = 'bad'
 

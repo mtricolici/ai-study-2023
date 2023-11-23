@@ -18,7 +18,7 @@ def dataset_loader():
   num_files = len(good_files)
   if num_files == 0:
     print(f"NO Files in dataset with resolution {ri}???")
-    os.exit(1)
+    os._exit(1)
 
   indices = np.random.choice(num_files, BATCH_SIZE)
   batch_input = []

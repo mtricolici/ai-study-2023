@@ -7,7 +7,8 @@ RAW_DIR=$HOME/temp/raw-images
 # output folder to save dataset ready for GAN
 DATASET_DIR=$HOME/temp/dataset
 
-resolutions=("176x144" "256x192" "320x180" "320x240" "420x240" ) #"640x360" "854x480")
+#resolutions=("176x144" "256x192" "320x180" "320x240" "420x240" ) #"640x360" "854x480")
+resolutions=("320x180")
 
 RES="?"
 PREFIX="?"
