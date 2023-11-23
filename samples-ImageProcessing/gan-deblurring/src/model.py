@@ -11,47 +11,57 @@ from image import load_image, save_image
 class MyGanModel:
 
   #########################################################
-  def __init(self):
+  def __init__(self):
     self.generator = None
     self.discriminator = None
     self.gan = None
+    self.hidden = 3
+    self.sn = 32 # start neurons
+
+  #########################################################
+  def create_generator(self):
+    i = layers.Input(shape=(None, None, 3))
+    x = i
+    n = self.sn
+    for l in range(self.hidden):
+      x = layers.Conv2D(n, (3, 3), padding='same')(x)
+      x = layers.BatchNormalization()(x)
+      x = layers.LeakyReLU()(x)
+      n = n*2
+
+    o = layers.Conv2D(3, (3, 3), activation='tanh', padding='same')(x)
+    self.generator = Model(i, o, name='generator')
+
+  #########################################################
+  def create_discriminator(self):
+    i = layers.Input(shape=(None, None, 3))
+    x = i
+    n = self.sn
+    for l in range(self.hidden):
+      x = layers.Conv2D(n, (3, 3), padding='valid')(x)
+      if l > 0:
+        x = layers.BatchNormalization()(x)
+      x = layers.LeakyReLU()(x)
+      n = n*2
+    x = layers.GlobalAveragePooling2D()(x)
+    o = layers.Dense(1, activation='sigmoid')(x)
+    self.discriminator = Model(i, o, name='discriminator')
+    self.discriminator.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=LEARNING_RATE))
+    self.discriminator.trainable = False
+
+  #########################################################
+  def create_gan(self):
+    i = layers.Input(shape=(None, None, 3))
+    generated_image = self.generator(i)
+    o = self.discriminator(generated_image)
+    self.gan = Model(i, o, name='gan')
+    self.gan.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=LEARNING_RATE))
 
   #########################################################
   def create(self):
-    # Generator with more layers and batch normalization
-    generator_input = layers.Input(shape=(None, None, 3))
-    x = layers.Conv2D(64, (3, 3), padding='same')(generator_input)
-    x = layers.BatchNormalization()(x)
-    x = layers.LeakyReLU()(x)
-    x = layers.Conv2D(128, (3, 3), padding='same')(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.LeakyReLU()(x)
-    generator_output = layers.Conv2D(3, (3, 3), activation='tanh', padding='same')(x)
-    self.generator = Model(generator_input, generator_output, name='generator')
-
-    # Discriminator with batch normalization
-    discriminator_input = layers.Input(shape=(None, None, 3))
-    x = layers.Conv2D(64, (3, 3), padding='valid')(discriminator_input)
-    x = layers.LeakyReLU()(x)
-    x = layers.Conv2D(128, (3, 3), padding='valid')(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.LeakyReLU()(x)
-    x = layers.GlobalAveragePooling2D()(x)
-    discriminator_output = layers.Dense(1, activation='sigmoid')(x)
-    self.discriminator = Model(discriminator_input, discriminator_output, name='discriminator')
-
-    # Compile the discriminator
-    self.discriminator.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=LEARNING_RATE))
-
-    # GAN
-    gan_input = layers.Input(shape=(None, None, 3))
-    generated_image = self.generator(gan_input)
-    self.discriminator.trainable = False
-    gan_output = self.discriminator(generated_image)
-    self.gan = Model(gan_input, gan_output, name='gan')
-
-    # Compile the GAN
-    self.gan.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=LEARNING_RATE))
+    self.create_generator()
+    self.create_discriminator()
+    self.create_gan()
 
   #########################################################
   def check_initialized(self):
