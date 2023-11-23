@@ -22,6 +22,7 @@ def main():
     model = MyGanModel()
     model.create()
     model.train()
+    model.process_image(DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
     print("training finished")
 
   elif args.command == 'continue':
@@ -29,6 +30,7 @@ def main():
     print("Loading existed model from disk ...")
     model.load()
     model.train()
+    model.process_image(DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
     print("training finished")
 
   elif args.command == 'demo':
