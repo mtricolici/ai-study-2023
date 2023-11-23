@@ -19,9 +19,13 @@ def dataset_loader():
     batch_input = []
     batch_output = []
 
+
     for idx in indices:
-      batch_input.append(load_image(good_files[idx]))
-      batch_output.append(load_image(bad_files[idx]))
+#      print(">>>>>>>>>")
+      batch_input.append(load_image(bad_files[idx]))
+      batch_output.append(load_image(good_files[idx]))
+#      print(f"input  => {bad_files[idx]}")
+#      print(f"output => {good_files[idx]}")
 
     batch_x = tf.stack(batch_input)
     batch_y = tf.stack(batch_output)
