@@ -5,7 +5,7 @@ set -e
 RAW_DIR=$HOME/temp/raw-images
 
 # output folder to save dataset ready for CNN training
-DATASET_DIR=$HOME/temp/dataset
+DATASET_DIR=$HOME/temp/cnn-dataset
 
 RES="640x360"
 

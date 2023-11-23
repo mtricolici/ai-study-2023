@@ -5,7 +5,7 @@ set -e
 RAW_DIR=$HOME/temp/raw-images
 
 # output folder to save dataset ready for GAN
-DATASET_DIR=$HOME/temp/dataset
+DATASET_DIR=$HOME/temp/gan-dataset
 
 #resolutions=("176x144" "256x192" "320x180" "320x240" "420x240" ) #"640x360" "854x480")
 resolutions=("160x90")
