@@ -37,7 +37,7 @@ class MyGanModel:
     self.discriminator = Model(discriminator_input, discriminator_output, name='discriminator')
 
     # Compile the discriminator
-    self.discriminator.compile(optimizer='adam', loss='binary_crossentropy')
+    self.discriminator.compile(loss='binary_crossentropy', optimizer=Adam(lr=LEARNING_RATE))
 
     # GAN
     gan_input = layers.Input(shape=(None, None, 3))
@@ -47,7 +47,7 @@ class MyGanModel:
     self.gan = Model(gan_input, gan_output, name='gan')
 
     # Compile the GAN
-    self.gan.compile(optimizer='adam', loss='binary_crossentropy')
+    self.gan.compile(loss='binary_crossentropy', optimizer=Adam(lr=LEARNING_RATE))
 
   #########################################################
   def check_initialized(self):
