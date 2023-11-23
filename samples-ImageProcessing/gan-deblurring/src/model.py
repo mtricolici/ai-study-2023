@@ -16,7 +16,7 @@ class MyGanModel:
     self.discriminator = None
     self.gan = None
     self.hidden = 3
-    self.sn = 32 # start neurons
+    self.sn = 64 # start neurons
 
   #########################################################
   def create_generator(self):
@@ -29,7 +29,7 @@ class MyGanModel:
       x = layers.LeakyReLU()(x)
       n = n*2
 
-    o = layers.Conv2D(3, (3, 3), activation='tanh', padding='same')(x)
+    o = layers.Conv2D(3, (3, 3), activation='relu', padding='same')(x)
     self.generator = Model(i, o, name='generator')
 
   #########################################################
@@ -120,7 +120,9 @@ class MyGanModel:
     img = tf.expand_dims(img, axis=0) # Add batch dimension
 
     out = self.generator.predict(img)
+    save_image(out[0], output_path)
+    #tf.keras.preprocessing.image.save_img(output_path, out[0])
 
-    out = tf.squeeze(out, axis=0)  # Remove batch dimension
-    save_image(out, output_path)
+    #out = tf.squeeze(out, axis=0)  # Remove batch dimension
+    #save_image(out, output_path)
 
