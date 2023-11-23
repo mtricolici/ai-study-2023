@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras import layers, Model
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, Conv2DTranspose, Activation
 from tensorflow.keras.optimizers import Adam
 
 from constants import *
