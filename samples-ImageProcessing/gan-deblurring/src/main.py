@@ -11,6 +11,7 @@ from model import MyGanModel
 
 #########################################################
 def main():
+  print(f"TensorFlowVersion: {tf.__version__}")
   parser = argparse.ArgumentParser(description='GAN deblurr ;)')
   parser.add_argument('command', choices=['train', 'continue', 'demo', 'demo-many', 'info'], help='The command to execute')
 

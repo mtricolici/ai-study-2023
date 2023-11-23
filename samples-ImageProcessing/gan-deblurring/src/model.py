@@ -26,7 +26,7 @@ class MyGanModel:
     x = layers.Conv2D(128, (3, 3), padding='same')(x)
     x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
-    generator_output = layers.Conv2D(3, (3, 3), activation='sigmoid', padding='same')(x)
+    generator_output = layers.Conv2D(3, (3, 3), activation='tanh', padding='same')(x)
     self.generator = Model(generator_input, generator_output, name='generator')
 
     # Discriminator with batch normalization
@@ -86,16 +86,15 @@ class MyGanModel:
       deblurred_images = self.generator.predict(blurred_images, verbose=0)
 
       # Labels for real and fake images
-      real_labels = np.ones((sharp_images.shape[0], 1))
-      fake_labels = np.zeros((deblurred_images.shape[0], 1))
+      real_labels = tf.ones((sharp_images.shape[0], 1))
+      fake_labels = tf.zeros((deblurred_images.shape[0], 1))
 
-      # Train the discriminator
+      #### Train the discriminator
       self.discriminator.trainable = True
-      # Real sharp images are labeled as real
+
       d_loss_real = self.discriminator.train_on_batch(sharp_images, real_labels)
-      # Deblurred images are labeled as fake
       d_loss_fake = self.discriminator.train_on_batch(deblurred_images, fake_labels)
-      d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+      d_loss = 0.5 * tf.math.add(d_loss_real, d_loss_fake)
       self.discriminator.trainable = False
 
       # Train the generator
