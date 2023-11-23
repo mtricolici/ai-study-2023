@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, Model
 from tensorflow.keras.models import load_model
+from tensorflow.keras.optimizers import Adam
 
 from constants import *
 from dataset import dataset_loader
@@ -17,27 +18,30 @@ class MyGanModel:
 
   #########################################################
   def create(self):
-    # Generator
+    # Generator with more layers and batch normalization
     generator_input = layers.Input(shape=(None, None, 3))
     x = layers.Conv2D(64, (3, 3), padding='same')(generator_input)
+    x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
-    x = layers.Conv2D(64, (3, 3), padding='same')(x)
+    x = layers.Conv2D(128, (3, 3), padding='same')(x)
+    x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
     generator_output = layers.Conv2D(3, (3, 3), activation='sigmoid', padding='same')(x)
     self.generator = Model(generator_input, generator_output, name='generator')
 
-    # Discriminator
+    # Discriminator with batch normalization
     discriminator_input = layers.Input(shape=(None, None, 3))
     x = layers.Conv2D(64, (3, 3), padding='valid')(discriminator_input)
     x = layers.LeakyReLU()(x)
     x = layers.Conv2D(128, (3, 3), padding='valid')(x)
+    x = layers.BatchNormalization()(x)
     x = layers.LeakyReLU()(x)
     x = layers.GlobalAveragePooling2D()(x)
     discriminator_output = layers.Dense(1, activation='sigmoid')(x)
     self.discriminator = Model(discriminator_input, discriminator_output, name='discriminator')
 
     # Compile the discriminator
-    self.discriminator.compile(loss='binary_crossentropy', optimizer=Adam(lr=LEARNING_RATE))
+    self.discriminator.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=LEARNING_RATE))
 
     # GAN
     gan_input = layers.Input(shape=(None, None, 3))
@@ -47,7 +51,7 @@ class MyGanModel:
     self.gan = Model(gan_input, gan_output, name='gan')
 
     # Compile the GAN
-    self.gan.compile(loss='binary_crossentropy', optimizer=Adam(lr=LEARNING_RATE))
+    self.gan.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=LEARNING_RATE))
 
   #########################################################
   def check_initialized(self):
@@ -79,18 +83,20 @@ class MyGanModel:
       blurred_images, sharp_images = dataset_loader()
 
       # Generate deblurred images
-      deblurred_images = self.generator.predict(blurred_images)
+      deblurred_images = self.generator.predict(blurred_images, verbose=0)
 
       # Labels for real and fake images
       real_labels = np.ones((sharp_images.shape[0], 1))
       fake_labels = np.zeros((deblurred_images.shape[0], 1))
 
       # Train the discriminator
+      self.discriminator.trainable = True
       # Real sharp images are labeled as real
       d_loss_real = self.discriminator.train_on_batch(sharp_images, real_labels)
       # Deblurred images are labeled as fake
       d_loss_fake = self.discriminator.train_on_batch(deblurred_images, fake_labels)
       d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
+      self.discriminator.trainable = False
 
       # Train the generator
       # The generator tries to make the discriminator label the deblurred images as real
@@ -102,7 +108,7 @@ class MyGanModel:
   def process_image(self, input_path, output_path):
     self.check_initialized()
     img = load_image(input_path)
-    img = np.expand_dims(img, axis=0)  # Add batch dimension
+    img = tf.expand_dims(img, axis=0) # Add batch dimension
 
     out = self.generator.predict(img)
 
