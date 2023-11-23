@@ -120,7 +120,8 @@ class MyGanModel:
     img = tf.expand_dims(img, axis=0) # Add batch dimension
 
     out = self.generator.predict(img)
-    save_image(out[0], output_path)
+    out = tf.squeeze(out, axis=0) # Remove batch dimension
+    save_image(out, output_path)
     #tf.keras.preprocessing.image.save_img(output_path, out[0])
 
     #out = tf.squeeze(out, axis=0)  # Remove batch dimension
