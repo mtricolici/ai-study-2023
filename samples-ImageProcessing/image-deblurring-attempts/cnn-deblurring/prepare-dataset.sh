@@ -26,9 +26,9 @@ while IFS= read -d '' img; do
 
   echo "Creating $DATASET_DIR/${prefix}-bad.png"
   # scaling down good image to 25%
-  convert "$DATASET_DIR/${prefix}-good.png" -resize 50% $OPS "$DATASET_DIR/${prefix}-bad.png"
+  convert "$DATASET_DIR/${prefix}-good.png" -resize 25% $OPS "$DATASET_DIR/${prefix}-bad.png"
   # scale up bad image to 400% - as a blurred example
-  convert "$DATASET_DIR/${prefix}-bad.png" -resize 200% $OPS "$DATASET_DIR/${prefix}-bad.png"
+  convert "$DATASET_DIR/${prefix}-bad.png" -resize 400% $OPS "$DATASET_DIR/${prefix}-bad.png"
 
   echo "${count} of ${total} done"
   
