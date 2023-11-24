@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Conv2DTranspose, Activation
+from tensorflow.keras.layers import Conv2D, Conv2DTranspose, BatchNormalization, Activation
 from tensorflow.keras.optimizers import Adam
 
 from constants import *
@@ -12,8 +12,13 @@ from image import load_image, save_image
 def model_create():
   model = Sequential([
     Conv2D(64, (3, 3), padding='same', input_shape=(*INPUT_SIZE[::-1], 3)),
+    BatchNormalization(),
     Activation('relu'),
     Conv2D(64, (3, 3), padding='same'),
+    BatchNormalization(),
+    Activation('relu'),
+    Conv2D(128, (3, 3), padding='same'),
+    BatchNormalization(),
     Activation('relu'),
     Conv2DTranspose(3, (3, 3), padding='same')
   ])
