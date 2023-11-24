@@ -18,7 +18,7 @@ def main():
 
   if args.command == 'train':
     print("Starting new training...")
-    model = edsr_model(num_res_blocks=16, num_filters=64)
+    model = edsr_model()
     train(model)
 
     print("training finished")
@@ -35,7 +35,7 @@ def main():
   elif args.command == 'demo':
     # safe-mode is needed otherwise it can't deserialize lambda functions :(
     model = load_model(MODEL_SAVE_PATH, safe_mode=False)
-    scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE, split=False)
+    scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'demo-many':
     model = load_model(MODEL_SAVE_PATH, safe_mode=False)
