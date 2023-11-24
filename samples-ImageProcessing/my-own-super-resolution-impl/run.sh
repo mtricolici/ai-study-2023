@@ -29,7 +29,7 @@ docker run --gpus all -it --rm \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
   -v $HOME/temp/many-images:/many-images \
-  -v $HOME/temp/dataset:/dataset \
+  -v $HOME/temp/super-dataset:/dataset \
   $IMG \
   python /app/main.py $@ || echo "Error: $?"
 

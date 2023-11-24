@@ -13,8 +13,8 @@ MODEL_SAVE_PATH = '/output/edsr-model.keras'
 SAVE_BEST_ONLY = True
 
 # dataset directory should have files of type
-# small-1212.png
-# big-1212.png << scaled small image
+# 1212-small.png
+# 1212-big.png << scaled small image
 
 DATASET_DIR = '/dataset'
 SMALL_SUFFIX = 'small'
