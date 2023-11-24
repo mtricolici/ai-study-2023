@@ -25,6 +25,8 @@ fi
 mkdir -p output
 
 docker run --gpus all -it --rm \
+  -e TF_FORCE_GPU_ALLOW_GROWTH=true \
+  -e TF_CPP_MIN_LOG_LEVEL=3 \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
