@@ -1,0 +1,1 @@
+implement validation loss calculation and early stopping to prevent overfitting!
