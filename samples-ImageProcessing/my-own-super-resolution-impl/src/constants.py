@@ -1,16 +1,16 @@
 
 SCALE_FACTOR = 4
 BATCH_SIZE   = 10
+VALIDATION_STEPS = 17 # !!! Number of validation samples / BATCH_SIZE
 
 NUM_RES_BLOCKS = 16
 NUM_FILTERS    = 64
 
-EPOCH = 1
-STEPS_PER_EPOCH = 500
+EPOCH = 2
+STEPS_PER_EPOCH = 50
 LEARNING_RATE = 0.001
 
 MODEL_SAVE_PATH = '/output/edsr-model.keras'
-SAVE_BEST_ONLY = True
 
 # dataset directory should have files of type
 # 1212-small.png

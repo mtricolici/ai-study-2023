@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Add, Conv2D, Input, Lambda
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import Adam
 
 from constants import *
 
@@ -21,6 +22,7 @@ def edsr_model():
 
     # Construct the model
     model = Model(inputs=input_layer, outputs=x)
+    model.compile(optimizer=Adam(LEARNING_RATE), loss='mean_squared_error')
     return model
 
 #########################################################
