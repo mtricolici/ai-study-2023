@@ -1,13 +1,20 @@
 
 SCALE_FACTOR = 4
 BATCH_SIZE   = 10
-VALIDATION_STEPS = 17 # !!! Number of validation samples / BATCH_SIZE
+
+# !!! Number of validation samples / BATCH_SIZE
+VALIDATION_STEPS = 17
+
+# Stop training If validation loss is not improving for EARLY_STOPPING_PATIENCE nr of epoches
+# NR of epoches to wait before stopping after the model stops improving
+# Common value between 5 .. 10
+EARLY_STOPPING_PATIENCE = 5
 
 NUM_RES_BLOCKS = 16
 NUM_FILTERS    = 64
 
-EPOCH = 2
-STEPS_PER_EPOCH = 50
+EPOCH = 5000 # It should stop anyway earlier ;)
+STEPS_PER_EPOCH = 100
 LEARNING_RATE = 0.001
 
 MODEL_SAVE_PATH = '/output/edsr-model.keras'
