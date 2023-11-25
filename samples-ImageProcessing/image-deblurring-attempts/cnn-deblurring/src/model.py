@@ -12,13 +12,8 @@ from image import load_image, save_image
 def model_create():
   model = Sequential([
     Conv2D(64, (3, 3), padding='same', input_shape=(*INPUT_SIZE[::-1], 3)),
-    BatchNormalization(),
     Activation('relu'),
-    Conv2D(64, (3, 3), padding='same'),
-    BatchNormalization(),
-    Activation('relu'),
-    Conv2D(128, (3, 3), padding='same'),
-    BatchNormalization(),
+    Conv2D(32, (3, 3), padding='same'),
     Activation('relu'),
     Conv2DTranspose(3, (3, 3), padding='same')
   ])
@@ -27,8 +22,10 @@ def model_create():
 
 #########################################################
 def train_model(model):
-  model.fit(dataset_loader(), steps_per_epoch=STEPS_PER_EPOCH, epochs=EPOCH)
-  model.save(MODEL_SAVE_PATH)
+  try:
+    model.fit(dataset_loader(), steps_per_epoch=STEPS_PER_EPOCH, epochs=EPOCH)
+  except KeyboardInterrupt:
+    print('Aborting...')
 
 #########################################################
 def unblure_image(model, input_path, output_path):
