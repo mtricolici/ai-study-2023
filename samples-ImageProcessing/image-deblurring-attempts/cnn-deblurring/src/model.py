@@ -6,7 +6,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 from constants import *
-from dataset import train_data_loader, validation_data_loader
+from dataset import train_data_loader, validation_data_loader, calc_validation_steps
 from image import load_image, save_image
 
 #########################################################
@@ -23,6 +23,7 @@ def model_create():
 
 #########################################################
 def train_model(model):
+  val_steps = calc_validation_steps()
 
   checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
   early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
@@ -33,7 +34,7 @@ def train_model(model):
       steps_per_epoch=STEPS_PER_EPOCH,
       epochs=EPOCH,
       validation_data=validation_data_loader(),
-      validation_steps=VALIDATION_STEPS,
+      validation_steps=val_steps,
       callbacks=[checkpoint, early_stopping])
   except KeyboardInterrupt:
     print('Aborting...')

@@ -24,6 +24,22 @@ def load_and_split_dataset(split_ratio=0.9):
 
   return (train_bad_files, train_good_files, validation_bad_files, validation_good_files)
 #########################################################
+def calc_validation_steps():
+  train_bad_files, _, validation_bad_files, _ = load_and_split_dataset()
+  num_train_samples = len(train_bad_files)
+  num_validation_samples = len(validation_bad_files)
+
+  # round up. for 18.6 will be 19
+  validation_steps = int(tf.math.ceil(num_validation_samples / BATCH_SIZE).numpy())
+
+  print("#info:")
+  print(f"training-samples   : {num_train_samples}")
+  print(f"validation-samples : {num_validation_samples}")
+  print(f"batch-size         : {BATCH_SIZE}")
+  print(f"validation-steps   : {validation_steps}")
+
+  return validation_steps
+#########################################################
 def generate_batch(indices, bad_files, good_files):
   batch_input = []
   batch_output = []

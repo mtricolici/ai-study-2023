@@ -1,9 +1,6 @@
 
 BATCH_SIZE = 10
 
-# !!! Number of validation samples / BATCH_SIZE
-VALIDATION_STEPS = 17
-
 # Stop training If validation loss is not improving for EARLY_STOPPING_PATIENCE nr of epoches
 # NR of epoches to wait before stopping after the model stops improving
 # Common value between 5 .. 10
