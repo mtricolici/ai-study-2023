@@ -3,9 +3,10 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Conv2DTranspose, BatchNormalization, Activation
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 from constants import *
-from dataset import dataset_loader
+from dataset import train_data_loader, validation_data_loader
 from image import load_image, save_image
 
 #########################################################
@@ -22,8 +23,18 @@ def model_create():
 
 #########################################################
 def train_model(model):
+
+  checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
+  early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
+
   try:
-    model.fit(dataset_loader(), steps_per_epoch=STEPS_PER_EPOCH, epochs=EPOCH)
+    model.fit(
+      train_data_loader(),
+      steps_per_epoch=STEPS_PER_EPOCH,
+      epochs=EPOCH,
+      validation_data=validation_data_loader(),
+      validation_steps=VALIDATION_STEPS,
+      callbacks=[checkpoint, early_stopping])
   except KeyboardInterrupt:
     print('Aborting...')
 

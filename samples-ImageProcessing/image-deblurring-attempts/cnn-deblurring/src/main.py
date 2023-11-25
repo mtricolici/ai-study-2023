@@ -18,14 +18,12 @@ def main():
     model = model_create()
     train_model(model)
     print("training finished")
-    unblure_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'continue':
     print("Loading existed model from disk ...")
     model = tf.keras.models.load_model(MODEL_SAVE_PATH)
     train_model(model)
     print("training finished")
-    unblure_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'demo':
     print("Loading existed model from disk ...")
