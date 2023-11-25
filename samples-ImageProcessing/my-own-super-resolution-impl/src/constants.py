@@ -2,8 +2,9 @@
 SCALE_FACTOR = 4
 BATCH_SIZE   = 10
 
-# !!! Number of validation samples / BATCH_SIZE
-VALIDATION_STEPS = 17
+# 0.9 means 10% of dataset will not be used for traing
+# it will be used for validation !
+SPLIT_RATIO = 0.9
 
 # Stop training If validation loss is not improving for EARLY_STOPPING_PATIENCE nr of epoches
 # NR of epoches to wait before stopping after the model stops improving

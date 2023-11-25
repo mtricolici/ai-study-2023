@@ -7,7 +7,7 @@ from constants import *
 from image import load_image
 
 #########################################################
-def load_and_split_dataset(split_ratio=0.9):
+def load_and_split_dataset():
   small_files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if file.endswith("small.png")]
   big_files = [file.replace("small.png", "big.png") for file in small_files]
   num_files = len(small_files)
@@ -15,7 +15,7 @@ def load_and_split_dataset(split_ratio=0.9):
     print("NO Files in dataset???")
     os.exit(1)
 
-  split_index = int(num_files * split_ratio)
+  split_index = int(num_files * SPLIT_RATIO)
 
   train_small_files = small_files[:split_index]
   train_big_files = big_files[:split_index]
@@ -24,6 +24,22 @@ def load_and_split_dataset(split_ratio=0.9):
   validation_big_files = big_files[split_index:]
 
   return (train_small_files, train_big_files, validation_small_files, validation_big_files)
+#########################################################
+def calc_validation_steps():
+  train_small_files, _, validation_small_files, _ = load_and_split_dataset()
+  num_train_samples = len(train_small_files)
+  num_validation_samples = len(validation_small_files)
+
+  # round up. for 18.6 will be 19
+  validation_steps = int(tf.math.ceil(num_validation_samples / BATCH_SIZE).numpy())
+
+  print("#info:")
+  print(f"training-samples   : {num_train_samples}")
+  print(f"validation-samples : {num_validation_samples}")
+  print(f"batch-size         : {BATCH_SIZE}")
+  print(f"validation-steps   : {validation_steps}")
+
+  return validation_steps
 #########################################################
 def generate_batch(indices, small_files, big_files):
   batch_input = []
@@ -51,6 +67,7 @@ def validation_dataset_loader():
   num_validation_files = len(validation_small_files)
 
   while True:
+    # replace=False - all indexes should be unique!!! not like in dataset_loader ;)
     indices = np.random.choice(num_validation_files, BATCH_SIZE, replace=False)
     yield generate_batch(indices, validation_small_files, validation_big_files)
 #########################################################
