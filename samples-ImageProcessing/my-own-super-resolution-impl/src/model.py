@@ -12,11 +12,18 @@ def edsr_model():
     # First convolution
     x = Conv2D(NUM_FILTERS, 3, padding='same', name='conv_initial')(input_layer)
 
+    # Store the output of the first convolution to add later
+    conv1_output = x
+
     # Residual blocks
     for i in range(NUM_RES_BLOCKS):
         x = residual_block(x, name=f'res_block_{i+1}')
 
-    # Output convolution
+    # Adding the first convolution output to the final output of residual blocks
+    x = Conv2D(NUM_FILTERS, 3, padding='same', name='conv_mid')(x)
+    x = Add(name='add_conv1')([conv1_output, x])
+
+    # Sub-Pixel Convolution Layer
     x = Conv2D(3 * (SCALE_FACTOR ** 2), 3, padding='same', name='conv_output')(x)
     x = Lambda(lambda x: tf.nn.depth_to_space(x, SCALE_FACTOR), name='pixel_shuffle')(x)
 
