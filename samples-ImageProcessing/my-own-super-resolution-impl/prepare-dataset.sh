@@ -14,17 +14,27 @@ RBIG=640x360
 OPS="-background black -gravity center -strip"
 
 count=1
-total=$(find $RAW_DIR/ -type f |wc -l)
+total=$(find $RAW_DIR/ -type f -name '*.png' |wc -l)
 
-find $RAW_DIR/ -type f -print0 |\
+find $RAW_DIR/ -type f -name '*.png' -print0 | shuf -z |\
 while IFS= read -d '' img; do
   prefix="${DATASET_DIR}/$(printf '%05d' $count)"
 
+  dimensions=$(identify -format "%w %h" "$img")
+  read w h <<< "$dimensions"
+
+  rotate=""
+  rotation="NO"
+  if [ "$h" -gt "$w" ]; then
+    rotate="-rotate 90"
+    rotation="YES"
+  fi
+
   # create a good unblured dataset example
-  echo "Creating ${prefix}-small.png"
-  convert "$img" -resize $RSMALL -filter lanczos -background black -gravity center -extent $RSMALL -strip "${prefix}-small.png"
-  echo "Creating ${prefix}-big.png"
-  convert "$img" -resize $RBIG -filter lanczos -background black -gravity center -extent $RBIG -strip "${prefix}-big.png"
+  echo "Creating ${prefix}-small.png (rotation: $rotation)"
+  convert "$img" $rotate -resize $RSMALL -filter lanczos -background black -gravity center -extent $RSMALL -strip "${prefix}-small.png"
+  echo "Creating ${prefix}-big.png (rotation: $rotation)"
+  convert "$img" $rotate -resize $RBIG -filter lanczos -background black -gravity center -extent $RBIG -strip "${prefix}-big.png"
 
   echo "${count} of ${total} done"
   
