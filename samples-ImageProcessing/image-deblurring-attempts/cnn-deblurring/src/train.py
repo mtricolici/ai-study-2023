@@ -23,6 +23,7 @@ def train_model(model):
 
   checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
   early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
+  #TODO: implement learning rate scheduler to adjust the learning rate during training
 
   try:
     model.fit(
