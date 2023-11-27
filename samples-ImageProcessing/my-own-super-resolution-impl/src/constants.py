@@ -1,6 +1,6 @@
 
 SCALE_FACTOR = 4
-BATCH_SIZE   = 10
+BATCH_SIZE   = 6
 
 # 0.9 means 10% of dataset will not be used for traing
 # it will be used for validation !

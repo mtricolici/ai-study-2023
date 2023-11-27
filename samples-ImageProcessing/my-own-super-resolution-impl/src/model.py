@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Add, Conv2D, Input, Lambda
+from tensorflow.keras.layers import Input, Conv2D, Add, Lambda, BatchNormalization, LeakyReLU
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
@@ -27,6 +27,9 @@ def edsr_model():
     x = Conv2D(3 * (SCALE_FACTOR ** 2), 3, padding='same', name='conv_output')(x)
     x = Lambda(lambda x: tf.nn.depth_to_space(x, SCALE_FACTOR), name='pixel_shuffle')(x)
 
+    # Refinement convolutional layer
+    x = Conv2D(3, 3, padding='same', activation='relu', name='refinement_conv')(x)
+
     # Construct the model
     model = Model(inputs=input_layer, outputs=x)
     model.compile(optimizer=Adam(LEARNING_RATE), loss='mean_squared_error')
@@ -34,8 +37,10 @@ def edsr_model():
 
 #########################################################
 def residual_block(input_tensor, name):
-    x = Conv2D(NUM_FILTERS, 3, padding='same', activation='relu', name=f'{name}_conv1')(input_tensor)
+    x = Conv2D(NUM_FILTERS, 3, padding='same', name=f'{name}_conv1')(input_tensor)
+    x = LeakyReLU(alpha=0.2)(BatchNormalization()(x))
     x = Conv2D(NUM_FILTERS, 3, padding='same', name=f'{name}_conv2')(x)
+    x = BatchNormalization()(x)
     x = Add(name=f'{name}_add')([input_tensor, x])
     return x
 
