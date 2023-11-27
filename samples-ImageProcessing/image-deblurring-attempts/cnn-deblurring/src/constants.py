@@ -4,7 +4,7 @@ BATCH_SIZE = 10
 # Stop training If validation loss is not improving for EARLY_STOPPING_PATIENCE nr of epoches
 # NR of epoches to wait before stopping after the model stops improving
 # Common value between 5 .. 10
-EARLY_STOPPING_PATIENCE = 2
+EARLY_STOPPING_PATIENCE = 5
 
 INPUT_SIZE = (640, 360)
 

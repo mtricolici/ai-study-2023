@@ -30,7 +30,7 @@ docker run --gpus all -it --rm \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
-  -v $HOME/temp/cnn-dataset:/dataset \
+  -v $HOME/temp/bad-good-dataset:/dataset \
   $IMG \
   python /app/main.py $@ || echo "Error: $?"
 
