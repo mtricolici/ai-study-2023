@@ -1,25 +1,21 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, Conv2DTranspose, BatchNormalization, Activation
-from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 from constants import *
 from dataset import train_data_loader, validation_data_loader, calc_validation_steps
 from image import load_image, save_image
 
+import models as m
+
 #########################################################
-def model_create():
-  model = Sequential([
-    Conv2D(64, (3, 3), padding='same', input_shape=(*INPUT_SIZE[::-1], 3)),
-    Activation('relu'),
-    Conv2D(32, (3, 3), padding='same'),
-    Activation('relu'),
-    Conv2DTranspose(3, (3, 3), padding='same')
-  ])
-  model.compile(optimizer=Adam(LEARNING_RATE), loss='mean_squared_error')
-  return model
+def model_create(t="resnet"):
+  if t == "simple":
+    return m.simple.model_create()
+  elif t == "resnet":
+    return m.resnet.model_create()
+
+  print(f"Error: unknown model {t}")
 
 #########################################################
 def train_model(model):

@@ -3,7 +3,7 @@ import argparse
 import tensorflow as tf
 
 from constants import *
-from model import *
+from train import *
 
 #########################################################
 def main():
