@@ -9,11 +9,13 @@ from image import load_image, save_image
 import models as m
 
 #########################################################
-def model_create(t="resnet"):
+def model_create(t="dncnn"):
   if t == "simple":
     return m.simple.model_create()
   elif t == "resnet":
     return m.resnet.model_create()
+  elif t == "dncnn":
+    return m.dncnn.model_create()
 
   print(f"Error: unknown model {t}")
 

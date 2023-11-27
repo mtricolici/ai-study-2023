@@ -8,6 +8,8 @@ from train import *
 #########################################################
 def main():
   print(f"TensorFlowVersion: {tf.__version__}")
+#  tf.keras.mixed_precision.set_global_policy('mixed_float16')
+
   parser = argparse.ArgumentParser(description='CNN deblurr ;)')
   parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
 
