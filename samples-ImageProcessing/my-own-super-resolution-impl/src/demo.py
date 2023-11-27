@@ -15,11 +15,28 @@ def scale_image(model, input_path, output_path):
   save_image(final_image, output_path)
 
 #########################################################
+def scale_batch_of_images(model, input_paths, output_paths):
+  imgs = [load_image(path) for path in input_paths]
+  imgs = tf.stack(imgs)
+  scaled = model.predict(imgs, verbose=0)
 
-def scale_all(model, dir_path):
-  #TODO: fit model multiple images in batches - should be faster
-  files = [os.path.join(dir_path, f) for f in os.listdir(dir_path) if '.png' in f]
-  for f in files:
-    print(f"converting {f}")
-    scale_image(model, f, f)
+  for scaled_img, output_path in zip(scaled, output_paths):
+    save_image(scaled_img, output_path)
+
+#########################################################
+def scale_all(model):
+  input_files = [os.path.join(DATASET_DIR, f) for f in os.listdir(DATASET_DIR) if f.endswith("small.png")]
+  output_files = [os.path.join('/many-images', os.path.basename(f).replace("small.png", "bad.png")) for f in input_files]
+  nr_of_files = len(input_files)
+
+  for i in range(0, nr_of_files, BATCH_SIZE):
+    print(f"scaling batch [{i} .. {i+BATCH_SIZE}] from total {nr_of_files} ...")
+    batch_input_files = input_files[i:i + BATCH_SIZE]
+    batch_output_files = output_files[i:i + BATCH_SIZE]
+
+    scale_batch_of_images(model, batch_input_files, batch_output_files)
+
+  print("scaling all dataset small files DONE! ;)")
+
+#########################################################
 

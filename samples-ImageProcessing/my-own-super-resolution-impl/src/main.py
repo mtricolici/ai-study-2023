@@ -12,7 +12,7 @@ from constants import *
 #########################################################
 def main():
   parser = argparse.ArgumentParser(description='Super Resolution EDSR demo')
-  parser.add_argument('command', choices=['train', 'continue', 'demo', 'demo-many', 'info'], help='The command to execute')
+  parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info'], help='The command to execute')
 
   args = parser.parse_args()
 
@@ -32,14 +32,14 @@ def main():
 
     print("training finished")
 
-  elif args.command == 'demo':
+  elif args.command == 'scale':
     # safe-mode is needed otherwise it can't deserialize lambda functions :(
     model = load_model(MODEL_SAVE_PATH, safe_mode=False)
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
-  elif args.command == 'demo-many':
+  elif args.command == 'scale-all':
     model = load_model(MODEL_SAVE_PATH, safe_mode=False)
-    scale_all(model, '/many-images')
+    scale_all(model)
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):
