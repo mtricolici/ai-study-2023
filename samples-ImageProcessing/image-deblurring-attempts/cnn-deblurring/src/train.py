@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 from constants import *
 from dataset import train_data_loader, validation_data_loader, calc_validation_steps
@@ -23,7 +23,14 @@ def train_model(model):
 
   checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
   early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
-  #TODO: implement learning rate scheduler to adjust the learning rate during training
+
+  lr_scheduler = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.1,       # new_lr = lr * factor
+    patience=3,       # number of epochs with no improvement after which learning rate will be reduced
+    verbose=1,
+    min_lr=0.00001    # lower bound on the learning rate
+  )
 
   try:
     model.fit(
@@ -32,7 +39,7 @@ def train_model(model):
       epochs=EPOCH,
       validation_data=validation_data_loader(),
       validation_steps=val_steps,
-      callbacks=[checkpoint, early_stopping])
+      callbacks=[checkpoint, early_stopping, lr_scheduler])
   except KeyboardInterrupt:
     print('Aborting...')
 
