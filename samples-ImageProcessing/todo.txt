@@ -1,0 +1,12 @@
+CNN - VGG
+CNN - ResNet
+
+autoencoders
+gan that works :D
+
+U-Net
+
+Deep Image Prior
+
+DnCNN Denoising Convolutional Neural Networks
+
