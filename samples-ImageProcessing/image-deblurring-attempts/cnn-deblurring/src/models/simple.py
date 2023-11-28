@@ -6,6 +6,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
 from constants import *
+from helper import psnr_metric
 
 #########################################################
 def model_create():
@@ -16,7 +17,10 @@ def model_create():
     Activation('relu'),
     Conv2DTranspose(3, (3, 3), padding='same')
   ])
-  model.compile(optimizer=Adam(LEARNING_RATE), loss='mean_squared_error')
+  model.compile(
+    optimizer=optimizers.Adam(learning_rate=LEARNING_RATE),
+    loss='mean_squared_error',
+    metrics=[psnr_metric])
   return model
 
 #########################################################

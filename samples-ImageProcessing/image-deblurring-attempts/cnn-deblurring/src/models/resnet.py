@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import layers, models, optimizers
 
 from constants import *
+from helper import psnr_metric
 
 #########################################################
 def model_create(num_res_blocks=5, num_filters=32):
@@ -24,7 +25,7 @@ def model_create(num_res_blocks=5, num_filters=32):
     model.compile(
       optimizer=optimizers.Adam(learning_rate=LEARNING_RATE),
       loss='mean_squared_error',
-      metrics=['accuracy'])
+      metrics=[psnr_metric])
 
     return model
 

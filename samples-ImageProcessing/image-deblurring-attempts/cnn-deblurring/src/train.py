@@ -24,14 +24,29 @@ def train_model(model):
   val_steps = calc_validation_steps()
 
   checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
-  early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
 
-  lr_scheduler = ReduceLROnPlateau(
-    monitor='val_loss',
-    factor=0.1,       # new_lr = lr * factor
-    patience=3,       # number of epochs with no improvement after which learning rate will be reduced
+  #early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
+  early_stopping = EarlyStopping(
+    monitor='psnr_metric',
+    patience=EARLY_STOPPING_PATIENCE,
     verbose=1,
-    min_lr=0.00001    # lower bound on the learning rate
+    mode='max'  # Change mode to 'max' since higher PSNR is better!
+  )
+
+#  lr_scheduler = ReduceLROnPlateau(
+#    monitor='val_loss',
+#    factor=0.1,       # new_lr = lr * factor
+#    patience=3,       # number of epochs with no improvement after which learning rate will be reduced
+#    verbose=1,
+#    min_lr=0.00001    # lower bound on the learning rate
+#  )
+  lr_scheduler = ReduceLROnPlateau(
+      monitor='psnr_metric',  # Monitor PSNR instead of loss
+      factor=0.1,       # new_lr = lr * factor
+      patience=3,       # number of epochs with no improvement after which learning rate will be reduced
+      verbose=1,
+      mode='max',       # Change mode to 'max' since higher PSNR is better
+      min_lr=0.00001    # lower bound on the learning rate
   )
 
   try:
