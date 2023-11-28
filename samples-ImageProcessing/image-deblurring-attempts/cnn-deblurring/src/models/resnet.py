@@ -1,24 +1,26 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models, optimizers
+from tensorflow.keras import layers, models, optimizers, initializers
 
 from constants import *
 from helper import psnr_metric
 
 #########################################################
-def model_create(num_res_blocks=5, num_filters=32):
+# num_res_blocks=16, num_filters=64
+def model_create(num_res_blocks=10, num_filters=64):
     # Input Layer
     inputs = layers.Input(shape=(*INPUT_SIZE[::-1], 3))
 
     # Initial Convolution
-    x = layers.Conv2D(num_filters, 3, padding='same')(inputs)
-    x = layers.Activation('relu')(x)
+    x = layers.Conv2D(num_filters, kernel_size=7, padding='same', kernel_initializer=initializers.HeNormal())(inputs)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU(alpha=0.01)(x)
 
     # Residual Blocks
     for _ in range(num_res_blocks):
         x = res_block(x, num_filters)
 
     # Final Convolution
-    x = layers.Conv2D(3, 3, padding='same')(x)
+    x = layers.Conv2D(3, kernel_size=7, padding='same', kernel_initializer=initializers.HeNormal())(x)
 
     # Build and Compile
     model = models.Model(inputs=inputs, outputs=x)
@@ -27,14 +29,25 @@ def model_create(num_res_blocks=5, num_filters=32):
       loss='mean_squared_error',
       metrics=[psnr_metric])
 
-    model.summary()
+#    model.summary()
 
     return model
 
 #########################################################
-def res_block(x, filters, kernel_size=3):
-    y = layers.Conv2D(filters, kernel_size, padding='same')(x)
-    y = layers.Activation('relu')(y)
-    y = layers.Conv2D(filters, kernel_size, padding='same')(y)
-    return layers.add([x, y])
+def res_block(x, filters, kernel_size=3, stride=1, padding='same'):
+
+    # First convolution layer
+    y = layers.Conv2D(filters, kernel_size=kernel_size, strides=stride, padding=padding, kernel_initializer=initializers.HeNormal())(x)
+    y = layers.BatchNormalization()(y)
+    y = layers.LeakyReLU(alpha=0.01)(y)
+
+    # Second convolution layer
+    y = layers.Conv2D(filters, kernel_size=kernel_size, strides=stride, padding=padding, kernel_initializer=initializers.HeNormal())(y)
+    y = layers.BatchNormalization()(y)
+
+    # Add shortcut to the output
+    x = layers.Add()([x, y])
+    x = layers.LeakyReLU(alpha=0.01)(x)
+
+    return x
 #########################################################

@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 
 #########################################################
 def load_image(path):
@@ -7,6 +8,8 @@ def load_image(path):
   img = img / 255.0
   if (img < 0).any() or (img > 1).any():
     raise ValueError(f'Error: Image at "{path}" is not a standard 8-bit per channel image.')
+  if np.isnan(img).any():
+    raise ValueError(f'Error: Image at "{path}" contains NaN values!?')
   return img
 
 #########################################################
