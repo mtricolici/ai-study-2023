@@ -27,7 +27,7 @@ def train_model(model):
 
   #early_stopping = EarlyStopping(monitor='val_loss', patience=EARLY_STOPPING_PATIENCE, verbose=1)
   early_stopping = EarlyStopping(
-    monitor='psnr_metric',
+    monitor='val_psnr_metric',
     patience=EARLY_STOPPING_PATIENCE,
     verbose=1,
     mode='max'  # Change mode to 'max' since higher PSNR is better!
@@ -41,7 +41,7 @@ def train_model(model):
 #    min_lr=0.00001    # lower bound on the learning rate
 #  )
   lr_scheduler = ReduceLROnPlateau(
-      monitor='psnr_metric',  # Monitor PSNR instead of loss
+      monitor='val_psnr_metric',  # Monitor PSNR instead of loss
       factor=0.1,       # new_lr = lr * factor
       patience=3,       # number of epochs with no improvement after which learning rate will be reduced
       verbose=1,
