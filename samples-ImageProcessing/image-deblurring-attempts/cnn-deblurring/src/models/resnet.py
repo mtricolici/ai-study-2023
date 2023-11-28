@@ -12,7 +12,7 @@ def model_create(num_res_blocks=10, num_filters=64):
 
     # Initial Convolution
     x = layers.Conv2D(num_filters, kernel_size=7, padding='same', kernel_initializer=initializers.HeNormal())(inputs)
-    x = layers.BatchNormalization()(x)
+    x = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
     x = layers.LeakyReLU(alpha=0.01)(x)
 
     # Residual Blocks
@@ -25,7 +25,7 @@ def model_create(num_res_blocks=10, num_filters=64):
     # Build and Compile
     model = models.Model(inputs=inputs, outputs=x)
     model.compile(
-      optimizer=optimizers.Adam(learning_rate=LEARNING_RATE),
+      optimizer=optimizers.Adam(learning_rate=0.0001, clipvalue=1.0),
       loss='mean_squared_error',
       metrics=[psnr_metric])
 
@@ -38,12 +38,12 @@ def res_block(x, filters, kernel_size=3, stride=1, padding='same'):
 
     # First convolution layer
     y = layers.Conv2D(filters, kernel_size=kernel_size, strides=stride, padding=padding, kernel_initializer=initializers.HeNormal())(x)
-    y = layers.BatchNormalization()(y)
+    y = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(y)
     y = layers.LeakyReLU(alpha=0.01)(y)
 
     # Second convolution layer
     y = layers.Conv2D(filters, kernel_size=kernel_size, strides=stride, padding=padding, kernel_initializer=initializers.HeNormal())(y)
-    y = layers.BatchNormalization()(y)
+    y = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(y)
 
     # Add shortcut to the output
     x = layers.Add()([x, y])
