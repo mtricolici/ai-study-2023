@@ -1,5 +1,6 @@
 #FROM tensorflow/tensorflow:latest
-FROM tensorflow/tensorflow:latest-gpu
+#FROM tensorflow/tensorflow:latest-gpu
+FROM tensorflow/tensorflow:2.15.0-gpu
 
 ARG USER_ID
 ARG GROUP_ID

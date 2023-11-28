@@ -9,7 +9,7 @@ from image import load_image, save_image
 import models as m
 
 #########################################################
-def model_create(t="dncnn"):
+def model_create(t="resnet"):
   if t == "simple":
     return m.simple.model_create()
   elif t == "resnet":

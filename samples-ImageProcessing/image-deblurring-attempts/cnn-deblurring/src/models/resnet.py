@@ -27,6 +27,8 @@ def model_create(num_res_blocks=5, num_filters=32):
       loss='mean_squared_error',
       metrics=[psnr_metric])
 
+    model.summary()
+
     return model
 
 #########################################################

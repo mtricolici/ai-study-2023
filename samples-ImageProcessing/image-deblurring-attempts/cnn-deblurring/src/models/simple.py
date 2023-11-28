@@ -12,10 +12,13 @@ def model_create():
     layers.LeakyReLU(alpha=0.01),
     layers.Conv2DTranspose(3, (3, 3), padding='same')
   ])
+
   model.compile(
     optimizer=optimizers.Adam(learning_rate=LEARNING_RATE),
     loss='mean_squared_error',
     metrics=[psnr_metric])
+
+  model.summary()
   return model
 
 #########################################################
