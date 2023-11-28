@@ -4,6 +4,7 @@ import tensorflow as tf
 
 from constants import *
 from train import *
+from helper import psnr_metric
 
 #########################################################
 def main():
@@ -23,13 +24,13 @@ def main():
 
   elif args.command == 'continue':
     print("Loading existed model from disk ...")
-    model = tf.keras.models.load_model(MODEL_SAVE_PATH)
+    model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
     train_model(model)
     print("training finished")
 
   elif args.command == 'demo':
     print("Loading existed model from disk ...")
-    model = tf.keras.models.load_model(MODEL_SAVE_PATH)
+    model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
     unblure_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'info':
