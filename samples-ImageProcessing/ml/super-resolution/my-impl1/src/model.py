@@ -4,6 +4,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 
 from constants import *
+from helper import psnr_metric
 
 #########################################################
 def edsr_model():
@@ -32,7 +33,12 @@ def edsr_model():
 
     # Construct the model
     model = Model(inputs=input_layer, outputs=x)
-    model.compile(optimizer=Adam(LEARNING_RATE), loss='mean_squared_error')
+    model.compile(
+      optimizer=Adam(learning_rate=LEARNING_RATE),
+      loss='mean_squared_error',
+      metrics=[psnr_metric])
+
+    model.summary()
     return model
 
 #########################################################

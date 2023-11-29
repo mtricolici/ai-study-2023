@@ -7,6 +7,7 @@ from model import edsr_model
 from train import train
 from demo import scale_image, scale_all
 from constants import *
+from helper import psnr_metric
 
 
 #########################################################
@@ -27,18 +28,18 @@ def main():
     print("Loading existed model from disk ...")
 
     # safe-mode is needed otherwise it can't deserialize lambda functions :(
-    model = load_model(MODEL_SAVE_PATH, safe_mode=False)
+    model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
     train(model)
 
     print("training finished")
 
   elif args.command == 'scale':
     # safe-mode is needed otherwise it can't deserialize lambda functions :(
-    model = load_model(MODEL_SAVE_PATH, safe_mode=False)
+    model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'scale-all':
-    model = load_model(MODEL_SAVE_PATH, safe_mode=False)
+    model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
     scale_all(model)
 
   elif args.command == 'info':
