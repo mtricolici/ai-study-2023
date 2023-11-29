@@ -41,7 +41,7 @@ def train_model(model):
 
 #########################################################
 def colorize_image(model, input_path, output_path):
-  img = load_image(input_path)
+  img = load_image(input_path, 1)
   img = tf.expand_dims(img, axis=0) # Add batch dimension
 
   out = model.predict(img)

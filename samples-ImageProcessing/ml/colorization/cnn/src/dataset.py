@@ -45,8 +45,8 @@ def generate_batch(indices, gray_files, color_files):
   batch_output = []
 
   for idx in indices:
-    batch_input.append(load_image(gray_files[idx]))
-    batch_output.append(load_image(color_files[idx]))
+    batch_input.append(load_image(gray_files[idx], 1))
+    batch_output.append(load_image(color_files[idx], 3))
 
   batch_x = tf.stack(batch_input)
   batch_y = tf.stack(batch_output)
