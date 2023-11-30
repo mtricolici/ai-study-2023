@@ -3,6 +3,8 @@ import tensorflow as tf
 from image import load_image, save_image
 
 from constants import *
+from helper import lm
+from time import sleep
 
 #########################################################
 
@@ -39,15 +41,19 @@ def scale_all(model):
     del output_files[i]
 
   nr_of_files = len(input_files)
+  lm(f'found {nr_of_files} to scale')
 
-  for i in range(0, nr_of_files, BATCH_SIZE):
-    print(f"scaling batch [{i} .. {i+BATCH_SIZE}] from total {nr_of_files} ...")
-    batch_input_files = input_files[i:i + BATCH_SIZE]
-    batch_output_files = output_files[i:i + BATCH_SIZE]
+  bs = 1
+
+  for i in range(0, nr_of_files, bs):
+    lm(f"scaling batch [{i} .. {i+bs}] from total {nr_of_files} ...")
+    batch_input_files = input_files[i:i + bs]
+    batch_output_files = output_files[i:i + bs]
 
     scale_batch_of_images(model, batch_input_files, batch_output_files)
+    sleep(1) # Let GPU fan do its work ops
 
-  print("scaling all dataset small files DONE! ;)")
+  lm("scaling all dataset small files DONE! ;)")
 
 #########################################################
 
