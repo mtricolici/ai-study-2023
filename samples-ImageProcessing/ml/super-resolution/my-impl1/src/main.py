@@ -8,12 +8,12 @@ from train import train
 from demo import scale_image, scale_all
 from constants import *
 from helper import psnr_metric
-
+from isr_model import create_isr_model
 
 #########################################################
 def main():
   parser = argparse.ArgumentParser(description='Super Resolution EDSR demo')
-  parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info'], help='The command to execute')
+  parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info', 'isr'], help='The command to execute')
 
   args = parser.parse_args()
 
@@ -41,6 +41,13 @@ def main():
   elif args.command == 'scale-all':
     model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
     scale_all(model)
+
+  elif args.command == 'isr':
+    model = create_isr_model()
+    model.summary()
+    model.load_weights('/output/rdn-C6-D20-G64-G064-x2_PSNR_epoch086.hdf5')
+    model.save(MODEL_SAVE_PATH)
+    print(f'ISR model converted to {MODEL_SAVE_PATH} ;)')
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):

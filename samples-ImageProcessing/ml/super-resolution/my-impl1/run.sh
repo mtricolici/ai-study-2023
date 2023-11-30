@@ -30,6 +30,7 @@ docker run --gpus all -it --rm \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
+  -v $(pwd)/.cache:/home/python/.keras \
   -v $HOME/temp/many-images:/many-images \
   -v $HOME/temp/super-dataset:/dataset \
   $IMG \
