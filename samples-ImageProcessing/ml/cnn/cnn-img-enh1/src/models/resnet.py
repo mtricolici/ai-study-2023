@@ -8,12 +8,10 @@ from helper import psnr_metric
 # num_res_blocks=16, num_filters=64
 def model_create(num_res_blocks=8, num_filters=64):
     # Input Layer
-    inputs = layers.Input(shape=(*INPUT_SIZE[::-1], 3))
+    inputs = layers.Input(shape=(None, None, 3))
 
     # Initial Convolution
     x = layers.Conv2D(num_filters, kernel_size=7, padding='same', kernel_initializer=initializers.HeNormal())(inputs)
-#    x = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
-#    x = layers.LeakyReLU(alpha=0.01)(x)
     x = layers.Activation('relu')(x)
 
     # Residual Blocks

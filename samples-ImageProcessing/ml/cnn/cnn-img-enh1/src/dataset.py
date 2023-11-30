@@ -8,7 +8,7 @@ from image import load_image
 #########################################################
 def load_and_split_dataset(split_ratio=0.9):
   bad_files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if file.endswith("bad.png")]
-  good_files = [file.replace("bad.png", "big.png") for file in bad_files]
+  good_files = [file.replace("bad.png", "good.png") for file in bad_files]
   num_files = len(bad_files)
   if num_files == 0:
     print("NO Files in dataset???")
