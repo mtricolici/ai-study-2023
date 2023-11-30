@@ -22,7 +22,7 @@ if [ "$DOCKERFILE_MODIFIED" -gt "$IMAGE_CREATED" ]; then
     -t $IMG .
 fi
 
-mkdir -p output
+mkdir -p output .keras
 
 docker run --gpus all -it --rm \
   -e TF_FORCE_GPU_ALLOW_GROWTH=true \
@@ -30,7 +30,7 @@ docker run --gpus all -it --rm \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
-  -v $(pwd)/.cache:/home/python/.keras \
+  -v $(pwd)/.keras:/home/python/.keras \
   -v $HOME/temp/many-source:/many-source \
   -v $HOME/temp/many-target:/many-target \
   -v $HOME/temp/super-dataset:/dataset \

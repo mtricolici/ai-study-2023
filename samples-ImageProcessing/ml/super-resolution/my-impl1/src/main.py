@@ -8,7 +8,7 @@ from train import train
 from demo import scale_image, scale_all
 from constants import *
 from helper import psnr_metric
-from isr_model import create_isr_model
+from isr_model import IsrRdn
 
 #########################################################
 def main():
@@ -43,10 +43,10 @@ def main():
     scale_all(model)
 
   elif args.command == 'isr':
-    model = create_isr_model()
-    model.summary()
-    model.load_weights('/output/rdn-C6-D20-G64-G064-x2_PSNR_epoch086.hdf5')
-    model.save(MODEL_SAVE_PATH)
+    isrModel = IsrRdn('psnr-large')
+    print(f'ISR model loaded: {isrModel} !!!')
+    isrModel.model.summary()
+    isrModel.model.save(MODEL_SAVE_PATH)
     print(f'ISR model converted to {MODEL_SAVE_PATH} ;)')
 
   elif args.command == 'info':
