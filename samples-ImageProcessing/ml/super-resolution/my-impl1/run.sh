@@ -31,7 +31,8 @@ docker run --gpus all -it --rm \
   -v $(pwd)/src:/app \
   -v $(pwd)/output:/output \
   -v $(pwd)/.cache:/home/python/.keras \
-  -v $HOME/temp/many-images:/many-images \
+  -v $HOME/temp/many-source:/many-source \
+  -v $HOME/temp/many-target:/many-target \
   -v $HOME/temp/super-dataset:/dataset \
   $IMG \
   python /app/main.py $@ || echo "Error: $?"

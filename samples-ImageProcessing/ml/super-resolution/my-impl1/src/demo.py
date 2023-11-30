@@ -25,8 +25,19 @@ def scale_batch_of_images(model, input_paths, output_paths):
 
 #########################################################
 def scale_all(model):
-  input_files = [os.path.join(DATASET_DIR, f) for f in os.listdir(DATASET_DIR) if f.endswith("small.png")]
-  output_files = [os.path.join('/many-images', os.path.basename(f).replace("small.png", "bad.png")) for f in input_files]
+  input_files = [os.path.join('/many-source', f) for f in os.listdir('/many-source') if f.endswith(".png")]
+  output_files = [os.path.join('/many-target', os.path.basename(f)) for f in input_files]
+
+  # find files that were converted already and remove from list
+  to_remove = []
+  for i, output_file in enumerate(output_files):
+    if os.path.exists(output_file):
+      to_remove.append(i)
+
+  for i in reversed(to_remove):
+    del input_files[i]
+    del output_files[i]
+
   nr_of_files = len(input_files)
 
   for i in range(0, nr_of_files, BATCH_SIZE):

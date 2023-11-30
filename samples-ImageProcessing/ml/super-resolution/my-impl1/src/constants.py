@@ -1,6 +1,6 @@
 
 SCALE_FACTOR = 4
-BATCH_SIZE   = 6
+BATCH_SIZE   = 2
 
 # 0.9 means 10% of dataset will not be used for traing
 # it will be used for validation !
@@ -30,4 +30,3 @@ BIG_SUFFIX = 'big'
 
 DEMO_INPUT_FILE = '/output/input.png'
 DEMO_OUTPUT_FILE = '/output/scaled.png'
-
