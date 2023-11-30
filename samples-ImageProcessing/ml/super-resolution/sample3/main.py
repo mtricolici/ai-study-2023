@@ -1,6 +1,6 @@
 #!/usr/bin/env/python
 import argparse
-from ISR.models import RDN
+from ISR.models import RRDN,RDN
 from PIL import Image
 import numpy as np
 

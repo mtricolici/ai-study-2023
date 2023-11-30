@@ -24,7 +24,9 @@ if [ "$DOCKERFILE_MODIFIED" -gt "$IMAGE_CREATED" ]; then
     -t $IMG .
 fi
 
-docker run -it --rm \
+docker run --gpus all -it --rm \
+  -e TF_FORCE_GPU_ALLOW_GROWTH=true \
+  -e TF_CPP_MIN_LOG_LEVEL=3 \
   -v $(pwd):/app \
   -v $(pwd)/.cache:/home/python/.keras \
   --workdir /tmp \
@@ -33,4 +35,3 @@ docker run -it --rm \
     /app/images/source.png \
     /app/images/output.png \
     || echo "Error: $?"
-
