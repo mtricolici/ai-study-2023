@@ -6,7 +6,7 @@ from helper import psnr_metric
 
 #########################################################
 # num_res_blocks=16, num_filters=64
-def model_create(num_res_blocks=8, num_filters=64):
+def model_create(num_res_blocks=14, num_filters=64):
     # Input Layer
     inputs = layers.Input(shape=(None, None, 3))
 
