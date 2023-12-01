@@ -37,7 +37,7 @@ def res_block(x, filters, kernel_size=3, stride=1, padding='same'):
 
     # First convolution layer
     y = layers.Conv2D(filters, kernel_size=kernel_size, strides=stride, padding=padding)(x)
-#    y = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(y)
+    y = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(y)
 #    y = layers.LeakyReLU(alpha=0.01)(y)
     y = layers.Activation('relu')(y)
 
