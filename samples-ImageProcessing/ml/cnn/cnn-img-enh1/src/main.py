@@ -12,7 +12,7 @@ def main():
 #  tf.keras.mixed_precision.set_global_policy('mixed_float16')
 
   parser = argparse.ArgumentParser(description='CNN deblurr ;)')
-  parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
+  parser.add_argument('command', choices=['train', 'continue', 'demo', 'demo-many', 'info'], help='The command to execute')
 
   args = parser.parse_args()
 
@@ -32,6 +32,11 @@ def main():
     print("Loading existed model from disk ...")
     model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
     unblure_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
+
+  elif args.command == 'demo-many':
+    print("Loading existed model from disk ...")
+    model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    demo_many(model)
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):
