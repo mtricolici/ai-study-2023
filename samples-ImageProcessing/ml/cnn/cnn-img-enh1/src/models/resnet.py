@@ -6,7 +6,7 @@ from helper import psnr_metric
 
 #########################################################
 # num_res_blocks=16, num_filters=64
-def model_create(num_res_blocks=14, num_filters=64):
+def model_create(num_res_blocks=16, num_filters=64):
     # Input Layer
     inputs = layers.Input(shape=(None, None, 3))
 
@@ -37,7 +37,7 @@ def res_block(x, filters, kernel_size=3, stride=1, padding='same'):
 
     # First convolution layer
     y = layers.Conv2D(filters, kernel_size=kernel_size, strides=stride, padding=padding)(x)
-    y = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(y)
+#    y = layers.BatchNormalization(momentum=0.9, epsilon=1e-5)(y)
 #    y = layers.LeakyReLU(alpha=0.01)(y)
     y = layers.Activation('relu')(y)
 
