@@ -8,5 +8,6 @@ pyyaml
 requests
 scikit-image
 scipy
+tb-nightly
 tqdm
 yapf

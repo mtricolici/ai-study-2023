@@ -13,6 +13,8 @@ if [ ! -f "models/NAFNet-REDS-width64.pth" ]; then
   exit 1
 fi
 
+mkdir -p .images # Put your images here
+
 DOCKERFILE_MODIFIED=$(stat -c %Y Dockerfile)
 
 # check if image exists
