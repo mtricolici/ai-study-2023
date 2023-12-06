@@ -37,4 +37,6 @@ ADD nafnet /nafnet
 
 RUN cd /nafnet && python setup.py develop --no_cuda_ext
 
+RUN apt-get install ffmpeg --no-install-recommends -qqy
+
 USER python

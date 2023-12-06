@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 IMG=my-nafnet-img-rest
 
@@ -7,11 +8,19 @@ if [ ! -f "nafnet/requirements.txt" ]; then
   rm -rf nafnet/.git # Need to remove this otherwise parent .gitignore does not work :(
 fi
 
-if [ ! -f "models/NAFNet-REDS-width64.pth" ]; then
-  echo "NAFNet-REDS-width64.pth not found!"
-  echo "Download it from: https://github.com/megvii-research/NAFNet/#results-and-pre-trained-models"
-  exit 1
-fi
+function check_model() {
+  local mf="$1"
+
+  if [ ! -f "models/${mf}" ]; then
+    echo "Error: file 'models/${mf}' not found!"
+    echo "Download it from: https://github.com/megvii-research/NAFNet/#results-and-pre-trained-models"
+    exit 1
+  fi
+}
+
+check_model "NAFNet-GoPro-width64.pth"
+check_model "NAFNet-REDS-width64.pth"
+check_model "NAFNet-SIDD-width64.pth"
 
 mkdir -p .images # Put your images here
 
