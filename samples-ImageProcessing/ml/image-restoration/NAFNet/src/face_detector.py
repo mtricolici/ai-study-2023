@@ -1,3 +1,4 @@
+import warnings
 import threading
 import cv2
 import insightface
@@ -11,6 +12,7 @@ def get_face_analyser():
   global FACE_ANALYSER
   with THREAD_LOCK:
     if FACE_ANALYSER is None:
+      warnings.filterwarnings("ignore", category=FutureWarning, module="insightface.utils.transform")
       FACE_ANALYSER = insightface.app.FaceAnalysis(name='buffalo_l', providers=['CUDAExecutionProvider'])
       FACE_ANALYSER.prepare(ctx_id=0)
   return FACE_ANALYSER
