@@ -1,13 +1,11 @@
 import os
+import time
 import torch
 from collections import OrderedDict
 import basicsr.models as bm
 import basicsr.train as bt
 import basicsr.utils as bu
 import vars
-
-
-
 
 ############################################################################
 def load_model():
@@ -46,9 +44,22 @@ def process_frames():
 
   model = load_model()
 
+  last_print_time = time.time()
+  last_print_iterations = 0
+
   for i, f in enumerate(files, start=1):
     path = os.path.join('/images/tmp', f)
     process_single_frame(model, path)
-    done = (i / total) * 100.0
-    print(f'{f} done. {done:.2f} processed')
+
+    time_elapsed = time.time() - last_print_time
+    iterations_processed = i - last_print_iterations
+    fps = iterations_processed / time_elapsed
+    if time_elapsed > 5:
+      done = (i / total) * 100.0
+      print(f'{i} of {total} = {done:.2f} % ({fps:.2f} frames/sec)\r', end='')
+      last_print_time = time.time()
+      last_print_iterations = i
+
+  print('\nprocess frames finished!')
 ############################################################################
+
