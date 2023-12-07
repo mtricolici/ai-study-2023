@@ -6,6 +6,7 @@ from collections import OrderedDict
 import basicsr.models as bm
 import basicsr.train as bt
 import basicsr.utils as bu
+import face_detector
 import vars
 
 ############################################################################
@@ -17,7 +18,7 @@ def load_model():
   model = bm.create_model(opt)
   return model
 ############################################################################
-def process_single_frame(model, in_path, out_path):
+def process_single_frame(frame_idx, model, in_path, out_path):
   # read image
   file_client = bu.FileClient('disk')
   img = file_client.get(in_path, None)
@@ -43,6 +44,9 @@ def process_frames():
 
   total = len(files)
 
+  if vars.keep_faces:
+    face_detector.detect_faces(files)
+
   model = load_model()
 
   last_print_time = time.time()
@@ -50,7 +54,7 @@ def process_frames():
 
   for i, f in enumerate(files, start=1):
     path = os.path.join('/images/tmp', f)
-    process_single_frame(model, path, path)
+    process_single_frame(i-1, model, path, path)
 
     time_elapsed = time.time() - last_print_time
     iterations_processed = i - last_print_iterations

@@ -23,6 +23,7 @@ for model in "${models[@]}"; do
     -v $(pwd)/src:/app:ro \
     -v $(pwd)/.images:/images \
     -v $(pwd)/models:/models:ro \
+    -v $(pwd)/.insightface:/home/python/.insightface \
     $IMG \
     python single_image.py \
       -i /images/src.png \

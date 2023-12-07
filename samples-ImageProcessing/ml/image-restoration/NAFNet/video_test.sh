@@ -17,6 +17,7 @@ docker run \
   -v $(pwd)/src:/app:ro \
   -v $(pwd)/.images:/images \
   -v $(pwd)/models:/models:ro \
+  -v $(pwd)/.insightface:/home/python/.insightface \
   $IMG \
   python main.py \
     -i /images/src.mp4 \

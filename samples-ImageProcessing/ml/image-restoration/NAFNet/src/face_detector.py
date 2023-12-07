@@ -3,6 +3,7 @@ import threading
 import cv2
 import insightface
 import onnxruntime as ort
+import vars
 
 FACE_ANALYSER = None
 THREAD_LOCK = threading.Lock()
@@ -22,6 +23,17 @@ def release_face_analyser():
     global FACE_ANALYSER
     FACE_ANALYSER = None
 
+#####################################################################
+def detect_faces(files):
+  print(f"detecting faces in {len(files)} ...")
+
+  vars.faces = []
+  for idx, path in enumerate(files):
+    img = cv2.imread(path)
+    faces = get_face_analyser().get(img)
+    vars.faces.append(faces) # Save faces coordinates for each image
+
+  release_face_analyser() # Release GPU used VRAM for other models
 #####################################################################
 def demo_face_detector(input_file, output_file):
   print(f'detecting faces in {input_file} ...')
