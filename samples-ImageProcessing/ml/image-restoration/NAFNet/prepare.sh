@@ -23,6 +23,7 @@ check_model "NAFNet-REDS-width64.pth"
 check_model "NAFNet-SIDD-width64.pth"
 
 mkdir -p .images # Put your images here
+mkdir -p .insightface # Needed by facedetector to save model here
 
 DOCKERFILE_MODIFIED=$(stat -c %Y Dockerfile)
 

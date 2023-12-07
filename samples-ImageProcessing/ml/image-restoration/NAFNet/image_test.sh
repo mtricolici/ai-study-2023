@@ -9,7 +9,8 @@ IMG=my-nafnet-img-rest
 #model="Baseline-SIDD-width64"  # << ???
 
 #models=("NAFNet-REDS-width64" "NAFNet-SIDD-width64" "NAFNet-GoPro-width64")
-models=("NAFNet-REDS-width64" "Baseline-GoPro-width64" "Baseline-SIDD-width64")
+#models=("NAFNet-REDS-width64" "Baseline-GoPro-width64" "Baseline-SIDD-width64")
+models=("NAFNet-REDS-width64")
 
 for model in "${models[@]}"; do
   echo "Using model '$model'"
@@ -17,6 +18,7 @@ for model in "${models[@]}"; do
     --gpus all \
     -it --rm \
     --network=none \
+    -e PYTHONPATH=/nafnet \
     -w /app \
     -v $(pwd)/src:/app:ro \
     -v $(pwd)/.images:/images \

@@ -12,6 +12,7 @@ docker run \
   --gpus all \
   -it --rm \
   --network=none \
+  -e PYTHONPATH=/nafnet \
   -w /app \
   -v $(pwd)/src:/app:ro \
   -v $(pwd)/.images:/images \
@@ -20,4 +21,4 @@ docker run \
   python main.py \
     -i /images/src.mp4 \
     -o /images/result.mp4 \
-    -m NAFNet-REDS-width64
+    -m NAFNet-REDS-width64 $@
