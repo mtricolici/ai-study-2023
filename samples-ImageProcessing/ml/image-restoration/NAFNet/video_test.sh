@@ -20,5 +20,4 @@ docker run \
   python main.py \
     -i /images/src.mp4 \
     -o /images/result.mp4 \
-    -m NAFNet-REDS-width64 \
-    --fps 1 # just for quick development
+    -m NAFNet-REDS-width64
