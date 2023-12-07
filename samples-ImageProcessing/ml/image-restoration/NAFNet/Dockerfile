@@ -14,6 +14,7 @@ FROM python:3.9.5-slim
 
 ARG USER_ID
 ARG GROUP_ID
+ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=cuda /TO-COPY/ /
 
@@ -22,7 +23,7 @@ RUN groupadd -g $GROUP_ID python && \
 
 RUN rm -f /etc/apt/sources.list.d/cuda.list && \
     apt-get update -qqy && \
-    apt-get install -qqy --no-install-recommends libgl1-mesa-glx libglib2.0-0 ffmpeg
+    apt-get install -qqy --no-install-recommends libgl1-mesa-glx libglib2.0-0 ffmpeg build-essential
 
 ADD requirements.txt /
 

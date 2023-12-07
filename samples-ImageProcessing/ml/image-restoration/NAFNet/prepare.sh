@@ -36,6 +36,7 @@ fi
 
 if [ "$DOCKERFILE_MODIFIED" -gt "$IMAGE_CREATED" ]; then
   docker build \
+    --progress=plain \
     --build-arg USER_ID=$(id -u) \
     --build-arg GROUP_ID=$(id -g) \
     -t $IMG .
