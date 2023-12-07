@@ -47,3 +47,19 @@ def extract_frames():
     sys.exit(f'Error: {e}')
 
 ############################################################################
+def create_output_video():
+  print(f'Saving frames to output video ...')
+  try:
+    cmd = [
+      'ffmpeg',
+      '-framerate', f'{vars.fps}',
+      '-i', '/images/tmp/%04d.png',
+      '-pix_fmt', 'yuv420p', '-shortest',
+      vars.target_file
+    ]
+    print(cmd)
+    subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True)
+    print('Video is ready ;)')
+  except subprocess.CalledProcessError as e:
+    sys.exit(f'Error: {e}')
+############################################################################
