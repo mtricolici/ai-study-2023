@@ -22,21 +22,19 @@ RUN groupadd -g $GROUP_ID python && \
 
 RUN rm -f /etc/apt/sources.list.d/cuda.list && \
     apt-get update -qqy && \
-    apt-get install -qqy libgl1-mesa-glx libglib2.0-0
+    apt-get install -qqy --no-install-recommends libgl1-mesa-glx libglib2.0-0 ffmpeg
 
 ADD requirements.txt /
 
+# Uncomment some mirror when fucking pypi is down :@
 #RUN pip config --user set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+#RUN pip config --user set global.index-url https://mirror.ox.ac.uk/sites/pypi.python.org/simple/
 RUN pip config --user set global.index-url https://mirrors.sustech.edu.cn/pypi/web/simple
 
 RUN pip install -r /requirements.txt
-RUN pip install torch==1.11.0
-RUN pip install torchvision
 
 ADD nafnet /nafnet
 
 RUN cd /nafnet && python setup.py develop --no_cuda_ext
-
-RUN apt-get install ffmpeg --no-install-recommends -qqy
 
 USER python
