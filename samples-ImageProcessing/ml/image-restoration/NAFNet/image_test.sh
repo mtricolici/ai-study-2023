@@ -24,10 +24,10 @@ for model in "${models[@]}"; do
     -v $(pwd)/.images:/images \
     -v $(pwd)/models:/models:ro \
     $IMG \
-    python demo.py \
-    -opt /app/$model.yml \
-    --input_path /images/src.png \
-    --output_path /images/result-${model}.png
+    python single_image.py \
+      -i /images/src.png \
+      -o /images/result-${model}.png \
+      -m NAFNet-REDS-width64 $@
 done
 
 

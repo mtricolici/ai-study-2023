@@ -17,10 +17,10 @@ def load_model():
   model = bm.create_model(opt)
   return model
 ############################################################################
-def process_single_frame(model, path):
+def process_single_frame(model, in_path, out_path):
   # read image
   file_client = bu.FileClient('disk')
-  img = file_client.get(path, None)
+  img = file_client.get(in_path, None)
   img = bu.imfrombytes(img, float32=True)
   img = bu.img2tensor(img, bgr2rgb=True, float32=True)
 
@@ -35,7 +35,7 @@ def process_single_frame(model, path):
   # Save image
   visuals = model.get_current_visuals()
   img = bu.tensor2img([visuals['result']])
-  bu.imwrite(img, path)
+  bu.imwrite(img, out_path)
 ############################################################################
 def process_frames():
   files = [f for f in os.listdir('/images/tmp/') if f.endswith('.png')]
@@ -50,7 +50,7 @@ def process_frames():
 
   for i, f in enumerate(files, start=1):
     path = os.path.join('/images/tmp', f)
-    process_single_frame(model, path)
+    process_single_frame(model, path, path)
 
     time_elapsed = time.time() - last_print_time
     iterations_processed = i - last_print_iterations
