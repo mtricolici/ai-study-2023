@@ -33,7 +33,13 @@ def demo_face_detector(input_file, output_file):
   for idx, face in enumerate(faces):
     bbox = face.bbox.astype(int)
     print(f"Face {idx + 1}: {bbox}")
+    p1 = (bbox[0], bbox[1])
+    p2 = (bbox[2], bbox[3])
+    color = (0, 255, 0)
+    cv2.rectangle(image, p1, p2, color, 1)
 
+  cv2.imwrite(output_file, image)
+  print(f'image with faces marked is saved in {output_file} ;)')
   release_face_analyser()
 #####################################################################
 
