@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 import torch
 from collections import OrderedDict
 import basicsr.models as bm
@@ -56,7 +57,9 @@ def process_frames():
     fps = iterations_processed / time_elapsed
     if time_elapsed > 5:
       done = (i / total) * 100.0
-      print(f'{i} of {total} = {done:.2f} % ({fps:.2f} frames/sec)\r', end='')
+      ert = int((total - i) / fps)
+      ert = str(datetime.timedelta(seconds=ert))
+      print(f'{i} of {total} = {done:.2f} % ({fps:.2f} frames/sec). Will finish in ~ {ert} \r', end='')
       last_print_time = time.time()
       last_print_iterations = i
 
