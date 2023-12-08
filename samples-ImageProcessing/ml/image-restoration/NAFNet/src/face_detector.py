@@ -25,13 +25,19 @@ def release_face_analyser():
 
 #####################################################################
 def detect_faces(files):
-  print(f"detecting faces in {len(files)} ...")
+  print(f"detecting faces in {len(files)} frames ...")
 
   vars.faces = []
   for idx, path in enumerate(files):
     img = cv2.imread(path)
+
     faces = get_face_analyser().get(img)
-    vars.faces.append(faces) # Save faces coordinates for each image
+    coords = []
+    for face in faces:
+      c = face.bbox.astype(int)
+      coords.append(c)
+
+    vars.faces.append(coords) # Save faces coordinates for each image
 
   release_face_analyser() # Release GPU used VRAM for other models
 #####################################################################

@@ -1,6 +1,7 @@
 import os
 import time
 import datetime
+import cv2
 import torch
 from collections import OrderedDict
 import basicsr.models as bm
@@ -18,7 +19,42 @@ def load_model():
   model = bm.create_model(opt)
   return model
 ############################################################################
+def clamp_coordinates(x1, y1, x2, y2, image_width, image_height):
+    x1 = max(0, min(x1, image_width - 1))
+    y1 = max(0, min(y1, image_height - 1))
+    x2 = max(0, min(x2, image_width - 1))
+    y2 = max(0, min(y2, image_height - 1))
+    return x1, y1, x2, y2
+
+############################################################################
+def save_faces_in_memory(path, index):
+  img = cv2.imread(path)
+  saved_faces = []
+
+  for (x1,y1,x2,y2) in vars.faces[index]:
+    x1, y1, x2, y2 = clamp_coordinates(x1, y1, x2, y2, img.shape[1], img.shape[0])
+    print(f'saving face in memory .. {x1},{y1},{x2},{y2}')
+    face = img[y1:y2, x1:x2].copy()
+    saved_faces.append(face)
+
+  return saved_faces
+############################################################################
+def restore_faces(path, index, face_images):
+  img = cv2.imread(path)
+
+  for (x1, y1, x2, y2), face_img in zip(vars.faces[index], face_images):
+    x1, y1, x2, y2 = clamp_coordinates(x1, y1, x2, y2, img.shape[1], img.shape[0])
+    print(f'restoring face from memory .. {x1},{y1},{x2},{y2}')
+    img[y1:y2, x1:x2] = face_img
+
+  cv2.imwrite('/images/restored-faces.png', img)
+
+############################################################################
 def process_single_frame(frame_idx, model, in_path, out_path):
+
+  if vars.keep_faces:
+    faces = save_faces_in_memory(in_path, frame_idx)
+
   # read image
   file_client = bu.FileClient('disk')
   img = file_client.get(in_path, None)
@@ -37,6 +73,9 @@ def process_single_frame(frame_idx, model, in_path, out_path):
   visuals = model.get_current_visuals()
   img = bu.tensor2img([visuals['result']])
   bu.imwrite(img, out_path)
+
+  if vars.keep_faces:
+    restore_faces(out_path, frame_idx, faces)
 ############################################################################
 def process_frames():
   files = [f for f in os.listdir('/images/tmp/') if f.endswith('.png')]
