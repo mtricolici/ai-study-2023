@@ -33,7 +33,7 @@ def save_faces_in_memory(path, index):
 
   for (x1,y1,x2,y2) in vars.faces[index]:
     x1, y1, x2, y2 = clamp_coordinates(x1, y1, x2, y2, img.shape[1], img.shape[0])
-    print(f'saving face in memory .. {x1},{y1},{x2},{y2}')
+#    print(f'saving face in memory .. {x1},{y1},{x2},{y2}')
     face = img[y1:y2, x1:x2].copy()
     saved_faces.append(face)
 
@@ -44,7 +44,7 @@ def restore_faces(path, index, face_images):
 
   for (x1, y1, x2, y2), face_img in zip(vars.faces[index], face_images):
     x1, y1, x2, y2 = clamp_coordinates(x1, y1, x2, y2, img.shape[1], img.shape[0])
-    print(f'restoring face from memory .. {x1},{y1},{x2},{y2}')
+#    print(f'restoring face from memory .. {x1},{y1},{x2},{y2}')
     img[y1:y2, x1:x2] = face_img
 
   cv2.imwrite('/images/restored-faces.png', img)
