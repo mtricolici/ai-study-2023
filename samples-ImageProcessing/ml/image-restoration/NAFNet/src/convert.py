@@ -47,7 +47,7 @@ def restore_faces(path, index, face_images):
 #    print(f'restoring face from memory .. {x1},{y1},{x2},{y2}')
     img[y1:y2, x1:x2] = face_img
 
-  cv2.imwrite('/images/restored-faces.png', img)
+  cv2.imwrite(path, img)
 
 ############################################################################
 def process_single_frame(frame_idx, model, in_path, out_path):
