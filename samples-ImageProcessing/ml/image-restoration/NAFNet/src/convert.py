@@ -78,7 +78,7 @@ def process_single_frame(frame_idx, model, in_path, out_path):
     restore_faces(out_path, frame_idx, faces)
 ############################################################################
 def process_frames():
-  files = [f for f in os.listdir('/images/tmp/') if f.endswith('.png')]
+  files = [os.path.join('/images/tmp',f) for f in os.listdir('/images/tmp/') if f.endswith('.png')]
   files.sort()
 
   total = len(files)
@@ -92,8 +92,7 @@ def process_frames():
   last_print_iterations = 0
 
   for i, f in enumerate(files, start=1):
-    path = os.path.join('/images/tmp', f)
-    process_single_frame(i-1, model, path, path)
+    process_single_frame(i-1, model, f, f)
 
     time_elapsed = time.time() - last_print_time
     iterations_processed = i - last_print_iterations
