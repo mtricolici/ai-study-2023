@@ -94,6 +94,9 @@ def process_frames():
   for i, f in enumerate(files, start=1):
     process_single_frame(i-1, model, f, f)
 
+    if vars.sleep is not None and isinstance(vars.sleep, float) and vars.sleep > 0.0:
+      time.sleep(vars.sleep) # Let GPU FAN to do its job to cool GPU
+
     time_elapsed = time.time() - last_print_time
     iterations_processed = i - last_print_iterations
     fps = iterations_processed / time_elapsed
