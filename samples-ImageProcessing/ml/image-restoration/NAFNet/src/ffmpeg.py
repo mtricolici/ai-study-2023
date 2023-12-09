@@ -113,7 +113,15 @@ def extract_frames():
 ############################################################################
 def create_output_video():
   print('Saving frames to output video ...')
-  run_executable(get_video_encode_cmd())
-  print(f'Video saved in {vars.target_file} !!! ;)')
+  cmd = get_video_encode_cmd()
+
+  if vars.skip_encode:
+    print('skip-encode is true. I will run this on your host ;)')
+    cmd = " ".join(cmd).replace("/images/", ".images/")
+    with open('/images/encode-to-run-on-host.txt', 'w') as file:
+      file.write(cmd)
+  else:
+    run_executable(cmd)
+    print(f'Video saved in {vars.target_file} !!! ;)')
 ############################################################################
 

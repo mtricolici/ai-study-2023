@@ -10,6 +10,7 @@ def parse_cmd_args():
     parser.add_argument("-k", "--keep-faces", type=int, default=1, help="Do not enhance faces (default: 1)")
     parser.add_argument("-s", "--sleep", type=float, default=0.0, help="Nr of seconds to sleep between frames (default: 0.0)")
     parser.add_argument("-d", "--device", type=str, default="cpu", choices=["cpu", "cuda", "amf"], help="Device to use for processing (default: cpu)")
+    parser.add_argument("--skip-encode", type=int, default=0, help="Skip encode (you need to run on host). Default is 0")
 
     args = parser.parse_args()
     vars.source_file = args.input_file
@@ -19,3 +20,4 @@ def parse_cmd_args():
     vars.keep_faces = args.keep_faces != 0
     vars.sleep = args.sleep
     vars.device = args.device
+    vars.skip_encode = args.skip_encode != 0
