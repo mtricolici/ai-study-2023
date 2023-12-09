@@ -3,8 +3,42 @@ import math
 import os
 import sys
 import json
+import re
 import vars
 
+VIDEO_ENCODE = {
+  "cpu"  : "ffmpeg               -framerate {fps} -thread_queue_size {thread_queue_size} -i /images/tmp/%04d.png {audio} -pix_fmt yuv420p -c:v libx264    -preset slower   -crf 12 -shortest -y",
+  "cuda" : "ffmpeg -hwaccel cuda -framerate {fps} -thread_queue_size {thread_queue_size} -i /images/tmp/%04d.png {audio} -pix_fmt yuv420p -c:v h264_nvenc -preset slow     -b:v 5M -shortest -y",
+  "amf"  : "ffmpeg -hwaccel amf  -framerate {fps} -thread_queue_size {thread_queue_size} -i /images/tmp/%04d.png {audio} -pix_fmt yuv420p -c:v h264_amf   -quality quality -b:v 5M -shortest -y"
+}
+
+############################################################################
+def get_video_encode_cmd():
+  cmd = VIDEO_ENCODE[vars.device]
+  cmd = cmd.replace('{fps}', f'{vars.fps}')
+  cmd = cmd.replace('{thread_queue_size}', f'{vars.thread_queue_size}')
+
+  if vars.has_audio:
+    cmd = cmd.replace('{audio}', '-i /images/tmp/audio.mp3')
+  else:
+    cmd = cmd.replace('{audio}', '')
+
+  cmd = re.sub(r'\s+', ' ', cmd) # make just 1 space
+  cmd = cmd.split()
+  cmd.append(vars.target_file)
+  return cmd
+
+############################################################################
+def run_executable(cmd):
+  try:
+    print(cmd)
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    if result.returncode != 0:
+      raise subprocess.CalledProcessError(result.returncode, cmd)
+  except subprocess.CalledProcessError as e:
+    print(f'Stdout: {result.stdout}')
+    print(f'Stderr: {result.stderr}')
+    sys.exit(f'Error: {e}')
 ############################################################################
 def detect_fps():
   if vars.fps is not None and isinstance(vars.fps, int) and vars.fps > 0:
@@ -78,25 +112,8 @@ def extract_frames():
 
 ############################################################################
 def create_output_video():
-  print(f'Saving frames to output video ...')
-  try:
-    cmd = [
-      'ffmpeg',
-      '-framerate', f'{vars.fps}',
-      '-i', '/images/tmp/%04d.png'
-    ]
-
-    if vars.has_audio:
-      cmd.extend(['-i', '/images/tmp/audio.mp3'])
-
-    cmd.extend([
-      '-pix_fmt', 'yuv420p', '-shortest', '-y',
-      vars.target_file
-    ])
-    print(cmd)
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-  except subprocess.CalledProcessError as e:
-    print(f'Stdout: {result.stdout}')
-    print(f'Stderr: {result.stderr}')
-    sys.exit(f'Error: {e}')
+  print('Saving frames to output video ...')
+  run_executable(get_video_encode_cmd())
+  print(f'Video saved in {vars.target_file} !!! ;)')
 ############################################################################
+
