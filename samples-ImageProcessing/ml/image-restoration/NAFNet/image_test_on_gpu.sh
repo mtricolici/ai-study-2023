@@ -28,6 +28,7 @@ for model in "${models[@]}"; do
     python single_image.py \
       -i /images/src.png \
       -o /images/result-${model}.png \
+      --device cuda \
       -m NAFNet-REDS-width64 $@
 done
 
