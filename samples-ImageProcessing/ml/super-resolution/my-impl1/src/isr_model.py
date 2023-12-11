@@ -9,17 +9,17 @@ from tensorflow.keras import initializers as tf_i
 #########################################################
 ISR_PARAMS = {
     'psnr-large': {
-        'params': {'C': 6, 'D': 20, 'scale': 2},
+        'params': {'rds_conv_layers': 6, 'rds_count': 20, 'scale': 2},
         'url': 'https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/ISR/rdn-C6-D20-G64-G064-x2/PSNR-driven/rdn-C6-D20-G64-G064-x2_PSNR_epoch086.hdf5',
         'name': 'rdn-C6-D20-G64-G064-x2_PSNR_epoch086.hdf5',
     },
     'psnr-small': {
-        'params': {'C': 3, 'D': 10, 'scale': 2},
+        'params': {'rds_conv_layers': 3, 'rds_count': 10, 'scale': 2},
         'url': 'https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/ISR/rdn-C3-D10-G64-G064-x2/PSNR-driven/rdn-C3-D10-G64-G064-x2_PSNR_epoch134.hdf5',
         'name': 'rdn-C3-D10-G64-G064-x2_PSNR_epoch134.hdf5',
     },
     'noise-cancel': {
-        'params': {'C': 6, 'D': 20, 'scale': 2},
+        'params': {'rds_conv_layers': 6, 'rds_count': 20, 'scale': 2},
         'url': 'https://public-asai-dl-models.s3.eu-central-1.amazonaws.com/ISR/rdn-C6-D20-G64-G064-x2/ArtefactCancelling/rdn-C6-D20-G64-G064-x2_ArtefactCancelling_epoch219.hdf5',
         'name': 'rdn-C6-D20-G64-G064-x2_ArtefactCancelling_epoch219.hdf5',
     }
@@ -36,11 +36,13 @@ class IsrRdn:
     self.nr_of_colors = 3
 
     self.name = name
-    self.p = mp['params']
+    self.params = mp['params']
     self.weights_fname = mp['name']
     self.download_url = mp['url']
 
-    self.scale = self.p['scale']
+    self.scale           = self.params['scale']
+    self.rds_count       = self.params['rds_count'] #  number of Residual Dense Blocks (RDB) insider each RRDB
+    self.rds_conv_layers = self.params['rds_conv_layers'] # number of convolutional layers stacked inside a RDB
     self.kernel_size = 3
 
     self.model = self._create_model()
@@ -50,7 +52,7 @@ class IsrRdn:
     return tf_i.RandomUniform(minval=-0.05, maxval=0.05, seed=None)
 #########################################################
   def __str__(self):
-    return f"IsrRdn(name:'{self.name}', params:{self.p})"
+    return f"IsrRdn(name:'{self.name}', params:{self.params})"
 #########################################################
   def _create_model(self):
     input_layer = tf_l.Input(shape=(None, None, self.nr_of_colors))
@@ -85,9 +87,9 @@ class IsrRdn:
   def _RDBs(self, input_layer):
     rdb_concat = list()
     rdb_in = input_layer
-    for d in range(1, self.p['D'] + 1):
+    for d in range(1, self.rds_count + 1):
       x = rdb_in
-      for c in range(1, self.p['C'] + 1):
+      for c in range(1, self.rds_conv_layers + 1):
         F_dc = tf_l.Conv2D( self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
         F_dc = tf_l.Activation('relu')(F_dc)
         x = tf_l.concatenate([x, F_dc], axis=3)
@@ -99,7 +101,7 @@ class IsrRdn:
       rdb_in = tf_l.Add()([x, rdb_in])
       rdb_concat.append(rdb_in)
 
-    assert len(rdb_concat) == self.p['D']
+    assert len(rdb_concat) == self.rds_count
 
     return tf_l.concatenate(rdb_concat, axis=3)
 #########################################################
