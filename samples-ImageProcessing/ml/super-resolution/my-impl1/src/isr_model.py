@@ -54,21 +54,17 @@ class IsrRdn:
   def _create_model(self):
     input_layer = tf_l.Input(shape=(self.patch_size, self.patch_size, self.c_dim), name='input')
 
-    conv1_layer = tf_l.Conv2D(
-      self.p['G0'],
-      kernel_size=self.kernel_size,
-      padding='same',
-      kernel_initializer=self.get_initializer(),
-    )(input_layer)
+    # First convolution
+    x = tf_l.Conv2D(self.p['G0'], kernel_size=self.kernel_size, padding='same',
+      kernel_initializer=self.get_initializer())(input_layer)
+    conv1_layer = x
 
-    x = tf_l.Conv2D(
-      self.p['G0'],
-      kernel_size=self.kernel_size,
-      padding='same',
-      kernel_initializer=self.get_initializer(),
-    )(conv1_layer)
+    # 2nd convultion
+    x = tf_l.Conv2D(self.p['G0'], kernel_size=self.kernel_size, padding='same',
+      kernel_initializer=self.get_initializer())(x)
 
-    FD = self._RDBs(x)
+    # Add residual blocks
+    x = self._RDBs(x)
 
     # Global Feature Fusion
     # 1x1 Conv of concat RDB layers -> G0 feature maps
@@ -77,7 +73,7 @@ class IsrRdn:
       kernel_size=1,
       padding='same',
       kernel_initializer=self.get_initializer(),
-    )(FD)
+    )(x)
 
     GFF2 = tf_l.Conv2D(
       self.p['G0'],
