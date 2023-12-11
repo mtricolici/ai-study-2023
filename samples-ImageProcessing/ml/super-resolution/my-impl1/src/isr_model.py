@@ -112,15 +112,11 @@ class IsrRdn:
     x = tf_l.Activation('relu')(x)
     x = tf_l.Conv2D(32, kernel_size=3, padding='same', kernel_initializer=self.get_initializer())(x)
     x = tf_l.Activation('relu')(x)
-    return self._upsampling_block(x)
-#########################################################
-  def _upsampling_block(self, input_layer):
-    x = tf_l.Conv2D(
-      self.nr_of_colors * self.scale ** 2,
-      kernel_size=3,
-      padding='same',
-      kernel_initializer=self.get_initializer(),
-    )(input_layer)
+
+    # Upsampling
+    in_size = self.nr_of_colors * self.scale ** 2
+    x = tf_l.Conv2D( in_size, kernel_size=3, padding='same', kernel_initializer=self.get_initializer())(x)
+
     return tf_l.UpSampling2D(size=self.scale)(x)
 #########################################################
   def _download_weights(self):
