@@ -11,8 +11,10 @@ SPLIT_RATIO = 0.9
 # Common value between 5 .. 10
 EARLY_STOPPING_PATIENCE = 5
 
-NUM_RES_BLOCKS = 16
-NUM_FILTERS    = 64
+NUM_FILTERS     = 64
+RDS_COUNT       = 10
+RDS_CONV_LAYERS = 3
+
 
 EPOCH = 5000 # It should stop anyway earlier ;)
 STEPS_PER_EPOCH = 100

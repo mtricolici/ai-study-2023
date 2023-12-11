@@ -1,54 +1,99 @@
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, Add, Lambda, BatchNormalization, LeakyReLU
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
+from tensorflow.keras import layers as tf_l
+from tensorflow.keras import models as tf_m
+from tensorflow.keras import optimizers as tf_o
+from tensorflow.keras import initializers as tf_i
 
 from constants import *
 from helper import psnr_metric
 
 #########################################################
-def edsr_model():
-    input_layer = Input(shape=(None, None, 3), name='input_layer')
+# Inspiration from: https://github.com/idealo/image-super-resolution/blob/master/ISR/models/rdn.py
+#########################################################
+class MyModel:
 
-    # First convolution
-    x = Conv2D(NUM_FILTERS, 3, padding='same', name='conv_initial')(input_layer)
-
-    # Store the output of the first convolution to add later
-    conv1_output = x
-
-    # Residual blocks
-    for i in range(NUM_RES_BLOCKS):
-        x = residual_block(x, name=f'res_block_{i+1}')
-
-    # Adding the first convolution output to the final output of residual blocks
-    x = Conv2D(NUM_FILTERS, 3, padding='same', name='conv_mid')(x)
-    x = Add(name='add_conv1')([conv1_output, x])
-
-    # Sub-Pixel Convolution Layer
-    x = Conv2D(3 * (SCALE_FACTOR ** 2), 3, padding='same', name='conv_output')(x)
-    x = Lambda(lambda x: tf.nn.depth_to_space(x, SCALE_FACTOR), name='pixel_shuffle')(x)
-
-    # Refinement convolutional layer
-    x = Conv2D(3, 3, padding='same', activation='relu', name='refinement_conv')(x)
-
-    # Construct the model
-    model = Model(inputs=input_layer, outputs=x)
-    model.compile(
-      optimizer=Adam(learning_rate=LEARNING_RATE),
-      loss='mean_squared_error',
-      metrics=[psnr_metric])
-
-    model.summary()
-    return model
+    def __init__(self):
+      self.num_filters = NUM_FILTERS
+      self.nr_of_colors = 3
+      self.scale = SCALE_FACTOR
+      self.rds_count = RDS_COUNT
+      self.rds_conv_layers = RDS_CONV_LAYERS
+      self.kernel_size = 3
 
 #########################################################
-def residual_block(input_tensor, name):
-    x = Conv2D(NUM_FILTERS, 3, padding='same', name=f'{name}_conv1')(input_tensor)
-    x = LeakyReLU(alpha=0.2)(BatchNormalization()(x))
-    x = Conv2D(NUM_FILTERS, 3, padding='same', name=f'{name}_conv2')(x)
-    x = BatchNormalization()(x)
-    x = Add(name=f'{name}_add')([input_tensor, x])
-    return x
+    def _conv2d(self, inputs, size=None, ks=None, padding='same'):
+        input_size = self.num_filters if size is None else size
+        kernel_size = self.kernel_size if ks is None else ks
 
+        return tf_l.Conv2D(
+            input_size,
+            kernel_size=kernel_size,
+            padding=padding,
+            kernel_initializer=tf_i.RandomUniform(minval=-0.05, maxval=0.05, seed=None)
+        )(inputs)
+
+#########################################################
+    def create_model(self):
+        input_layer = tf_l.Input(shape=(None, None, self.nr_of_colors))
+
+        # First convolution
+        x = self._conv2d(input_layer)
+        conv1_layer = x
+        # 2nd convultion
+        x = self._conv2d(x)
+        # Add residual blocks
+        x = self._residual_blocks(x)
+        # Global Feature Fusion
+        x = self._conv2d(x, ks=1)
+        x = self._conv2d(x)
+        # Global Residual Learning for Dense Features
+        x = tf_l.Add()([x, conv1_layer])
+        # Upscaling
+        x = self._upscaling_layers(x)
+        # Compose SR image
+        x = self._conv2d(x, size=self.nr_of_colors)
+        model = tf_m.Model(inputs=input_layer, outputs=x)
+
+        model.compile(
+            optimizer=tf_o.Adam(learning_rate=LEARNING_RATE),
+            loss='mean_squared_error',
+            metrics=[psnr_metric])
+
+        return model
+#########################################################
+    def _residual_blocks(self, input_layer):
+        rdb_concat = list()
+        rdb_in = input_layer
+
+        for _ in range(self.rds_count):
+            x = rdb_in
+
+            for _ in range(self.rds_conv_layers):
+                y = self._conv2d(x)
+                y = tf_l.Activation('relu')(y)
+                x = tf_l.concatenate([x, y], axis=3)
+
+            # 1x1 convolution (Local Feature Fusion)
+            x = self._conv2d(x, ks=1, padding='valid')
+
+            # Local Residual Learning F_{i,LF} + F_{i-1}
+            rdb_in = tf_l.Add()([x, rdb_in])
+            rdb_concat.append(rdb_in)
+
+        assert len(rdb_concat) == self.rds_count
+
+        return tf_l.concatenate(rdb_concat, axis=3)
+#########################################################
+    def _upscaling_layers(self, x):
+        x = self._conv2d(x, size=64, ks=5)
+        x = tf_l.Activation('relu')(x)
+        x = self._conv2d(x, size=32, ks=3)
+        x = tf_l.Activation('relu')(x)
+
+        # Upsampling
+        x = self._conv2d(x, size=self.nr_of_colors * self.scale ** 2, ks=3)
+
+        return tf_l.UpSampling2D(size=self.scale)(x)
 #########################################################
 

@@ -3,7 +3,7 @@ import argparse
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
-from model import edsr_model
+from model import MyModel
 from train import train
 from demo import scale_image, scale_all
 from constants import *
@@ -13,14 +13,14 @@ from isr_model import IsrRdn
 
 #########################################################
 def main():
-  parser = argparse.ArgumentParser(description='Super Resolution EDSR demo')
+  parser = argparse.ArgumentParser(description='Super Resolution demo')
   parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info', 'isr'], help='The command to execute')
 
   args = parser.parse_args()
 
   if args.command == 'train':
     print("Starting new training...")
-    model = edsr_model()
+    model = MyModel().create_model()
     train(model)
 
     print("training finished")
@@ -28,8 +28,7 @@ def main():
   elif args.command == 'continue':
     lm("Loading existed model from disk ...")
 
-    # safe-mode is needed otherwise it can't deserialize lambda functions :(
-    model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
+    model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
     train(model)
 
     lm("training finished")
@@ -37,7 +36,7 @@ def main():
   elif args.command == 'scale':
     # safe-mode is needed otherwise it can't deserialize lambda functions :(
     lm("Loading model ...")
-    model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
+    model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
     lm("scaling image ...")
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
     lm('scaling finished')
