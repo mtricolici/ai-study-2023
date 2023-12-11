@@ -41,10 +41,12 @@ class IsrRdn:
     self.kernel_size = 3
     self.c_dim = 3 # Number of colors
     self.scale = self.p['x']
-    self.initializer = tf_i.RandomUniform(minval=-0.05, maxval=0.05, seed=None)
 
     self.model = self._create_model()
     self._download_weights()
+#########################################################
+  def get_initializer(self):
+    return tf_i.RandomUniform(minval=-0.05, maxval=0.05, seed=None)
 #########################################################
   def __str__(self):
     return f"IsrRdn(name:'{self.name}', params:{self.p})"
@@ -56,19 +58,18 @@ class IsrRdn:
       self.p['G0'],
       kernel_size=self.kernel_size,
       padding='same',
-      kernel_initializer=self.initializer,
+      kernel_initializer=self.get_initializer(),
       name='F_m1',
     )(LR_input)
 
-    F_0 = tf_l.Conv2D(
+    x = tf_l.Conv2D(
       self.p['G0'],
       kernel_size=self.kernel_size,
       padding='same',
-      kernel_initializer=self.initializer,
-      name='F_0',
+      kernel_initializer=self.get_initializer(),
     )(F_m1)
 
-    FD = self._RDBs(F_0)
+    FD = self._RDBs(x)
 
     # Global Feature Fusion
     # 1x1 Conv of concat RDB layers -> G0 feature maps
@@ -76,7 +77,7 @@ class IsrRdn:
       self.p['G0'],
       kernel_size=1,
       padding='same',
-      kernel_initializer=self.initializer,
+      kernel_initializer=self.get_initializer(),
       name='GFF_1',
     )(FD)
 
@@ -84,7 +85,7 @@ class IsrRdn:
       self.p['G0'],
       kernel_size=self.kernel_size,
       padding='same',
-      kernel_initializer=self.initializer,
+      kernel_initializer=self.get_initializer(),
       name='GFF_2',
     )(GFF1)
 
@@ -99,7 +100,7 @@ class IsrRdn:
       self.c_dim,
       kernel_size=self.kernel_size,
       padding='same',
-      kernel_initializer=self.initializer,
+      kernel_initializer=self.get_initializer(),
       name='SR',
     )(FU)
 
@@ -115,7 +116,7 @@ class IsrRdn:
           self.p['G'],
           kernel_size=self.kernel_size,
           padding='same',
-          kernel_initializer=self.initializer,
+          kernel_initializer=self.get_initializer(),
           name='F_%d_%d' % (d, c),
         )(x)
         F_dc = tf_l.Activation('relu', name='F_%d_%d_Relu' % (d, c))(F_dc)
@@ -124,7 +125,7 @@ class IsrRdn:
 
       # 1x1 convolution (Local Feature Fusion)
       x = tf_l.Conv2D(
-        self.p['G0'], kernel_size=1, kernel_initializer=self.initializer, name='LFF_%d' % (d)
+        self.p['G0'], kernel_size=1, kernel_initializer=self.get_initializer(), name='LFF_%d' % (d)
       )(x)
       # Local Residual Learning F_{i,LF} + F_{i-1}
       rdb_in = tf_l.Add(name='LRL_%d' % (d))([x, rdb_in])
@@ -141,11 +142,11 @@ class IsrRdn:
       strides=1,
       padding='same',
       name='UPN1',
-      kernel_initializer=self.initializer,
+      kernel_initializer=self.get_initializer(),
     )(input_layer)
     x = tf_l.Activation('relu', name='UPN1_Relu')(x)
     x = tf_l.Conv2D(
-      32, kernel_size=3, padding='same', name='UPN2', kernel_initializer=self.initializer
+      32, kernel_size=3, padding='same', name='UPN2', kernel_initializer=self.get_initializer()
     )(x)
     x = tf_l.Activation('relu', name='UPN2_Relu')(x)
     return self._upsampling_block(x)
@@ -156,7 +157,7 @@ class IsrRdn:
       kernel_size=3,
       padding='same',
       name='UPN3',
-      kernel_initializer=self.initializer,
+      kernel_initializer=self.get_initializer(),
     )(input_layer)
     return tf_l.UpSampling2D(size=self.scale, name='UPsample')(x)
 #########################################################

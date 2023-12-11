@@ -51,9 +51,10 @@ def main():
   elif args.command == 'isr':
     isrModel = IsrRdn('psnr-large') # psnr-large, psnr-small, noise-cancel
     print(f'ISR model loaded: {isrModel} !!!')
-    isrModel.model.summary()
-    isrModel.model.save(MODEL_SAVE_PATH)
-    print(f'ISR model converted to {MODEL_SAVE_PATH} ;)')
+    #isrModel.model.summary()
+    scale_image(isrModel.model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
+    #isrModel.model.save(MODEL_SAVE_PATH)
+    #print(f'ISR model converted to {MODEL_SAVE_PATH} ;)')
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):
