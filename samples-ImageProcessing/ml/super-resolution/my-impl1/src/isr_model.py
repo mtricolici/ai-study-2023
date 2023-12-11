@@ -54,22 +54,35 @@ class IsrRdn:
   def __str__(self):
     return f"IsrRdn(name:'{self.name}', params:{self.params})"
 #########################################################
+  def conv2d(self, inputs, size=None, ks=None, padding='same'):
+
+    input_size = self.num_filters if size is None else size
+    kernel_size = self.kernel_size if ks is None else ks
+
+    return tf_l.Conv2D(
+      input_size,
+      kernel_size=kernel_size,
+      padding=padding,
+      kernel_initializer=self.get_initializer()
+    )(inputs)
+
+#########################################################
   def _create_model(self):
     input_layer = tf_l.Input(shape=(None, None, self.nr_of_colors))
 
     # First convolution
-    x = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(input_layer)
+    x = self.conv2d(input_layer)
     conv1_layer = x
 
     # 2nd convultion
-    x = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
+    x = self.conv2d(x)
 
     # Add residual blocks
     x = self._residual_blocks(x)
 
     # Global Feature Fusion
-    x = tf_l.Conv2D(self.num_filters, kernel_size=1, padding='same', kernel_initializer=self.get_initializer())(x)
-    x = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
+    x = self.conv2d(x, ks=1)
+    x = self.conv2d(x)
 
     # Global Residual Learning for Dense Features
     x = tf_l.Add()([x, conv1_layer])
@@ -78,7 +91,7 @@ class IsrRdn:
     x = self._upscaling_layers(x)
 
     # Compose SR image
-    x = tf_l.Conv2D(self.nr_of_colors, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
+    x = self.conv2d(x, size=self.nr_of_colors)
 
     return tf_m.Model(inputs=input_layer, outputs=x)
 #########################################################
@@ -90,12 +103,12 @@ class IsrRdn:
       x = rdb_in
 
       for _ in range(self.rds_conv_layers):
-        F_dc = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
+        F_dc = self.conv2d(x)
         F_dc = tf_l.Activation('relu')(F_dc)
         x = tf_l.concatenate([x, F_dc], axis=3)
 
       # 1x1 convolution (Local Feature Fusion)
-      x = tf_l.Conv2D(self.num_filters, kernel_size=1, kernel_initializer=self.get_initializer())(x)
+      x = self.conv2d(x, ks=1, padding='valid')
 
       # Local Residual Learning F_{i,LF} + F_{i-1}
       rdb_in = tf_l.Add()([x, rdb_in])
@@ -105,15 +118,14 @@ class IsrRdn:
 
     return tf_l.concatenate(rdb_concat, axis=3)
 #########################################################
-  def _upscaling_layers(self, input_layer):
-    x = tf_l.Conv2D(64, kernel_size=5, strides=1, padding='same', kernel_initializer=self.get_initializer())(input_layer)
+  def _upscaling_layers(self, x):
+    x = self.conv2d(x, size=64, ks=5)
     x = tf_l.Activation('relu')(x)
-    x = tf_l.Conv2D(32, kernel_size=3, padding='same', kernel_initializer=self.get_initializer())(x)
+    x = self.conv2d(x, size=32, ks=3)
     x = tf_l.Activation('relu')(x)
 
     # Upsampling
-    in_size = self.nr_of_colors * self.scale ** 2
-    x = tf_l.Conv2D( in_size, kernel_size=3, padding='same', kernel_initializer=self.get_initializer())(x)
+    x = self.conv2d(x, size=self.nr_of_colors * self.scale ** 2, ks=3)
 
     return tf_l.UpSampling2D(size=self.scale)(x)
 #########################################################
