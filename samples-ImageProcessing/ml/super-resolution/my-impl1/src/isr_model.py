@@ -89,9 +89,8 @@ class IsrRdn:
       x = rdb_in
       for c in range(1, self.p['C'] + 1):
         F_dc = tf_l.Conv2D( self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
-        F_dc = tf_l.Activation('relu', name='F_%d_%d_Relu' % (d, c))(F_dc)
-        # concatenate input and output of ConvRelu block
-        x = tf_l.concatenate([x, F_dc], axis=3, name='RDB_Concat_%d_%d' % (d, c))
+        F_dc = tf_l.Activation('relu')(F_dc)
+        x = tf_l.concatenate([x, F_dc], axis=3)
 
       # 1x1 convolution (Local Feature Fusion)
       x = tf_l.Conv2D(self.num_filters, kernel_size=1, kernel_initializer=self.get_initializer())(x)
@@ -102,7 +101,7 @@ class IsrRdn:
 
     assert len(rdb_concat) == self.p['D']
 
-    return tf_l.concatenate(rdb_concat, axis=3, name='LRLs_Concat')
+    return tf_l.concatenate(rdb_concat, axis=3)
 #########################################################
   def _UPN(self, input_layer):
     x = tf_l.Conv2D(64, kernel_size=5, strides=1, padding='same', kernel_initializer=self.get_initializer())(input_layer)
