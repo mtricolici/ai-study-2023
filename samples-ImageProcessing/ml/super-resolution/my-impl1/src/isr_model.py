@@ -103,9 +103,9 @@ class IsrRdn:
       x = rdb_in
 
       for _ in range(self.rds_conv_layers):
-        F_dc = self.conv2d(x)
-        F_dc = tf_l.Activation('relu')(F_dc)
-        x = tf_l.concatenate([x, F_dc], axis=3)
+        y = self.conv2d(x)
+        y = tf_l.Activation('relu')(y)
+        x = tf_l.concatenate([x, y], axis=3)
 
       # 1x1 convolution (Local Feature Fusion)
       x = self.conv2d(x, ks=1, padding='valid')
