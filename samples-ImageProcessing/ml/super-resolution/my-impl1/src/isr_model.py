@@ -65,7 +65,7 @@ class IsrRdn:
     x = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
 
     # Add residual blocks
-    x = self._RDBs(x)
+    x = self._residual_blocks(x)
 
     # Global Feature Fusion
     # 1x1 Conv of concat RDB layers -> G0 feature maps
@@ -77,20 +77,22 @@ class IsrRdn:
     FDF = tf_l.Add()([GFF2, conv1_layer])
 
     # Upscaling
-    FU = self._UPN(FDF)
+    FU = self._upscaling_layers(FDF)
 
     # Compose SR image
     SR = tf_l.Conv2D(self.nr_of_colors, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(FU)
 
     return tf_m.Model(inputs=input_layer, outputs=SR)
 #########################################################
-  def _RDBs(self, input_layer):
+  def _residual_blocks(self, input_layer):
     rdb_concat = list()
     rdb_in = input_layer
-    for d in range(1, self.rds_count + 1):
+
+    for _ in range(self.rds_count):
       x = rdb_in
-      for c in range(1, self.rds_conv_layers + 1):
-        F_dc = tf_l.Conv2D( self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
+
+      for _ in range(self.rds_conv_layers):
+        F_dc = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
         F_dc = tf_l.Activation('relu')(F_dc)
         x = tf_l.concatenate([x, F_dc], axis=3)
 
@@ -105,7 +107,7 @@ class IsrRdn:
 
     return tf_l.concatenate(rdb_concat, axis=3)
 #########################################################
-  def _UPN(self, input_layer):
+  def _upscaling_layers(self, input_layer):
     x = tf_l.Conv2D(64, kernel_size=5, strides=1, padding='same', kernel_initializer=self.get_initializer())(input_layer)
     x = tf_l.Activation('relu')(x)
     x = tf_l.Conv2D(32, kernel_size=3, padding='same', kernel_initializer=self.get_initializer())(x)
