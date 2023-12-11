@@ -68,21 +68,19 @@ class IsrRdn:
     x = self._residual_blocks(x)
 
     # Global Feature Fusion
-    # 1x1 Conv of concat RDB layers -> G0 feature maps
-    GFF1 = tf_l.Conv2D(self.num_filters, kernel_size=1, padding='same', kernel_initializer=self.get_initializer())(x)
-
-    GFF2 = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(GFF1)
+    x = tf_l.Conv2D(self.num_filters, kernel_size=1, padding='same', kernel_initializer=self.get_initializer())(x)
+    x = tf_l.Conv2D(self.num_filters, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
 
     # Global Residual Learning for Dense Features
-    FDF = tf_l.Add()([GFF2, conv1_layer])
+    x = tf_l.Add()([x, conv1_layer])
 
     # Upscaling
-    FU = self._upscaling_layers(FDF)
+    x = self._upscaling_layers(x)
 
     # Compose SR image
-    SR = tf_l.Conv2D(self.nr_of_colors, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(FU)
+    x = tf_l.Conv2D(self.nr_of_colors, kernel_size=self.kernel_size, padding='same', kernel_initializer=self.get_initializer())(x)
 
-    return tf_m.Model(inputs=input_layer, outputs=SR)
+    return tf_m.Model(inputs=input_layer, outputs=x)
 #########################################################
   def _residual_blocks(self, input_layer):
     rdb_concat = list()
