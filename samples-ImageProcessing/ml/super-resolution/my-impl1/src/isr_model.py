@@ -52,22 +52,21 @@ class IsrRdn:
     return f"IsrRdn(name:'{self.name}', params:{self.p})"
 #########################################################
   def _create_model(self):
-    LR_input = tf_l.Input(shape=(self.patch_size, self.patch_size, self.c_dim), name='LR')
+    input_layer = tf_l.Input(shape=(self.patch_size, self.patch_size, self.c_dim), name='input')
 
-    F_m1 = tf_l.Conv2D(
+    conv1_layer = tf_l.Conv2D(
       self.p['G0'],
       kernel_size=self.kernel_size,
       padding='same',
       kernel_initializer=self.get_initializer(),
-      name='F_m1',
-    )(LR_input)
+    )(input_layer)
 
     x = tf_l.Conv2D(
       self.p['G0'],
       kernel_size=self.kernel_size,
       padding='same',
       kernel_initializer=self.get_initializer(),
-    )(F_m1)
+    )(conv1_layer)
 
     FD = self._RDBs(x)
 
@@ -78,7 +77,6 @@ class IsrRdn:
       kernel_size=1,
       padding='same',
       kernel_initializer=self.get_initializer(),
-      name='GFF_1',
     )(FD)
 
     GFF2 = tf_l.Conv2D(
@@ -86,11 +84,10 @@ class IsrRdn:
       kernel_size=self.kernel_size,
       padding='same',
       kernel_initializer=self.get_initializer(),
-      name='GFF_2',
     )(GFF1)
 
     # Global Residual Learning for Dense Features
-    FDF = tf_l.Add(name='FDF')([GFF2, F_m1])
+    FDF = tf_l.Add()([GFF2, conv1_layer])
 
     # Upscaling
     FU = self._UPN(FDF)
@@ -101,10 +98,9 @@ class IsrRdn:
       kernel_size=self.kernel_size,
       padding='same',
       kernel_initializer=self.get_initializer(),
-      name='SR',
     )(FU)
 
-    return tf_m.Model(inputs=LR_input, outputs=SR)
+    return tf_m.Model(inputs=input_layer, outputs=SR)
 #########################################################
   def _RDBs(self, input_layer):
     rdb_concat = list()
