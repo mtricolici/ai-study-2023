@@ -11,10 +11,9 @@ SPLIT_RATIO = 0.9
 # Common value between 5 .. 10
 EARLY_STOPPING_PATIENCE = 5
 
-NUM_FILTERS     = 64 # ISR: all models have just 64 filters
-RDS_COUNT       = 30 # ISR: small is 10, large is 20
-RDS_CONV_LAYERS = 10 # ISR: small is  3, large is  6
-
+NUM_FILTERS     = 6 # ISR: all models have just 64 filters
+RDS_COUNT       = 3 # ISR: small is 10, large is 20
+RDS_CONV_LAYERS = 1 # ISR: small is  3, large is  6
 
 EPOCH = 5000 # It should stop anyway earlier ;)
 STEPS_PER_EPOCH = 100

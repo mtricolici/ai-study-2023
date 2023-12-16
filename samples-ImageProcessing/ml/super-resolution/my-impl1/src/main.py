@@ -5,6 +5,7 @@ from tensorflow.keras.models import load_model
 
 from model import MyModel
 from train import train
+from lazy_training import lazy_training
 from demo import scale_image, scale_all
 from constants import *
 from helper import *
@@ -19,7 +20,9 @@ def new_training(args):
       model = MyModel().create_model()
       model.save_weights(WEIGHTS_SAVE_PATH, save_format='h5') # << REMOVE THIS later
       show_model_summary(model)
-      lm('TODO:training by layers not implemented yet :(')
+
+    lm('Starting lazy training ...')
+    lazy_training(model)
   else:
       lm('Creating model into video memory directly...')
       model = MyModel().create_model()
@@ -36,7 +39,8 @@ def continue_training(args):
       show_model_summary(model)
       lm('Loading weights from disk ...')
       model.load_weights(WEIGHTS_SAVE_PATH)
-      lm('TODO:training by layers not implemented yet :(')
+    lm('Starting lazy training ...')
+    lazy_training(model)
   else:
     lm('Loading existing model from disk into video memory ...')
     model = MyModel().create_model()

@@ -20,7 +20,7 @@ class MyModel:
       self.kernel_size = 3
 
 #########################################################
-    def _conv2d(self, inputs, size=None, ks=None, padding='same'):
+    def _conv2d(self, inputs, size=None, ks=None, padding='same', activation='linear'):
         input_size = self.num_filters if size is None else size
         kernel_size = self.kernel_size if ks is None else ks
 
@@ -28,7 +28,8 @@ class MyModel:
             input_size,
             kernel_size=kernel_size,
             padding=padding,
-            kernel_initializer=tf_i.RandomUniform(minval=-0.05, maxval=0.05, seed=None)
+            kernel_initializer=tf_i.RandomUniform(minval=-0.05, maxval=0.05, seed=None),
+            activation=activation
         )(inputs)
 
 #########################################################
@@ -64,8 +65,7 @@ class MyModel:
             x = rdb_in
 
             for _ in range(self.rds_conv_layers):
-                y = self._conv2d(x)
-                y = tf_l.Activation('relu')(y)
+                y = self._conv2d(x, activation='relu')
                 x = tf_l.concatenate([x, y], axis=3)
 
             # 1x1 convolution (Local Feature Fusion)
@@ -80,10 +80,8 @@ class MyModel:
         return tf_l.concatenate(rdb_concat, axis=3)
 #########################################################
     def _upscaling_layers(self, x):
-        x = self._conv2d(x, size=64, ks=5)
-        x = tf_l.Activation('relu')(x)
-        x = self._conv2d(x, size=32, ks=3)
-        x = tf_l.Activation('relu')(x)
+        x = self._conv2d(x, size=64, ks=5, activation='relu')
+        x = self._conv2d(x, size=32, ks=3, activation='relu')
 
         # Upsampling
         x = self._conv2d(x, size=self.nr_of_colors * self.scale ** 2, ks=3)
