@@ -39,8 +39,10 @@ def continue_training(args):
       lm('TODO:training by layers not implemented yet :(')
   else:
     lm('Loading existing model from disk into video memory ...')
-    model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    model = MyModel().create_model()
     show_model_summary(model)
+    lm('Loading weights from disk ...')
+    model.load_weights(WEIGHTS_SAVE_PATH)
     lm('Continue training ...')
     train(model)
 
@@ -57,8 +59,10 @@ def scale_one_image(args):
       lm('TODO:scaling with partial forward not implemented yet')
   else:
     lm('Loading existing model from disk into video memory ...')
-    model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    model = MyModel().create_model()
     show_model_summary(model)
+    lm('Loading weights from disk ...')
+    model.load_weights(WEIGHTS_SAVE_PATH)
     lm("scaling image ...")
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
@@ -75,8 +79,11 @@ def scale_many_images(args):
       model.load_weights(WEIGHTS_SAVE_PATH)
       lm('TODO:scaling with partial forward not implemented yet')
   else:
-    lm("Loading model ...")
-    model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
+    lm('Loading existing model from disk into video memory ...')
+    model = MyModel().create_model()
+    show_model_summary(model)
+    lm('Loading weights from disk ...')
+    model.load_weights(WEIGHTS_SAVE_PATH)
     lm("Invoking scale-all")
     scale_all(model)
 

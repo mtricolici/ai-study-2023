@@ -14,7 +14,7 @@ def train(model):
 
     val_steps = calc_validation_steps()
 
-    checkpoint = tf_c.ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
+    checkpoint = tf_c.ModelCheckpoint(WEIGHTS_SAVE_PATH, save_best_only=True, save_weights_only=True)
     early_stopping = tf_c.EarlyStopping(
       monitor='val_psnr_metric',
       patience=EARLY_STOPPING_PATIENCE,
