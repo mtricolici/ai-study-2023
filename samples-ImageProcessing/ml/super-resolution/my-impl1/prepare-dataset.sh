@@ -7,8 +7,8 @@ RAW_DIR=$HOME/temp/raw-images
 # output folder to save dataset ready for CNN training
 DATASET_DIR=$HOME/temp/super-dataset
 
-RSMALL=160x90
-RBIG=640x360
+RSMALL=60x50
+RBIG=240x200
 
 # ImageMagic convert filters: "lanczos", "bilinear", "nearestneighbor", "box", "cubic", "mitchell"
 OPS="-background black -gravity center -strip"

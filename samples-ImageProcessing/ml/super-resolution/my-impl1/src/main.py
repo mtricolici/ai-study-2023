@@ -1,11 +1,11 @@
 #!/usr/bin/env/python
+import os
 import argparse
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 from model import MyModel
 from train import train
-from lazy_training import lazy_training
 from demo import scale_image, scale_all
 from constants import *
 from helper import *
@@ -14,82 +14,43 @@ from isr_model import IsrRdn
 #########################################################
 def new_training(args):
   lm("Starting new training...")
-  if args.partial:
-    lm('Creating model in RAM ...')
-    with tf.device('/CPU:0'):
-      model = MyModel().create_model()
-      model.save_weights(WEIGHTS_SAVE_PATH, save_format='h5') # << REMOVE THIS later
-      show_model_summary(model)
-
-    lm('Starting lazy training ...')
-    lazy_training(model)
-  else:
-      lm('Creating model into video memory directly...')
-      model = MyModel().create_model()
-      show_model_summary(model)
-      train(model)
+  model = MyModel().create_model()
+  show_model_summary(model)
+  train(model)
   lm("training finished")
 
 #########################################################
 def continue_training(args):
-  if args.partial:
-    with tf.device('/CPU:0'):
-      lm('Creating model in RAM ...')
-      model = MyModel().create_model()
-      show_model_summary(model)
-      lm('Loading weights from disk ...')
-      model.load_weights(WEIGHTS_SAVE_PATH)
-    lm('Starting lazy training ...')
-    lazy_training(model)
-  else:
-    lm('Loading existing model from disk into video memory ...')
-    model = MyModel().create_model()
-    show_model_summary(model)
-    lm('Loading weights from disk ...')
-    model.load_weights(WEIGHTS_SAVE_PATH)
-    lm('Continue training ...')
-    train(model)
+  lm('Loading existing model from disk into video memory ...')
+  model = MyModel().create_model()
+  show_model_summary(model)
 
+  lm('Loading weights from disk ...')
+  model.load_weights(WEIGHTS_SAVE_PATH)
+
+  lm('Continue training ...')
+  train(model)
   lm("training finished")
 #########################################################
 def scale_one_image(args):
-  if args.partial:
-    with tf.device('/CPU:0'):
-      lm('Creating model in RAM ...')
-      model = MyModel().create_model()
-      show_model_summary(model)
-      lm('Loading weights from disk ...')
-      model.load_weights(WEIGHTS_SAVE_PATH)
-      lm('TODO:scaling with partial forward not implemented yet')
-  else:
-    lm('Loading existing model from disk into video memory ...')
-    model = MyModel().create_model()
-    show_model_summary(model)
-    lm('Loading weights from disk ...')
-    model.load_weights(WEIGHTS_SAVE_PATH)
-    lm("scaling image ...")
-    scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
-
+  lm('Loading existing model from disk into video memory ...')
+  model = MyModel().create_model()
+  show_model_summary(model)
+  lm('Loading weights from disk ...')
+  model.load_weights(WEIGHTS_SAVE_PATH)
+  lm("scaling image ...")
+  scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
   lm('scaling finished')
 
 #########################################################
 def scale_many_images(args):
-  if args.partial:
-    with tf.device('/CPU:0'):
-      lm('Creating model in RAM ...')
-      model = MyModel().create_model()
-      show_model_summary(model)
-      lm('Loading weights from disk ...')
-      model.load_weights(WEIGHTS_SAVE_PATH)
-      lm('TODO:scaling with partial forward not implemented yet')
-  else:
-    lm('Loading existing model from disk into video memory ...')
-    model = MyModel().create_model()
-    show_model_summary(model)
-    lm('Loading weights from disk ...')
-    model.load_weights(WEIGHTS_SAVE_PATH)
-    lm("Invoking scale-all")
-    scale_all(model)
+  lm('Loading existing model from disk into video memory ...')
+  model = MyModel().create_model()
+  show_model_summary(model)
+  lm('Loading weights from disk ...')
+  model.load_weights(WEIGHTS_SAVE_PATH)
+  lm("Invoking scale-all")
+  scale_all(model)
 
 #########################################################
 def test_isr_model(args, model_name):
@@ -113,8 +74,11 @@ def show_gpu_info():
 def main():
   parser = argparse.ArgumentParser(description='Super Resolution demo')
   parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info', 'isr'], help='The command to execute')
-  parser.add_argument('-p', '--partial', action='store_true', default=False, help='use this for big models that do not fit in video memory')
+  parser.add_argument('-c', '--cpu', action='store_true', default=False, help='force running in CPU instead of GPU')
   args = parser.parse_args()
+
+  if args.cpu:
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
   if args.command == 'train':
     new_training(args)
