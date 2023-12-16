@@ -7,61 +7,121 @@ from model import MyModel
 from train import train
 from demo import scale_image, scale_all
 from constants import *
-from helper import psnr_metric, lm
+from helper import *
 from isr_model import IsrRdn
 
+#########################################################
+def new_training(args):
+  lm("Starting new training...")
+  if args.partial:
+    lm('Creating model in RAM ...')
+    with tf.device('/CPU:0'):
+      model = MyModel().create_model()
+      model.save_weights(WEIGHTS_SAVE_PATH, save_format='h5') # << REMOVE THIS later
+      show_model_summary(model)
+      lm('TODO:training by layers not implemented yet :(')
+  else:
+      lm('Creating model into video memory directly...')
+      model = MyModel().create_model()
+      show_model_summary(model)
+      train(model)
+  lm("training finished")
 
 #########################################################
-def main():
-  parser = argparse.ArgumentParser(description='Super Resolution demo')
-  parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info', 'isr'], help='The command to execute')
-
-  args = parser.parse_args()
-
-  if args.command == 'train':
-    print("Starting new training...")
-    model = MyModel().create_model()
+def continue_training(args):
+  if args.partial:
+    with tf.device('/CPU:0'):
+      lm('Creating model in RAM ...')
+      model = MyModel().create_model()
+      show_model_summary(model)
+      lm('Loading weights from disk ...')
+      model.load_weights(WEIGHTS_SAVE_PATH)
+      lm('TODO:training by layers not implemented yet :(')
+  else:
+    lm('Loading existing model from disk into video memory ...')
+    model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    show_model_summary(model)
+    lm('Continue training ...')
     train(model)
 
-    print("training finished")
-
-  elif args.command == 'continue':
-    lm("Loading existed model from disk ...")
-
+  lm("training finished")
+#########################################################
+def scale_one_image(args):
+  if args.partial:
+    with tf.device('/CPU:0'):
+      lm('Creating model in RAM ...')
+      model = MyModel().create_model()
+      show_model_summary(model)
+      lm('Loading weights from disk ...')
+      model.load_weights(WEIGHTS_SAVE_PATH)
+      lm('TODO:scaling with partial forward not implemented yet')
+  else:
+    lm('Loading existing model from disk into video memory ...')
     model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
-    train(model)
-
-    lm("training finished")
-
-  elif args.command == 'scale':
-    # safe-mode is needed otherwise it can't deserialize lambda functions :(
-    lm("Loading model ...")
-    model = load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    show_model_summary(model)
     lm("scaling image ...")
     scale_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
-    lm('scaling finished')
 
-  elif args.command == 'scale-all':
+  lm('scaling finished')
+
+#########################################################
+def scale_many_images(args):
+  if args.partial:
+    with tf.device('/CPU:0'):
+      lm('Creating model in RAM ...')
+      model = MyModel().create_model()
+      show_model_summary(model)
+      lm('Loading weights from disk ...')
+      model.load_weights(WEIGHTS_SAVE_PATH)
+      lm('TODO:scaling with partial forward not implemented yet')
+  else:
     lm("Loading model ...")
     model = load_model(MODEL_SAVE_PATH, safe_mode=False, custom_objects={'psnr_metric': psnr_metric})
     lm("Invoking scale-all")
     scale_all(model)
 
+#########################################################
+def test_isr_model(args, model_name):
+  isrModel = IsrRdn(model_name) # psnr-large, psnr-small, noise-cancel
+  lm(f'ISR model loaded: {isrModel} !!!')
+  show_model_summary(isrModel.model)
+  scale_image(isrModel.model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
+  #isrModel.model.save(MODEL_SAVE_PATH)
+  #print(f'ISR model converted to {MODEL_SAVE_PATH} ;)')
+
+#########################################################
+def show_gpu_info():
+  if tf.config.list_physical_devices('GPU'):
+    print("Available GPUs:")
+    for gpu in tf.config.list_physical_devices('GPU'):
+      print(gpu)
+  else:
+    print("GPU is not available :((")
+
+#########################################################
+def main():
+  parser = argparse.ArgumentParser(description='Super Resolution demo')
+  parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info', 'isr'], help='The command to execute')
+  parser.add_argument('-p', '--partial', action='store_true', default=False, help='use this for big models that do not fit in video memory')
+  args = parser.parse_args()
+
+  if args.command == 'train':
+    new_training(args)
+
+  elif args.command == 'continue':
+    continue_training(args)
+
+  elif args.command == 'scale':
+    scale_one_image(args)
+
+  elif args.command == 'scale-all':
+    scale_many_images(args)
+
   elif args.command == 'isr':
-    isrModel = IsrRdn('psnr-large') # psnr-large, psnr-small, noise-cancel
-    print(f'ISR model loaded: {isrModel} !!!')
-    #isrModel.model.summary()
-    scale_image(isrModel.model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
-    #isrModel.model.save(MODEL_SAVE_PATH)
-    #print(f'ISR model converted to {MODEL_SAVE_PATH} ;)')
+    test_isr_model(args, 'psnr-large') # psnr-large, psnr-small, noise-cancel
 
   elif args.command == 'info':
-    if tf.config.list_physical_devices('GPU'):
-      print("Available GPUs:")
-      for gpu in tf.config.list_physical_devices('GPU'):
-        print(gpu)
-    else:
-      print("GPU is not available :((")
+    show_gpu_info()
 
 #########################################################
 

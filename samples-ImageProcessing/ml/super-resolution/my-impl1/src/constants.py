@@ -11,16 +11,18 @@ SPLIT_RATIO = 0.9
 # Common value between 5 .. 10
 EARLY_STOPPING_PATIENCE = 5
 
-NUM_FILTERS     = 64
-RDS_COUNT       = 10
-RDS_CONV_LAYERS = 3
+NUM_FILTERS     = 64 # ISR: all models have just 64 filters
+RDS_COUNT       = 30 # ISR: small is 10, large is 20
+RDS_CONV_LAYERS = 10  # ISR: small is  3, large is  6
 
 
 EPOCH = 5000 # It should stop anyway earlier ;)
 STEPS_PER_EPOCH = 100
 LEARNING_RATE = 0.001
 
-MODEL_SAVE_PATH = '/output/edsr-model.keras'
+MODEL_SAVE_PATH   = '/output/edsr-model.keras'
+WEIGHTS_SAVE_PATH = '/output/my-model.h5'
+
 
 # dataset directory should have files of type
 # 1212-small.png

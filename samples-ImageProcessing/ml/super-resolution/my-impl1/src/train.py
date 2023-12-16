@@ -1,4 +1,5 @@
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras import optimizers as tf_o
+from tensorflow.keras import callbacks as tf_c
 
 from dataset import dataset_loader, validation_dataset_loader, calc_validation_steps
 from constants import *
@@ -6,17 +7,22 @@ from helper import psnr_metric
 
 #########################################################
 def train(model):
+    model.compile(
+        optimizer=tf_o.Adam(learning_rate=LEARNING_RATE),
+        loss='mean_squared_error',
+        metrics=[psnr_metric])
+
     val_steps = calc_validation_steps()
 
-    checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
-    early_stopping = EarlyStopping(
+    checkpoint = tf_c.ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
+    early_stopping = tf_c.EarlyStopping(
       monitor='val_psnr_metric',
       patience=EARLY_STOPPING_PATIENCE,
       verbose=1,
       mode='max'  # Change mode to 'max' since higher PSNR is better!
     )
 
-    lr_scheduler = ReduceLROnPlateau(
+    lr_scheduler = tf_c.ReduceLROnPlateau(
         monitor='val_psnr_metric',  # Monitor PSNR instead of loss
         factor=0.1,       # new_lr = lr * factor
         patience=3,       # number of epochs with no improvement after which learning rate will be reduced

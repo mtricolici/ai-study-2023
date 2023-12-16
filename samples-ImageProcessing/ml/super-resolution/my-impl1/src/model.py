@@ -6,8 +6,6 @@ from tensorflow.keras import optimizers as tf_o
 from tensorflow.keras import initializers as tf_i
 
 from constants import *
-from helper import psnr_metric
-
 #########################################################
 # Inspiration from: https://github.com/idealo/image-super-resolution/blob/master/ISR/models/rdn.py
 #########################################################
@@ -55,10 +53,6 @@ class MyModel:
         x = self._conv2d(x, size=self.nr_of_colors)
         model = tf_m.Model(inputs=input_layer, outputs=x)
 
-        model.compile(
-            optimizer=tf_o.Adam(learning_rate=LEARNING_RATE),
-            loss='mean_squared_error',
-            metrics=[psnr_metric])
 
         return model
 #########################################################
