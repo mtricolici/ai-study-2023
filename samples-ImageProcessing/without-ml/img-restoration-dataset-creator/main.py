@@ -7,17 +7,13 @@ import random
 
 #######################################################################
 def add_grain_effect(image):
-  intensity=random.randint(13,17)
+  intensity=random.randint(10,18)
 
   height, width, channels = image.shape
 
-  # Generate random noise with the same dimensions as the image
   noise = np.random.normal(0, intensity, (height, width, channels))
-
-  # Add the noise to the image
   noisy_image = image + noise
 
-  # Ensure that pixel values are within the valid range [0, 255]
   noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
   return noisy_image
 #######################################################################
@@ -56,19 +52,33 @@ def add_scan_lines(image):
 
   return image
 #######################################################################
-def add_color_bleeding(image):
-  possible_kernel_sizes = [(3, 3), (3, 5), (5, 3), (5, 5)]
-  kernel_size = random.choice(possible_kernel_sizes)
-
+def add_blur_effect(image):
+  kernel_size = np.random.choice([3, 5], size=2, replace=True)
   return cv2.GaussianBlur(image, kernel_size, 0)
 #######################################################################
+def add_downscale_effect(image):
+  original_size = image.shape[:2]
+  s_min = 0.5
+  s_max = 0.7
+  scale = s_min + (s_max - s_min)*random.random()
+  small = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+  return cv2.resize(small, dsize=original_size[::-1], interpolation=cv2.INTER_AREA)
+#######################################################################
+def add_jpeg_effect(image):
+  quality = np.random.randint(40, 70)
+  _, jpg_image = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, quality])
+  return cv2.imdecode(jpg_image, cv2.IMREAD_UNCHANGED)
+
+#######################################################################
+
 def convert(input_file, output_file):
   print(f'>>> {input_file} to {output_file}')
   img = cv2.imread(input_file)
 
-  effects = [add_grain_effect, add_chromatic_aberration, add_scan_lines, add_color_bleeding]
 
+  effects = [add_downscale_effect, add_blur_effect, add_grain_effect, add_jpeg_effect]
   random.shuffle(effects)
+
   num_effects_to_apply = random.randint(2, 3)
 
   for effect in effects[:num_effects_to_apply]:

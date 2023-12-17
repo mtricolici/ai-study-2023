@@ -5,7 +5,9 @@ import sys
 import random
 
 ##################################################################
-def add_chromatic_aberration(img, shift_x=5, shift_y=5):
+def add_chromatic_aberration(img):
+    shift_x=random.randint(1,3)
+    shift_y=random.randint(1,3)
     height, width, _ = img.shape
     r_channel = np.roll(img[:, :, 2], shift_x, axis=1)
     b_channel = np.roll(img[:, :, 0], shift_y, axis=0)
@@ -83,30 +85,10 @@ def add_gaussian_noise_distortion(image, mean=0, sigma=0.3):
 
     return distorted_image
 ##################################################################
-# blur - very cpu consuming (slow) !
-def add_color_bleeding(image, neighborhood_size=2):
-    # Define the size of the neighborhood for color bleeding
+def add_blur_effect(image):
+    kernel_size = np.random.choice([3, 5], size=2, replace=True)
 
-    # Create a copy of the input image to work on
-    output_image = image.copy()
-
-    # Get the height and width of the image
-    height, width = image.shape[:2]
-
-    # Loop through each pixel in the image
-    for y in range(neighborhood_size, height - neighborhood_size):
-        for x in range(neighborhood_size, width - neighborhood_size):
-            # Get the neighborhood around the current pixel
-            neighborhood = image[y - neighborhood_size:y + neighborhood_size + 1,
-                                x - neighborhood_size:x + neighborhood_size + 1]
-
-            # Calculate the average color of the neighborhood
-            average_color = np.mean(neighborhood, axis=(0, 1))
-
-            # Set the color of the current pixel to the average color
-            output_image[y, x] = average_color.astype(np.uint8)
-
-    return output_image
+    return cv2.GaussianBlur(image, kernel_size, 0)
 ##################################################################
 def sharpen_image(image, level=8.9):
     # Define a sharpening kernel
@@ -137,7 +119,8 @@ def adjust_saturation(image, saturation_factor=0.8):
 
     return adjusted_image
 ##################################################################
-def add_grain_effect(image, intensity=10):
+def add_grain_effect(image):
+    intensity=random.randint(10,18)
     # Get the dimensions of the image
     height, width, channels = image.shape
 
@@ -170,7 +153,20 @@ def adjust_brightness(image, factor=0.8):
 
     return adjusted_image
 ##################################################################
+def add_downscale_effect(image):
+  original_size = image.shape[:2]
+  s_min = 0.5
+  s_max = 0.7
+  scale = s_min + (s_max - s_min)*random.random()
+  small = cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+  return cv2.resize(small, dsize=original_size[::-1], interpolation=cv2.INTER_AREA)
+##################################################################
+def add_jpeg_effect(image):
+  quality = np.random.randint(40, 70)
+  _, jpg_image = cv2.imencode(".jpg", image, [cv2.IMWRITE_JPEG_QUALITY, quality])
+  return cv2.imdecode(jpg_image, cv2.IMREAD_UNCHANGED)
 
+##################################################################
 def main():
     if len(sys.argv) != 3:
         print("Usage: python vhs_effect.py <input_image_path> <output_image_path>")
@@ -188,18 +184,21 @@ def main():
             sys.exit(1)
 
         # Add various effects to the image
-        img = add_chromatic_aberration(img)
-        img = add_scan_lines(img)
-#        img = apply_vintage_effect(img)
-        img = add_flicker_effect(img)
-        img = add_gaussian_noise_distortion(img)
-
-        img = adjust_brightness(img, factor=1.2)
-        img = sharpen_image(img, level=9)
-        img = adjust_saturation(img)
+        img = add_downscale_effect(img)
+        img = add_blur_effect(img)
         img = add_grain_effect(img)
+        img = add_jpeg_effect(img)
 
-        img = add_color_bleeding(img)
+#        img = add_chromatic_aberration(img)
+
+#        img = add_scan_lines(img)
+#        img = apply_vintage_effect(img)
+#        img = add_flicker_effect(img)
+#        img = add_gaussian_noise_distortion(img)
+
+#        img = adjust_brightness(img, factor=1.2)
+#        img = sharpen_image(img, level=9)
+#        img = adjust_saturation(img)
 
         # Save the modified image
         cv2.imwrite(output_image_path, img)
@@ -208,6 +207,7 @@ def main():
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        raise e
 
 if __name__ == "__main__":
     main()

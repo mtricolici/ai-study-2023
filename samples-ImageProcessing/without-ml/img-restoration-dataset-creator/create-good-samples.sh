@@ -9,7 +9,7 @@ DATASET_DIR=$HOME/temp/image-restoration
 
 mkdir -p "$DATASET_DIR"
 
-RES="100x70"
+RES="120x90"
 
 count=1
 total=$(find $RAW_DIR/ -type f -name '*.png' |wc -l)
