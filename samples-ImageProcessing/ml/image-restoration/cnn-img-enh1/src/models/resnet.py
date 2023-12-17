@@ -11,7 +11,7 @@ def model_create(num_res_blocks=32, num_filters=128):
     inputs = layers.Input(shape=(None, None, 3))
 
     # Initial Convolution
-    x = layers.Conv2D(num_filters, kernel_size=(3, 3), padding='same')(inputs)
+    x = layers.Conv2D(num_filters, kernel_size=(5, 5), padding='same')(inputs)
     x = layers.BatchNormalization()(x)
     x = layers.Activation('relu')(x)
 
@@ -20,7 +20,7 @@ def model_create(num_res_blocks=32, num_filters=128):
         x = res_block(x, num_filters)
 
     # Final Convolution
-    x = layers.Conv2D(3, kernel_size=(3, 3), activation='sigmoid', padding='same')(x)
+    x = layers.Conv2D(3, kernel_size=(5, 5), activation='sigmoid', padding='same')(x)
 
     # Build and Compile
     model = models.Model(inputs=inputs, outputs=x)

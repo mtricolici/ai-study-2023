@@ -36,10 +36,10 @@ def train_model(model):
   lr_scheduler = ReduceLROnPlateau(
       monitor='val_psnr_metric',  # Monitor PSNR instead of loss
       factor=0.1,       # new_lr = lr * factor
-      patience=3,       # number of epochs with no improvement after which learning rate will be reduced
+      patience=5,       # number of epochs with no improvement after which learning rate will be reduced
       verbose=1,
       mode='max',       # Change mode to 'max' since higher PSNR is better
-      min_lr=0.00001    # lower bound on the learning rate
+      min_lr=1e-11    # lower bound on the learning rate
   )
 
   try:
