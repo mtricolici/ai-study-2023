@@ -1,5 +1,5 @@
 
-BATCH_SIZE = 2
+BATCH_SIZE = 4
 
 # Stop training If validation loss is not improving for EARLY_STOPPING_PATIENCE nr of epoches
 # NR of epoches to wait before stopping after the model stops improving
@@ -10,7 +10,7 @@ INPUT_SIZE = (640, 360)
 
 EPOCH = 1000
 STEPS_PER_EPOCH = 100
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.01
 
 MODEL_SAVE_PATH = '/output/my-cnn.keras'
 

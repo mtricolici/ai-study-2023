@@ -5,7 +5,7 @@ from constants import *
 from helper import psnr_metric
 
 #########################################################
-def model_create(depth=8, filters=32):
+def model_create(depth=20, filters=64):
     inputs = layers.Input(shape=(None, None, 3), name='input')
 
     # Initial Convolution
@@ -20,6 +20,9 @@ def model_create(depth=8, filters=32):
 
     # Final Convolution
     x = layers.Conv2D(3, 3, padding='same', use_bias=False)(x)
+
+    # Subtract the input from the denoised image
+    x = layers.Subtract()([inputs, x])
 
     # Build and Compile
     model = models.Model(inputs=inputs, outputs=x)
