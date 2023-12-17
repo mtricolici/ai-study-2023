@@ -54,32 +54,41 @@ def train_model(model):
     print('Aborting...')
 
 #########################################################
-def unblure_image(model, input_path, output_path):
+def restore_image(model, input_path, output_path, iterations):
+  print(f'Restoring image {input_path} into {output_path}. iterations: {iterations} ...')
   img = load_image(input_path)
   img = tf.expand_dims(img, axis=0) # Add batch dimension
-  
-  out = model.predict(img)
+
+  out = img
+
+  for _ in range(iterations):
+    out = model.predict(out)
+
   out = tf.squeeze(out, axis=0) # Remove batch dimension
   save_image(out, output_path)
 
 #########################################################
-def demo_single(model, input_path, output_path):
+def demo_single(model, input_path, output_path, iterations):
   original_img = load_image(input_path)
 
   img = tf.expand_dims(original_img, axis=0) # Add batch dimension
-  out = model.predict(img)
+  out = img
+
+  for _ in range(iterations):
+    out = model.predict(out)
+
   out = tf.squeeze(out, axis=0) # Remove batch dimension
 
   out = np.hstack((original_img, out.numpy()))
   save_image(out, output_path)
 #########################################################
-def demo_many(model):
+def restore_many(model, iterations):
   in_files  = [os.path.join('/output/inputs', f) for f in os.listdir('/output/inputs') if f.endswith(".png")]
   out_files = [f.replace("/inputs/", "/outputs/") for f in in_files]
 
   for in_file, out_file in zip(in_files, out_files):
-    print(f'processing {in_file} > {out_file}')
-    demo_single(model, in_file, out_file)
+    print(f'processing {in_file} > {out_file} (iterations: {iterations})')
+    demo_single(model, in_file, out_file, iterations)
 
 #########################################################
 

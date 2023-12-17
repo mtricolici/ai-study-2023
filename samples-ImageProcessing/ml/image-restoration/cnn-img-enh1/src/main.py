@@ -13,7 +13,7 @@ def main():
 
   parser = argparse.ArgumentParser(description='CNN deblurr ;)')
   parser.add_argument('command', choices=['train', 'continue', 'demo', 'demo-many', 'info'], help='The command to execute')
-
+  parser.add_argument('-i', '--iterations', type=int, default=1, metavar='N', help='Nr of demo restore iterations (default: 1)')
   args = parser.parse_args()
 
   if args.command == 'train':
@@ -33,13 +33,13 @@ def main():
     print("Loading existed model from disk ...")
     model = model_create()
     model.load_weights(MODEL_SAVE_PATH)
-    unblure_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
+    restore_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE, args.iterations)
 
   elif args.command == 'demo-many':
     print("Loading existed model from disk ...")
     model = model_create()
     model.load_weights(MODEL_SAVE_PATH)
-    demo_many(model)
+    restore_many(model, args.iterations)
 
   elif args.command == 'info':
     if tf.config.list_physical_devices('GPU'):
