@@ -12,7 +12,7 @@ EPOCH = 1000
 STEPS_PER_EPOCH = 100
 LEARNING_RATE = 0.01
 
-MODEL_SAVE_PATH = '/output/my-cnn.keras'
+MODEL_SAVE_PATH = '/output/my-model.h5'
 
 DATASET_DIR = '/dataset'
 

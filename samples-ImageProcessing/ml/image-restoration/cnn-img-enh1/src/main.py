@@ -24,18 +24,21 @@ def main():
 
   elif args.command == 'continue':
     print("Loading existed model from disk ...")
-    model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    model = model_create()
+    model.load_weights(MODEL_SAVE_PATH)
     train_model(model)
     print("training finished")
 
   elif args.command == 'demo':
     print("Loading existed model from disk ...")
-    model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    model = model_create()
+    model.load_weights(MODEL_SAVE_PATH)
     unblure_image(model, DEMO_INPUT_FILE, DEMO_OUTPUT_FILE)
 
   elif args.command == 'demo-many':
     print("Loading existed model from disk ...")
-    model = tf.keras.models.load_model(MODEL_SAVE_PATH, custom_objects={'psnr_metric': psnr_metric})
+    model = model_create()
+    model.load_weights(MODEL_SAVE_PATH)
     demo_many(model)
 
   elif args.command == 'info':

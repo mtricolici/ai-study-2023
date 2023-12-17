@@ -72,6 +72,8 @@ def show_gpu_info():
 
 #########################################################
 def main():
+  print(f"TensorFlowVersion: {tf.__version__}")
+
   parser = argparse.ArgumentParser(description='Super Resolution demo')
   parser.add_argument('command', choices=['train', 'continue', 'scale', 'scale-all', 'info', 'isr'], help='The command to execute')
   parser.add_argument('-c', '--cpu', action='store_true', default=False, help='force running in CPU instead of GPU')

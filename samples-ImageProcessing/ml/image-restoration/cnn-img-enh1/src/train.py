@@ -24,7 +24,7 @@ def model_create(t="resnet"):
 def train_model(model):
   val_steps = calc_validation_steps()
 
-  checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True)
+  checkpoint = ModelCheckpoint(MODEL_SAVE_PATH, save_best_only=True, save_weights_only=True)
 
   early_stopping = EarlyStopping(
     monitor='val_psnr_metric',
