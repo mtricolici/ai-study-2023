@@ -2,28 +2,35 @@
 set +e
 
 function dl_model() {
-  local mf="$1"
-  local murl="$2"
+  local mt="$1"   # model type
+  local murl="$2" # url to download the model
 
-  if [ ! -f "models/${mf}" ]; then
-    echo "Model 'models/${mf}' not found. let's download it ..."
-    wget -q -O "models/$mf" "$murl"
+  fn=${murl##*/} # Get file name from url
+  fn="models/$mt/$fn" # Append path
+
+  mkdir -p "models/${mt}"
+
+  if [ ! -f "$fn" ]; then
+    echo "Model '${fn}' not found. let's download it ..."
+    wget -q -O "${fn}" "$murl"
     if [ $? -ne 0 ]; then
-      rm -f "models/$mf"
-      echo "Downloading model $mf failed :("
+      rm -f "${fn}"
+      echo "Downloading model ${fn} failed :("
       exit 1
     fi
   else
-    echo "Model 'models/${mf}' already exists ;)"
+    echo "Model '${fn}' already exists ;)"
   fi
 }
 
-mkdir -p models
 
-dl_model "blendswap_256.onnx" "https://github.com/facefusion/facefusion-assets/releases/download/models/blendswap_256.onnx"
-dl_model "inswapper_128.onnx" "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx"
-dl_model "inswapper_128_fp16.onnx" "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128_fp16.onnx"
-dl_model "simswap_256.onnx" "https://github.com/facefusion/facefusion-assets/releases/download/models/simswap_256.onnx"
-dl_model "simswap_512_unofficial.onnx" "https://github.com/facefusion/facefusion-assets/releases/download/models/simswap_512_unofficial.onnx"
+dl_model "face-swap" "https://github.com/facefusion/facefusion-assets/releases/download/models/blendswap_256.onnx"
+dl_model "face-swap" "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx"
+dl_model "face-swap" "https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128_fp16.onnx"
+dl_model "face-swap" "https://github.com/facefusion/facefusion-assets/releases/download/models/simswap_256.onnx"
+dl_model "face-swap" "https://github.com/facefusion/facefusion-assets/releases/download/models/simswap_512_unofficial.onnx"
+
+dl_model "face-detect" "https://github.com/facefusion/facefusion-assets/releases/download/models/retinaface_10g.onnx"
+dl_model "face-detect" "https://github.com/facefusion/facefusion-assets/releases/download/models/yunet_2023mar.onnx"
 
 echo "Models downloaded fine ;)"
