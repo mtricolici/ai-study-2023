@@ -20,4 +20,8 @@ RUN groupadd -g $GROUP_ID python && \
 
 RUN rm -f /opt/nvidia/entrypoint.d/*copyright.txt /opt/nvidia/entrypoint.d/*license.txt
 
+ADD src/requirements.txt /
+
+RUN pip install -r /requirements.txt
+
 USER python
