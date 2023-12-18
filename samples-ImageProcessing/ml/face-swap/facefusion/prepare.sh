@@ -3,6 +3,23 @@ set -e
 
 IMG=my-facefusion
 
+function check_model() {
+  local mf="$1"
+
+  if [ ! -f "models/${mf}" ]; then
+    echo "Error: file 'models/${mf}' not found!"
+    echo "Download it from: https://github.com/facefusion/facefusion-assets"
+    echo "or invoke ./download_models.sh"
+    exit 1
+  fi
+}
+
+check_model "blendswap_256.onnx"
+check_model "inswapper_128.onnx"
+check_model "inswapper_128_fp16.onnx"
+check_model "simswap_256.onnx"
+check_model "simswap_512_unofficial.onnx"
+
 DOCKERFILE_MODIFIED=$(stat -c %Y Dockerfile)
 
 # check if image exists
