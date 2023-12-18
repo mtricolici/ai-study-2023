@@ -1,4 +1,5 @@
-FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+#FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+FROM tensorflow/tensorflow:2.13.0-gpu
 
 ARG USER_ID
 ARG GROUP_ID

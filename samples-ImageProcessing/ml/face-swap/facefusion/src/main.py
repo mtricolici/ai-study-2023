@@ -1,5 +1,5 @@
-import onnxruntime as ort
 import torch
+import onnxruntime as ort
 import cv2
 
 from cmdparser import parse_cmd_args
