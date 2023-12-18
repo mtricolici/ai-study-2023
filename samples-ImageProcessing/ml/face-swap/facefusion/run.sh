@@ -18,5 +18,6 @@ docker run \
   -w /app \
   -v $(pwd)/src:/app:ro \
   -v $(pwd)/content:/content \
+  -v $(pwd)/models:/models:ro \
   $IMG \
   python /app/main.py $@
