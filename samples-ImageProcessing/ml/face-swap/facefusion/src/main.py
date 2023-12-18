@@ -1,4 +1,4 @@
-import onnxruntime
+import onnxruntime as ort
 import torch
 import cv2
 
@@ -10,7 +10,7 @@ import vars
 #####################################################################
 def show_info():
     print(f'Torch gpu available: {torch.cuda.is_available()}')
-    providers = onnxruntime.get_available_providers()
+    providers = ort.get_available_providers()
     print(f'OnnxRuntime providers: {", ".join(providers)}')
 
 #####################################################################

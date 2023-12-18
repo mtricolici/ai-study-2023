@@ -112,13 +112,13 @@ def __detect_faces_retinaface(frame, height, width, fd_h, fd_w, ratio_h, ratio_w
             bbox_raw = (detections[index + feature_map_channel] * feature_stride)
             kps_raw = detections[index + feature_map_channel * 2] * feature_stride
 
-            for bbox in distance_to_bbox(anchors, bbox_raw)[keep_indices]:
+            for bbox in helper.distance_to_bbox(anchors, bbox_raw)[keep_indices]:
                 bbox_list.append(numpy.array(
                 [
-                    bbox[0] * ratio_width,
-                    bbox[1] * ratio_height,
-                    bbox[2] * ratio_width,
-                    bbox[3] * ratio_height
+                    bbox[0] * ratio_w,
+                    bbox[1] * ratio_h,
+                    bbox[2] * ratio_w,
+                    bbox[3] * ratio_h
                 ]))
 
     return bbox_list
