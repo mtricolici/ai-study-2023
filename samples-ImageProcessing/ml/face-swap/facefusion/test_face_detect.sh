@@ -11,7 +11,9 @@ fi
 
 mkdir -p content
 
-models=("yunet_2023mar" "retinaface_10g")
+#models=("yunet_2023mar" "retinaface_10g")
+models=("yunet_2023mar")
+#models=("retinaface_10g")
 
 for model in "${models[@]}"; do
   docker run \

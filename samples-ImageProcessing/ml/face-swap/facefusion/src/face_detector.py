@@ -57,10 +57,12 @@ def detect_all_faces(frame):
     ratio_w = frame_w / temp_w
 
     if vars.face_detect_model == "yunet_2023mar":
-        return __detect_faces_yunet(temp, temp_h, temp_w, ratio_h, ratio_w)
+        bboxes, kps, scores = __detect_faces_yunet(temp, temp_h, temp_w, ratio_h, ratio_w)
+        return create_faces(frame, bboxes, kps, scores)
 
     elif vars.face_detect_model == "retinaface_10g":
-        return __detect_faces_retinaface(temp, temp_h, temp_w, fd_h, fd_w, ratio_h, ratio_w)
+        bboxes, kps, scores = __detect_faces_retinaface(temp, temp_h, temp_w, fd_h, fd_w, ratio_h, ratio_w)
+        return create_faces(frame, bboxes, kps, scores)
 
     return []
 #####################################################################
@@ -69,6 +71,8 @@ def __detect_faces_yunet(frame, height, width, ratio_h, ratio_w):
     face_detector.setInputSize((width, height))
     face_detector.setScoreThreshold(0.5)
     bbox_list = []
+    kps_list = []
+    score_list = []
 
     _, detections = face_detector.detect(frame)
     if detections.any():
@@ -80,14 +84,18 @@ def __detect_faces_yunet(frame, height, width, ratio_h, ratio_w):
                 (detection[0] + detection[2]) * ratio_w,
                 (detection[1] + detection[3]) * ratio_h
             ]))
+            kps_list.append(detection[4:14].reshape((5, 2)) * [ ratio_w, ratio_h])
+            score_list.append(detection[14])
 
-    return bbox_list
+    return bbox_list, kps_list, score_list
 #####################################################################
 def __detect_faces_retinaface(frame, height, width, fd_h, fd_w, ratio_h, ratio_w):
     face_detector_score = 0.5
 
     face_detector = get_face_detector()
     bbox_list = []
+    kps_list = []
+    score_list = []
     feature_strides = [ 8, 16, 32 ]
     feature_map_channel = 3
     anchor_total = 2
@@ -120,7 +128,23 @@ def __detect_faces_retinaface(frame, height, width, fd_h, fd_w, ratio_h, ratio_w
                     bbox[2] * ratio_w,
                     bbox[3] * ratio_h
                 ]))
+            for kps in helper.distance_to_kps(anchors, kps_raw)[keep_indices]:
+                kps_list.append(kps * [ ratio_w, ratio_h ])
+            for score in detections[index][keep_indices]:
+                score_list.append(score[0])
 
-    return bbox_list
+    return bbox_list, kps_list, score_list
+#####################################################################
+def create_faces(frame, bboxes, kpses, scores):
+    faces = []
+    keep_indices = helper.apply_nms(bboxes, 0.4)
+
+    for idx in keep_indices:
+        faces.append(vision.Face(
+            bbox = bboxes[idx],
+            kps = kpses[idx],
+            score = scores[idx],
+        ))
+    return faces
 #####################################################################
 

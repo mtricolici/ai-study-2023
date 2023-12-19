@@ -19,8 +19,9 @@ def show_info():
 def demo_face_detect():
     img = cv2.imread(vars.input_file)
     faces = detect_all_faces(img)
-    print(f'Found faces: {faces}')
-    for box in faces:
+    for face in faces:
+#        print(f'Foud face: {face}')
+        box = face.bbox
         x1, y1, x2, y2 = int(box[0]), int(box[1]), int(box[2]), int(box[3])
         cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 2)
 

@@ -1,4 +1,12 @@
 import cv2
+from collections import namedtuple
+
+Face = namedtuple('Face',
+[
+  'bbox',
+  'kps',
+  'score',
+])
 
 #####################################################################
 def resize_frame_dimension(frame, max_width, max_height):
