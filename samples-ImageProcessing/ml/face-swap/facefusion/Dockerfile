@@ -23,6 +23,7 @@ RUN rm -f /opt/nvidia/entrypoint.d/*copyright.txt /opt/nvidia/entrypoint.d/*lice
 
 ADD src/requirements.txt /
 
-RUN pip install -r /requirements.txt
+RUN pip install -r /requirements.txt && \
+    rm -rf /root/.cache
 
 USER python

@@ -12,6 +12,8 @@ def show_info():
     print(f'Torch gpu available: {torch.cuda.is_available()}')
     providers = ort.get_available_providers()
     print(f'OnnxRuntime providers: {", ".join(providers)}')
+    cv2_gpus = cv2.cuda.getCudaEnabledDeviceCount()
+    print(f'cv2 visible cuda devices: {cv2_gpus}')
 
 #####################################################################
 def demo_face_detect():
