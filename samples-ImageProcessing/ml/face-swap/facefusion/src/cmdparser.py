@@ -5,7 +5,7 @@ import vars
 
 def parse_cmd_args():
     parser = argparse.ArgumentParser(description="FaceFussion simplified")
-    parser.add_argument('command', choices=['detect', 'swap', 'info'], help='The command to execute')
+    parser.add_argument('command', choices=['detect', 'swap', 'face-enh', 'info'], help='The command to execute')
 
     parser.add_argument("-i", "--input-file", help="Path to the input file")
     parser.add_argument("-o", "--output-file", help="Path to the output file")
@@ -15,12 +15,13 @@ def parse_cmd_args():
     parser.add_argument("--swap-model", default='inswapper_128', help="Face swap Model name (default: inswapper_128)")
     parser.add_argument("--detect-model", default='yunet_2023mar', help="Face detect model name (default: yunet_2023mar)")
     parser.add_argument("--rec-model", default='arcface_w600k_r50', help="Face recognizer model name (default: arcface_w600k_r50)")
+    parser.add_argument("--face-enh-model", default='gfpgan_1.4', help="Face enhancer model name (default: gfpgan_1.4)")
 
     args = parser.parse_args()
 
     vars.command = args.command
 
-    if vars.command in ("swap", "detect"):
+    if vars.command in ("swap", "detect", "face-enh"):
 
         if args.input_file is None:
             print('Error: input-file is required for this command')
@@ -46,5 +47,6 @@ def parse_cmd_args():
     vars.face_swap_model = args.swap_model
     vars.face_detect_model = args.detect_model
     vars.face_recognizer_model = args.rec_model
+    vars.face_enh_model = args.face_enh_model
 
 

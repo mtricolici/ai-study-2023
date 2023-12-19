@@ -36,4 +36,12 @@ dl_model "face-detect" "https://github.com/facefusion/facefusion-assets/releases
 dl_model "face-recognizer" "https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_w600k_r50.onnx"
 dl_model "face-recognizer" "https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_simswap.onnx"
 
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/codeformer.onnx"
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.2.onnx"
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.3.onnx"
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/gfpgan_1.4.onnx"
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/gpen_bfr_256.onnx"
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/gpen_bfr_512.onnx"
+dl_model "face-enh" "https://github.com/facefusion/facefusion-assets/releases/download/models/restoreformer.onnx"
+
 echo "Models downloaded fine ;)"

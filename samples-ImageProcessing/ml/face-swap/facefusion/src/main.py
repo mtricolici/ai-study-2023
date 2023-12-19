@@ -5,6 +5,7 @@ import cv2
 from cmdparser import parse_cmd_args
 from face_detector import detect_all_faces
 import face_swapper
+import face_enhancer
 
 import vars
 
@@ -38,6 +39,14 @@ def demo_face_swap():
     print(f'Image with swapped faces saved in {vars.output_file} ;)')
 
 #####################################################################
+def demo_face_enhance():
+    face_enhancer.process_image(
+        vars.input_file,
+        vars.output_file)
+
+    print(f'Image with enhanced faces saved in {vars.output_file} ;)')
+
+#####################################################################
 def main():
     parse_cmd_args()
 
@@ -47,6 +56,8 @@ def main():
         demo_face_detect()
     elif vars.command == 'swap':
         demo_face_swap()
+    elif vars.command == "face-enh":
+        demo_face_enhance()
 
 if __name__ == "__main__":
     main()

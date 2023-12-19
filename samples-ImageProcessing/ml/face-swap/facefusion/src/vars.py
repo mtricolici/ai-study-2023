@@ -7,4 +7,4 @@ device = None
 face_swap_model = None
 face_detect_model = None
 face_recognizer_model = None
-
+face_enh_model = None
