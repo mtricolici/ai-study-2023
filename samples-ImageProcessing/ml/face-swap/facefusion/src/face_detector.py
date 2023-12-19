@@ -8,6 +8,7 @@ import onnxruntime
 import helper
 import vars
 import vision
+from face_recognizer import get_face_recognizer
 
 FACE_DETECTOR = None
 THREAD_LOCK = threading.Lock()
@@ -65,6 +66,11 @@ def detect_all_faces(frame):
         return create_faces(frame, bboxes, kps, scores)
 
     return []
+#####################################################################
+def get_one_face(frame, idx = 0):
+    faces = detect_all_faces(frame)
+    return faces[idx]
+
 #####################################################################
 def __detect_faces_yunet(frame, height, width, ratio_h, ratio_w):
     face_detector = get_face_detector()
@@ -140,11 +146,34 @@ def create_faces(frame, bboxes, kpses, scores):
     keep_indices = helper.apply_nms(bboxes, 0.4)
 
     for idx in keep_indices:
+        embedding, normed_embedding = calc_embedding(frame, kpses[idx])
+
         faces.append(vision.Face(
             bbox = bboxes[idx],
             kps = kpses[idx],
             score = scores[idx],
+            embedding = embedding,
+            normed_embedding = normed_embedding,
         ))
+
     return faces
+
+#####################################################################
+def calc_embedding(temp_frame, kps):
+    face_recognizer = get_face_recognizer()
+
+    crop_frame, matrix = helper.warp_face(temp_frame, kps, 'arcface_v2', (112, 112))
+    crop_frame = crop_frame.astype(numpy.float32) / 127.5 - 1
+    crop_frame = crop_frame[:, :, ::-1].transpose(2, 0, 1)
+    crop_frame = numpy.expand_dims(crop_frame, axis = 0)
+
+    embedding = face_recognizer.run(None,
+    {
+        face_recognizer.get_inputs()[0].name: crop_frame
+    })[0]
+
+    embedding = embedding.ravel()
+    normed_embedding = embedding / numpy.linalg.norm(embedding)
+    return embedding, normed_embedding
 #####################################################################
 

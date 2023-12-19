@@ -4,6 +4,7 @@ import cv2
 
 from cmdparser import parse_cmd_args
 from face_detector import detect_all_faces
+import face_swapper
 
 import vars
 
@@ -27,6 +28,14 @@ def demo_face_detect():
 
     cv2.imwrite(vars.output_file, img)
     print(f'Image with marked faces saved in {vars.output_file} ;)')
+#####################################################################
+def demo_face_swap():
+    face_swapper.process_image(
+        vars.face_file,
+        vars.input_file,
+        vars.output_file)
+
+    print(f'Image with swapped faces saved in {vars.output_file} ;)')
 
 #####################################################################
 def main():
@@ -36,6 +45,8 @@ def main():
         show_info()
     elif vars.command == 'detect':
         demo_face_detect()
+    elif vars.command == 'swap':
+        demo_face_swap()
 
 if __name__ == "__main__":
     main()

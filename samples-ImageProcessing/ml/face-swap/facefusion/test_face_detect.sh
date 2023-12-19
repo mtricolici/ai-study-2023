@@ -26,10 +26,10 @@ for model in "${models[@]}"; do
     -v $(pwd)/models:/models:ro \
     $IMG \
     python /app/main.py \
-      --detect-model $model \
       detect \
       -i /content/src.png \
-      -o /content/test-face-detect-$model.png
+      -o /content/test-face-detect-$model.png \
+      --detect-model $model
 done
 
 

@@ -33,4 +33,7 @@ dl_model "face-swap" "https://github.com/facefusion/facefusion-assets/releases/d
 dl_model "face-detect" "https://github.com/facefusion/facefusion-assets/releases/download/models/retinaface_10g.onnx"
 dl_model "face-detect" "https://github.com/facefusion/facefusion-assets/releases/download/models/yunet_2023mar.onnx"
 
+dl_model "face-recognizer" "https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_w600k_r50.onnx"
+dl_model "face-recognizer" "https://github.com/facefusion/facefusion-assets/releases/download/models/arcface_simswap.onnx"
+
 echo "Models downloaded fine ;)"

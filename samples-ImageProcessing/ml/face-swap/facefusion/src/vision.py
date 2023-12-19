@@ -6,6 +6,8 @@ Face = namedtuple('Face',
   'bbox',
   'kps',
   'score',
+  'embedding',
+  'normed_embedding',
 ])
 
 #####################################################################
