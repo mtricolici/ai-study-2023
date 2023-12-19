@@ -11,13 +11,11 @@ fi
 
 mkdir -p content
 
-detect_model="yunet_2023mar"
-recognizer_model="arcface_w600k_r50"
+detect_model="retinaface_10g"
+rec_model="arcface_simswap" # or arcface_w600k_r50 - I do not see any difference
+swap_model="blendswap_256"
 
-swap_model="inswapper_128"
-#swap_model="simswap_256"
-#swap_model="simswap_512_unofficial"
-#swap_model="blendswap_256"
+rm -f content/result-blendswap256.png
 
 docker run \
   --gpus all \
@@ -31,9 +29,8 @@ docker run \
   python /app/main.py \
     swap \
     -i /content/src.png \
-    -o /content/result-${swap_model}.png \
+    -o /content/result-blendswap256.png \
     -f /content/face.png \
     --detect-model $detect_model \
     --swap-model $swap_model \
-    --rec-model $recognizer_model
-
+    --rec-model $rec_model
