@@ -1,4 +1,5 @@
 import os
+import time
 import argparse
 import cv2
 import numpy as np
@@ -45,7 +46,6 @@ def downscale_image(img, size=128):
 def handle_file(path):
     global face_idx
 
-    print(f'handling raw file: {path}')
     img, faces = face_detector.detect_faces(path)
     for face in faces:
         x1, y1, x2, y2 = face
@@ -58,19 +58,29 @@ def handle_file(path):
         face_img = downscale_image(face_img)
         if face_img is not None:
             face_path = os.path.join(vars.target_path, f'{face_idx:05d}-face.png')
-            print(f'--new face {face_path}')
             cv2.imwrite(face_path, face_img)
             face_idx += 1
 ###########################################################
 def main():
+    global face_idx
     parse_cmd_args()
     files = list_images()
     total = len(files)
 
+    start_time = time.time()
+    last_update_time = start_time
+
     for i, f in enumerate(files):
         handle_file(f)
-        if i > 10:
-            break
+        current_time = time.time()
+
+        # print progress every 10 seconds
+        if current_time - last_update_time >= 10:
+            last_update_time = current_time
+            el = time.time() - start_time
+            rtime = (total - i - 1) * el / (i + 1)
+            p = (i + 1) / total * 100
+            print(f"Processed {p:.0f}% {i + 1}/{total} files ({el:.2f} seconds < {rtime:.2f} seconds). Faces found: {face_idx}")
 ###########################################################
 
 if __name__ == "__main__":
