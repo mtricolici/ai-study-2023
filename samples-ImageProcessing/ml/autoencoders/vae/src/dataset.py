@@ -19,7 +19,16 @@ def data_loader():
   num_files = len(files)
   print(f'Dataset - found {num_files} samples.')
 
+  available_indices = np.arange(num_files)
+  np.random.shuffle(available_indices)
+
   while True:
-    indices = np.random.choice(num_files, BATCH_SIZE, replace=False)
+    if len(available_indices) < BATCH_SIZE:
+        available_indices = np.arange(num_files)
+        np.random.shuffle(available_indices)
+
+    indices = available_indices[:BATCH_SIZE]
+    available_indices = available_indices[BATCH_SIZE:]
+
     yield generate_batch(indices, files)
 #########################################################
