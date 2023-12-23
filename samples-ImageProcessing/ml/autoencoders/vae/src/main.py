@@ -6,7 +6,7 @@ import numpy as np
 from model import VAE
 from image import save_image
 
-latent_dim = 512
+latent_dim = 256
 input_shape = (128, 128, 3)
 
 #########################################################
