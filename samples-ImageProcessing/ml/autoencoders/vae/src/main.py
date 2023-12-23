@@ -8,13 +8,16 @@ from train import train
 from image import save_image
 
 latent_dim = 32
-input_shape = (90, 120, 3)
+input_shape = (128, 128, 3)
 
 #########################################################
 def invoke_train():
+    print('creating model ...')
     vae = VAE(latent_dim, input_shape)
     vae.create_model()
+    print('starting training ...')
     train(vae)
+    print('saving model ...')
     vae.save_model('/content')
 #########################################################
 def invoke_demo(num_samples=20):

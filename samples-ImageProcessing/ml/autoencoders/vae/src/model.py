@@ -3,6 +3,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import numpy as np
 
+from constants import *
+
 class VAE:
     def __init__(self, latent_dim, input_shape):
         self.latent_dim = latent_dim
@@ -14,7 +16,7 @@ class VAE:
         # Encoder model
         inputs = tf.keras.Input(shape=self.input_shape)
         x = tf.keras.layers.Flatten()(inputs)
-        x = tf.keras.layers.Dense(512, activation='relu')(x)
+        x = tf.keras.layers.Dense(DEPTH, activation='relu')(x)
         z_mean = tf.keras.layers.Dense(self.latent_dim)(x)
         z_log_var = tf.keras.layers.Dense(self.latent_dim)(x)
         z = self.reparameterize(z_mean, z_log_var)
@@ -23,7 +25,7 @@ class VAE:
 
         # Decoder model
         latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = tf.keras.layers.Dense(512, activation='relu')(latent_inputs)
+        x = tf.keras.layers.Dense(DEPTH, activation='relu')(latent_inputs)
 
         outputs = tf.keras.layers.Dense(tf.reduce_prod(self.input_shape), activation='sigmoid')(x)
         outputs = tf.keras.layers.Reshape(self.input_shape)(outputs)
