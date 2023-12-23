@@ -8,6 +8,7 @@ from constants import *
 
 #########################################################
 def vae_loss(x, x_decoded_mean, z_log_var, z_mean):
+    z_log_var = tf.clip_by_value(z_log_var, -10, 10)  # Clip to a reasonable range
     reconstruction_loss = mse(x, x_decoded_mean)
     kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
     return reconstruction_loss + kl_loss

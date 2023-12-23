@@ -20,6 +20,17 @@ def invoke_train():
     print('saving model ...')
     vae.save_model('/content')
 #########################################################
+def continue_train():
+    print('creating model ...')
+    vae = VAE(latent_dim, input_shape)
+    vae.create_model()
+    print('Loading weights ...')
+    vae.load_model('/content')
+    print('starting training ...')
+    train(vae)
+    print('saving model ...')
+    vae.save_model('/content')
+#########################################################
 def invoke_demo(num_samples=20):
     vae = VAE(latent_dim, input_shape)
     vae.create_model()
@@ -42,11 +53,13 @@ def main():
     print(f"TensorFlowVersion: {tf.__version__}")
 
     parser = argparse.ArgumentParser(description='GAN try 2')
-    parser.add_argument('command', choices=['train', 'demo', 'info'], help='The command to execute')
+    parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
     args = parser.parse_args()
 
     if args.command == 'train':
         invoke_train()
+    elif args.command == 'continue':
+        continue_train()
     elif args.command == 'demo':
         invoke_demo()
     elif args.command == 'info':
