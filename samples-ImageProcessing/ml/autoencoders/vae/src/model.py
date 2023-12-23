@@ -16,16 +16,16 @@ class VAE:
         # Encoder model
         inputs = tf.keras.Input(shape=self.input_shape)
         x = tf.keras.layers.Flatten()(inputs)
-        x = tf.keras.layers.Dense(DEPTH, activation='relu')(x)
-        z_mean = tf.keras.layers.Dense(self.latent_dim)(x)
-        z_log_var = tf.keras.layers.Dense(self.latent_dim)(x)
+        x = tf.keras.layers.Dense(DEPTH, activation='relu', kernel_initializer='he_normal')(x)
+        z_mean = tf.keras.layers.Dense(self.latent_dim, kernel_initializer='he_normal')(x)
+        z_log_var = tf.keras.layers.Dense(self.latent_dim, kernel_initializer='he_normal')(x)
         z = self.reparameterize(z_mean, z_log_var)
 
         self.encoder = tf.keras.Model(inputs, [z_mean, z_log_var, z], name='encoder')
 
         # Decoder model
         latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = tf.keras.layers.Dense(DEPTH, activation='relu')(latent_inputs)
+        x = tf.keras.layers.Dense(DEPTH, activation='relu', kernel_initializer='he_normal')(latent_inputs)
 
         outputs = tf.keras.layers.Dense(tf.reduce_prod(self.input_shape), activation='sigmoid')(x)
         outputs = tf.keras.layers.Reshape(self.input_shape)(outputs)
