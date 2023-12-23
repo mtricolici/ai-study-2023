@@ -17,8 +17,9 @@ def generate_batch(indices, files):
 def data_loader():
   files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if file.endswith(".png")]
   num_files = len(files)
+  print(f'Dataset - found {num_files} samples.')
 
   while True:
-    indices = np.random.choice(num_files, BATCH_SIZE)
+    indices = np.random.choice(num_files, BATCH_SIZE, replace=False)
     yield generate_batch(indices, files)
 #########################################################
