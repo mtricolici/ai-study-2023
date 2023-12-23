@@ -7,7 +7,7 @@ from model import VAE
 from train import train
 from image import save_image
 
-latent_dim = 32
+latent_dim = 512
 input_shape = (128, 128, 3)
 
 #########################################################
@@ -16,7 +16,10 @@ def invoke_train():
     vae = VAE(latent_dim, input_shape)
     vae.create_model()
     print('starting training ...')
-    train(vae)
+    try:
+      train(vae)
+    except KeyboardInterrupt:
+        print('Aborting ...')
     print('saving model ...')
     vae.save_model('/content')
 #########################################################
@@ -27,7 +30,10 @@ def continue_train():
     print('Loading weights ...')
     vae.load_model('/content')
     print('starting training ...')
-    train(vae)
+    try:
+      train(vae)
+    except KeyboardInterrupt:
+        print('Aborting ...')
     print('saving model ...')
     vae.save_model('/content')
 #########################################################
