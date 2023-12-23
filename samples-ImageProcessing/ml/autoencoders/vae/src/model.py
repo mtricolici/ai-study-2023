@@ -1,6 +1,5 @@
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
+from tensorflow.keras import layers, models, losses, optimizers, metrics
 import numpy as np
 
 from constants import *
@@ -34,7 +33,7 @@ class VAE:
             z_mean, z_log_var, z = self.encoder(x_batch)
             reconstruction = self.decoder(z)
             reconstruction_loss = tf.reduce_mean(
-                tf.keras.losses.binary_crossentropy(x_batch, reconstruction))
+                losses.binary_crossentropy(x_batch, reconstruction))
             kl_loss = -0.5 * tf.reduce_mean(
                 z_log_var - tf.square(z_mean) - tf.exp(z_log_var) + 1)
             loss = reconstruction_loss + kl_loss
@@ -51,8 +50,8 @@ class VAE:
 #########################################################
     def train(self):
         dl = ds.data_loader()
-        optimizer = tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE)
-        loss_metric = tf.keras.metrics.Mean()
+        optimizer = optimizers.Adam(learning_rate=LEARNING_RATE)
+        loss_metric = metrics.Mean()
 
         for epoch in range(EPOCH):
             self._train_epoch(optimizer, dl, loss_metric)
@@ -60,23 +59,23 @@ class VAE:
 #########################################################
     def create_model(self):
         # Encoder model
-        inputs = tf.keras.Input(shape=self.input_shape)
-        x = tf.keras.layers.Flatten()(inputs)
-        x = tf.keras.layers.Dense(DEPTH, activation='relu', kernel_initializer='he_normal')(x)
-        z_mean = tf.keras.layers.Dense(self.latent_dim, kernel_initializer='he_normal')(x)
-        z_log_var = tf.keras.layers.Dense(self.latent_dim, kernel_initializer='he_normal')(x)
+        inputs = layers.Input(shape=self.input_shape)
+        x = layers.Flatten()(inputs)
+        x = layers.Dense(DEPTH, activation='relu', kernel_initializer='he_normal')(x)
+        z_mean = layers.Dense(self.latent_dim, kernel_initializer='he_normal')(x)
+        z_log_var = layers.Dense(self.latent_dim, kernel_initializer='he_normal')(x)
         z = self.reparameterize(z_mean, z_log_var)
 
-        self.encoder = tf.keras.Model(inputs, [z_mean, z_log_var, z], name='encoder')
+        self.encoder = models.Model(inputs, [z_mean, z_log_var, z], name='encoder')
 
         # Decoder model
-        latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = tf.keras.layers.Dense(DEPTH, activation='relu', kernel_initializer='he_normal')(latent_inputs)
+        latent_inputs = layers.Input(shape=(self.latent_dim,))
+        x = layers.Dense(DEPTH, activation='relu', kernel_initializer='he_normal')(latent_inputs)
 
-        outputs = tf.keras.layers.Dense(tf.reduce_prod(self.input_shape), activation='sigmoid')(x)
-        outputs = tf.keras.layers.Reshape(self.input_shape)(outputs)
+        outputs = layers.Dense(tf.reduce_prod(self.input_shape), activation='sigmoid')(x)
+        outputs = layers.Reshape(self.input_shape)(outputs)
 
-        self.decoder = tf.keras.Model(latent_inputs, outputs, name='decoder')
+        self.decoder = models.Model(latent_inputs, outputs, name='decoder')
 
 #########################################################
     def reparameterize(self, z_mean, z_log_var):
