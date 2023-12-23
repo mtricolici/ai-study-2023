@@ -13,24 +13,32 @@ def vae_loss(x, x_decoded_mean, z_log_var, z_mean):
     return reconstruction_loss + kl_loss
 
 #########################################################
+@tf.function(reduce_retracing=True)
+def train_epoch(vae, optimizer, dl):
+    for step in range(STEPS_PER_EPOCH):
+        x_batch = next(dl)
+        with tf.GradientTape() as tape:
+            z_mean, z_log_var, z = vae.encoder(x_batch)
+            reconstruction = vae.decoder(z)
+            reconstruction_loss = tf.reduce_mean(
+                tf.keras.losses.binary_crossentropy(x_batch, reconstruction)
+            )
+            kl_loss = -0.5 * tf.reduce_mean(
+                z_log_var - tf.square(z_mean) - tf.exp(z_log_var) + 1
+            )
+            loss = reconstruction_loss + kl_loss
+
+        gradients = tape.gradient(loss, vae.encoder.trainable_variables + vae.decoder.trainable_variables)
+        optimizer.apply_gradients(zip(gradients, vae.encoder.trainable_variables + vae.decoder.trainable_variables))
+
+    return loss
+#########################################################
 def train(vae):
     dl = ds.data_loader()
     optimizer = Adam(learning_rate=LEARNING_RATE)
 
     for epoch in range(EPOCH):
-        print(f"Epoch {epoch + 1}/{EPOCH}")
-
-        for step in range(STEPS_PER_EPOCH):
-            x_batch = next(dl)
-            with tf.GradientTape() as tape:
-                x_decoded = vae.vae(x_batch)
-                loss = vae_loss(x_batch, x_decoded, *vae.encoder(x_batch)[1:])
-
-            gradients = tape.gradient(loss, vae.vae.trainable_variables)
-            optimizer.apply_gradients(zip(gradients, vae.vae.trainable_variables))
-
-        avgl = np.mean(loss.numpy())
-        print(f"Epoch {epoch + 1}/{EPOCH}, Loss: {avgl:.4f}")
-        tf.keras.backend.clear_session()
+        loss = train_epoch(vae, optimizer, dl)
+        tf.print(f"Epoch {epoch + 1}/{EPOCH}, Loss: {loss:.4f}")
 #########################################################
 

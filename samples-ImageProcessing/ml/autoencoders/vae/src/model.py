@@ -9,36 +9,30 @@ class VAE:
         self.input_shape = input_shape
         self.encoder = None
         self.decoder = None
-        self.vae = None
 
     def create_model(self):
-        # Encoder
-        input_layer = keras.Input(shape=self.input_shape)
-        x = layers.Flatten()(input_layer)
-        x = layers.Dense(256, activation='relu')(x)
-        z_mean = layers.Dense(self.latent_dim, name='z_mean')(x)
-        z_log_var = layers.Dense(self.latent_dim, name='z_log_var')(x)
+        # Encoder model
+        inputs = tf.keras.Input(shape=self.input_shape)
+        x = tf.keras.layers.Flatten()(inputs)
+        x = tf.keras.layers.Dense(256, activation='relu')(x)
+        z_mean = tf.keras.layers.Dense(self.latent_dim)(x)
+        z_log_var = tf.keras.layers.Dense(self.latent_dim)(x)
+        z = self.reparameterize(z_mean, z_log_var)
 
-        def sampling(args):
-            z_mean, z_log_var = args
-            epsilon = tf.random.normal(shape=(tf.shape(z_mean)[0], self.latent_dim), mean=0., stddev=1.0)
-            return z_mean + tf.exp(0.5 * z_log_var) * epsilon
+        self.encoder = tf.keras.Model(inputs, [z_mean, z_log_var, z], name='encoder')
 
-        z = layers.Lambda(sampling, output_shape=(self.latent_dim,), name='z')([z_mean, z_log_var])
+        # Decoder model
+        latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
+        x = tf.keras.layers.Dense(256, activation='relu')(latent_inputs)
 
-        self.encoder = keras.Model(input_layer, [z_mean, z_log_var, z], name='encoder')
+        outputs = tf.keras.layers.Dense(tf.reduce_prod(self.input_shape), activation='sigmoid')(x)
+        outputs = tf.keras.layers.Reshape(self.input_shape)(outputs)
 
-        # Decoder
-        latent_inputs = keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(256, activation='relu')(latent_inputs)
-        x = layers.Dense(np.prod(self.input_shape), activation='sigmoid')(x)
-        decoded = layers.Reshape(self.input_shape)(x)
+        self.decoder = tf.keras.Model(latent_inputs, outputs, name='decoder')
 
-        self.decoder = keras.Model(latent_inputs, decoded, name='decoder')
-
-        # VAE model
-        outputs = self.decoder(self.encoder(input_layer)[2])
-        self.vae = keras.Model(input_layer, outputs, name='vae')
+    def reparameterize(self, z_mean, z_log_var):
+        eps = tf.random.normal(shape=tf.shape(z_mean))
+        return z_mean + tf.exp(0.5 * z_log_var) * eps
 
     def save_model(self, model_dir):
         self.encoder.save_weights(model_dir + '/encoder_weights.h5')
