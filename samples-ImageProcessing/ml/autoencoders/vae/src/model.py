@@ -33,14 +33,14 @@ class VAE:
             optimizer=optimizers.Adam(learning_rate=LEARNING_RATE))
 
         callbacks = [
-            # Stop if no progress for 4 epoches
-            EarlyStopping(monitor='loss', patience=4, restore_best_weights=True),
+            # Stop if no progress for 5 epoches
+            EarlyStopping(monitor='loss', patience=5, restore_best_weights=True),
 
             # Save best models only
             ModelCheckpoint('/content/model.h5', monitor='loss', save_best_only=True, save_weights_only=True),
 
             # Reduce learning rate if no progress during 1 epoches
-            ReduceLROnPlateau(monitor='loss', factor=0.1, patience=1, min_lr=1e-12),
+            ReduceLROnPlateau(monitor='loss', factor=0.1, patience=1, min_lr=1e-30),
         ]
 
         self.vae.fit(
