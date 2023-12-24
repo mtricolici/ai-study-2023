@@ -31,13 +31,13 @@ class SampleGenerationCallback(Callback):
 #########################################################
 class VAE:
 #########################################################
-    def __init__(self, latent_dim, input_shape, depths):
-        self.latent_dim = latent_dim
-        self.input_shape = input_shape
+    def __init__(self):
+        self.latent_dim = 256
+        self.input_shape = (128, 128, 3)
         self.encoder = None
         self.decoder = None
         self.vae = None
-        self.depths = depths
+        self.depths = [64, 128]
         self.create_model()
 #########################################################
     def load_model(self):

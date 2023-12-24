@@ -6,14 +6,10 @@ import numpy as np
 from model import VAE
 from image import save_image
 
-latent_dim = 256
-input_shape = (128, 128, 3)
-depths = [64, 128]
-
 #########################################################
 def invoke_train():
     print('creating model ...')
-    vae = VAE(latent_dim, input_shape, depths)
+    vae = VAE()
     print('starting training ...')
     try:
       vae.train()
@@ -22,7 +18,7 @@ def invoke_train():
 #########################################################
 def continue_train():
     print('creating model ...')
-    vae = VAE(latent_dim, input_shape, depths)
+    vae = VAE()
     vae.load_model()
     print('starting training ...')
     try:
@@ -31,7 +27,7 @@ def continue_train():
         print('\nAborting ...')
 #########################################################
 def invoke_demo():
-    vae = VAE(latent_dim, input_shape, depths)
+    vae = VAE()
     vae.load_model()
     samples = vae.generate_samples(50)
     for i, sample in enumerate(samples):
