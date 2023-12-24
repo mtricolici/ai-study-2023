@@ -1,13 +1,34 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models, losses, optimizers, metrics, regularizers
 from tensorflow.keras import backend as K
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.callbacks import Callback, ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 import numpy as np
 
 from constants import *
 import dataset as ds
+from image import save_image
 
+#########################################################
+class SampleGenerationCallback(Callback):
+    def __init__(self, vae):
+        super().__init__()
+        self.vae = vae
+
+    def on_epoch_end(self, epoch, logs=None):
+        # Save weights after each epoch
+        self.vae.save_weights(f'/content/model-ep-{epoch+1}.h5')
+        decoder = self.vae.get_layer('decoder')
+
+        num_samples=3
+
+        random_latent_vectors = tf.random.normal(shape=(num_samples, decoder.input_shape[-1]))
+        samples = decoder.predict(random_latent_vectors)
+        for i, img in enumerate(samples):
+            path = f'/content/ep{epoch+1:03d}-s{i+1}.png'
+            save_image(img, path)
+
+#########################################################
 class VAE:
 #########################################################
     def __init__(self, latent_dim, input_shape, depths):
@@ -41,6 +62,9 @@ class VAE:
 
             # Reduce learning rate if no progress during 1 epoches
             ReduceLROnPlateau(monitor='loss', factor=0.1, patience=1, min_lr=1e-30),
+
+            # Generate some samples per epoch to see how it progress during training
+            SampleGenerationCallback(self.vae),
         ]
 
         self.vae.fit(
