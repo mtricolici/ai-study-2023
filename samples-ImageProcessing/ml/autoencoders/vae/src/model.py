@@ -32,12 +32,12 @@ class SampleGenerationCallback(Callback):
 class VAE:
 #########################################################
     def __init__(self):
-        self.latent_dim = 256
-        self.input_shape = (128, 128, 3)
+        self.input_shape = (128, 128, 3) # 128x128 RGB images
+        self.latent_dim = 128
+        self.depths = [64, 128]
         self.encoder = None
         self.decoder = None
         self.vae = None
-        self.depths = [64, 128]
         self.create_model()
 #########################################################
     def load_model(self):
@@ -104,6 +104,8 @@ class VAE:
         for depth in self.depths:
             x = layers.Conv2D(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
             x = layers.BatchNormalization()(x)
+#            x = layers.MaxPooling2D((2, 2), padding='same')(x)
+
         x = layers.Flatten()(x)
         z_mean = layers.Dense(self.latent_dim, name="z_mean", kernel_regularizer=regularizers.l2(1e-4))(x)
         z_log_var = layers.Dense(self.latent_dim, name="z_log_var", kernel_regularizer=regularizers.l2(1e-4))(x)
@@ -115,9 +117,12 @@ class VAE:
         latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
         x = layers.Dense(32 * 32 * self.depths[-1], activation="relu", kernel_regularizer=regularizers.l2(1e-4))(latent_inputs)
         x = layers.Reshape((32, 32, self.depths[-1]))(x)
+
         for depth in reversed(self.depths):
             x = layers.Conv2DTranspose(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
             x = layers.BatchNormalization()(x)
+#            x = layers.UpSampling2D((2, 2))(x)
+
         outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
         return models.Model(latent_inputs, outputs, name="decoder")
 

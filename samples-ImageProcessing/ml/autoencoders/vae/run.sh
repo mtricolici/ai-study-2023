@@ -24,6 +24,11 @@ fi
 
 mkdir -p content
 
+# Tensorflow caches something there?
+# I get strange errors when changing BATCH_SIZE and do not remove this folder
+find . -type d -name "__pycache__" -prune -exec rm -r {} \;
+
+
 docker run --gpus all -it --rm \
   -e TF_FORCE_GPU_ALLOW_GROWTH=true \
   -e TF_CPP_MIN_LOG_LEVEL=3 \
