@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models, losses, optimizers, metrics
+from tensorflow.keras import layers, models, losses, optimizers, metrics, regularizers
 from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
@@ -33,14 +33,14 @@ class VAE:
             optimizer=optimizers.Adam(learning_rate=LEARNING_RATE))
 
         callbacks = [
-            # Stop if no progress for 10 epoches
-            EarlyStopping(monitor='loss', patience=10, restore_best_weights=True),
+            # Stop if no progress for 4 epoches
+            EarlyStopping(monitor='loss', patience=4, restore_best_weights=True),
 
             # Save best models only
             ModelCheckpoint('/content/model.h5', monitor='loss', save_best_only=True, save_weights_only=True),
 
-            # Reduce learning rate if no progress during 2 epoches
-            ReduceLROnPlateau(monitor='loss', factor=0.5, patience=2, min_lr=1e-9),
+            # Reduce learning rate if no progress during 1 epoches
+            ReduceLROnPlateau(monitor='loss', factor=0.1, patience=1, min_lr=1e-12),
         ]
 
         self.vae.fit(
@@ -78,21 +78,23 @@ class VAE:
         inputs = tf.keras.Input(shape=self.input_shape)
         x = inputs
         for depth in self.depths:
-            x = layers.Conv2D(depth, 3, activation="relu", strides=2, padding="same")(x)
+            x = layers.Conv2D(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
+            x = layers.BatchNormalization()(x)
         x = layers.Flatten()(x)
-        z_mean = layers.Dense(self.latent_dim, name="z_mean")(x)
-        z_log_var = layers.Dense(self.latent_dim, name="z_log_var")(x)
+        z_mean = layers.Dense(self.latent_dim, name="z_mean", kernel_regularizer=regularizers.l2(1e-4))(x)
+        z_log_var = layers.Dense(self.latent_dim, name="z_log_var", kernel_regularizer=regularizers.l2(1e-4))(x)
         z = self.sampling([z_mean, z_log_var])
         return models.Model(inputs, [z_mean, z_log_var, z], name="encoder")
 
 #########################################################
     def build_decoder(self):
         latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(32 * 32 * self.depths[-1], activation="relu")(latent_inputs)
+        x = layers.Dense(32 * 32 * self.depths[-1], activation="relu", kernel_regularizer=regularizers.l2(1e-4))(latent_inputs)
         x = layers.Reshape((32, 32, self.depths[-1]))(x)
         for depth in reversed(self.depths):
-            x = layers.Conv2DTranspose(depth, 3, activation="relu", strides=2, padding="same")(x)
-        outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same")(x)
+            x = layers.Conv2DTranspose(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
+            x = layers.BatchNormalization()(x)
+        outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
         return models.Model(latent_inputs, outputs, name="decoder")
 
 #########################################################

@@ -8,7 +8,7 @@ from image import save_image
 
 latent_dim = 256
 input_shape = (128, 128, 3)
-depths = [32, 64]
+depths = [64, 128]
 
 #########################################################
 def invoke_train():
