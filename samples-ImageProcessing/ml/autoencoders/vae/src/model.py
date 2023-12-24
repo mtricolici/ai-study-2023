@@ -5,7 +5,6 @@ from tensorflow.keras.callbacks import Callback, ModelCheckpoint, EarlyStopping,
 
 import numpy as np
 
-from constants import *
 import dataset as ds
 from image import save_image
 
@@ -36,6 +35,10 @@ class VAE:
         self.latent_dim = 256
         self.depths = [32, 64, 128]
         self.latent_space = int(128 / 2 ** len(self.depths))
+        self.learning_rate = 1e-4
+        self.batch_size = 10
+        self.epochs = 1000
+        self.steps_per_epoch = 100
         self.encoder = None
         self.decoder = None
         self.vae = None
@@ -52,7 +55,7 @@ class VAE:
 #########################################################
     def train(self):
         self.vae.compile(
-            optimizer=optimizers.Adam(learning_rate=LEARNING_RATE))
+            optimizer=optimizers.Adam(learning_rate=self.learning_rate))
 
         callbacks = [
             # Stop if no progress for 5 epoches
@@ -69,9 +72,9 @@ class VAE:
         ]
 
         self.vae.fit(
-          ds.data_loader(),
-          steps_per_epoch=STEPS_PER_EPOCH,
-          epochs=EPOCH,
+          ds.data_loader(self.batch_size),
+          steps_per_epoch=self.steps_per_epoch,
+          epochs=self.epochs,
           verbose=1,
           callbacks=callbacks)
 
