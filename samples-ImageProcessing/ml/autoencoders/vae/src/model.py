@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models, losses, optimizers, metrics
 from tensorflow.keras import backend as K
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 import numpy as np
 
@@ -18,25 +19,33 @@ class VAE:
         self.depths = depths
         self.create_model()
 #########################################################
-    def save_model(self):
-        self.encoder.save_weights('/content/model_encoder.h5')
-        self.decoder.save_weights('/content/model_decoder.h5')
-        self.vae.save_weights('/content/model_vae.h5')
-
-#########################################################
     def load_model(self):
-        self.encoder.load_weights('/content/model_encoder.h5')
-        self.decoder.load_weights('/content/model_decoder.h5')
-        self.vae.load_weights('/content/model_vae.h5')
+        self.vae.load_weights('/content/model.h5')
+        self.encoder.set_weights(self.vae.get_layer('encoder').get_weights())
+        self.decoder.set_weights(self.vae.get_layer('decoder').get_weights())
 #########################################################
     def generate_samples(self, num_samples):
         random_latent_points = np.random.normal(size=(num_samples, self.latent_dim))
         return self.decoder.predict(random_latent_points)
 #########################################################
     def train(self):
-        dl = ds.data_loader()
         self.vae.compile(optimizer=optimizers.Adam(learning_rate=LEARNING_RATE))
-        self.vae.fit(dl, steps_per_epoch=STEPS_PER_EPOCH, epochs=EPOCH, verbose=1)
+
+        callbacks = [
+            # Stop if no progress for 3 epoches
+            EarlyStopping(monitor='loss', patience=3, restore_best_weights=True),
+
+            # Save best models only
+            ModelCheckpoint('/content/model_vae.h5', monitor='loss', save_best_only=True, save_weights_only=True),
+        ]
+
+        self.vae.fit(
+          ds.data_loader(),
+          steps_per_epoch=STEPS_PER_EPOCH,
+          epochs=EPOCH,
+          verbose=1,
+          callbacks=callbacks)
+
 #########################################################
     def create_model(self):
         # Define the encoder

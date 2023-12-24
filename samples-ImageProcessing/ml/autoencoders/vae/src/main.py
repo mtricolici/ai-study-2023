@@ -20,7 +20,6 @@ def invoke_train():
     except KeyboardInterrupt:
         print('Aborting ...')
     print('saving model ...')
-    vae.save_model()
 #########################################################
 def continue_train():
     print('creating model ...')
@@ -32,7 +31,6 @@ def continue_train():
     except KeyboardInterrupt:
         print('Aborting ...')
     print('saving model ...')
-    vae.save_model()
 #########################################################
 def invoke_demo():
     vae = VAE(latent_dim, input_shape, depths)
