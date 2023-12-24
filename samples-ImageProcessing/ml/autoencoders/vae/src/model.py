@@ -33,8 +33,9 @@ class VAE:
 #########################################################
     def __init__(self):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 128
-        self.depths = [64, 128]
+        self.latent_dim = 256
+        self.depths = [32, 64, 128]
+        self.latent_space = int(128 / 2 ** len(self.depths))
         self.encoder = None
         self.decoder = None
         self.vae = None
@@ -115,8 +116,8 @@ class VAE:
 #########################################################
     def build_decoder(self):
         latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(32 * 32 * self.depths[-1], activation="relu", kernel_regularizer=regularizers.l2(1e-4))(latent_inputs)
-        x = layers.Reshape((32, 32, self.depths[-1]))(x)
+        x = layers.Dense(self.latent_space * self.latent_space * self.depths[-1], activation="relu", kernel_regularizer=regularizers.l2(1e-4))(latent_inputs)
+        x = layers.Reshape((self.latent_space, self.latent_space, self.depths[-1]))(x)
 
         for depth in reversed(self.depths):
             x = layers.Conv2DTranspose(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
