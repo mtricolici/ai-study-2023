@@ -8,11 +8,12 @@ from image import save_image
 
 latent_dim = 256
 input_shape = (128, 128, 3)
+depths = [64, 128]
 
 #########################################################
 def invoke_train():
     print('creating model ...')
-    vae = VAE(latent_dim, input_shape)
+    vae = VAE(latent_dim, input_shape, depths)
     print('starting training ...')
     try:
       vae.train()
@@ -23,7 +24,7 @@ def invoke_train():
 #########################################################
 def continue_train():
     print('creating model ...')
-    vae = VAE(latent_dim, input_shape)
+    vae = VAE(latent_dim, input_shape, depths)
     vae.load_model()
     print('starting training ...')
     try:
@@ -34,7 +35,7 @@ def continue_train():
     vae.save_model()
 #########################################################
 def invoke_demo():
-    vae = VAE(latent_dim, input_shape)
+    vae = VAE(latent_dim, input_shape, depths)
     vae.load_model()
     samples = vae.generate_samples(20)
     for i, sample in enumerate(samples):
