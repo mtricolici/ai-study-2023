@@ -29,7 +29,8 @@ class VAE:
         return self.decoder.predict(random_latent_points)
 #########################################################
     def train(self):
-        self.vae.compile(optimizer=optimizers.Adam(learning_rate=LEARNING_RATE))
+        self.vae.compile(
+            optimizer=optimizers.Adam(learning_rate=LEARNING_RATE))
 
         callbacks = [
             # Stop if no progress for 10 epoches

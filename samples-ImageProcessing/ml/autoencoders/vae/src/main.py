@@ -8,7 +8,7 @@ from image import save_image
 
 latent_dim = 256
 input_shape = (128, 128, 3)
-depths = [64, 128]
+depths = [32, 64]
 
 #########################################################
 def invoke_train():
@@ -33,9 +33,9 @@ def continue_train():
 def invoke_demo():
     vae = VAE(latent_dim, input_shape, depths)
     vae.load_model()
-    samples = vae.generate_samples(20)
+    samples = vae.generate_samples(50)
     for i, sample in enumerate(samples):
-        filename = f'/content/result-{i + 1}.png'
+        filename = f'/content/result-{i + 1:03d}.png'
         save_image(samples[i], filename)
 #########################################################
 def show_info():
