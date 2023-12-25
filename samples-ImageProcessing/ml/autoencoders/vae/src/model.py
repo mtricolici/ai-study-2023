@@ -13,13 +13,27 @@ class VAE:
 #########################################################
     def __init__(self):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 128
-        self.depths = [64, 128]
+        #
+        #      latent-dim: 256, depths=[ 32, 64], batchs:10 => 1377MiB VRAM
+        #      latent-dim: 128, dephts=[ 64,128], batchs:10 => 2333MiB VRAM
+        #      latent-dim: 128, dephts=[128,256], batchs:10 => 3560MiB VRAM
+        #
+        self.latent_dim = 256
+        self.depths = [32, 64]
         self.latent_space = int(128 / 2 ** len(self.depths))
-        self.learning_rate = 1e-4
+        self.learning_rate = 3e-5
+
+        # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
+        # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
+        self.relu_alpha = 0.7
+
+        # L2 Regularization. strength of regularization.
+        # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
+        # Smaller values: forces the model to learn more paterns. ex: 1e-5, 1e-6
+        self.l2r = 1e-6
         self.batch_size = 10
         self.epochs = 10
-        self.steps_per_epoch = 100
+        self.steps_per_epoch = 200
 
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
@@ -40,28 +54,30 @@ class VAE:
         inputs = tf.keras.Input(shape=self.input_shape)
         x = inputs
         for depth in self.depths:
-            x = layers.Conv2D(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
+            x = layers.Conv2D(depth, 3, activation=layers.LeakyReLU(alpha=self.relu_alpha), strides=2, padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
             x = layers.BatchNormalization()(x)
 #            x = layers.MaxPooling2D((2, 2), padding='same')(x)
 
         x = layers.Flatten()(x)
-        z_mean = layers.Dense(self.latent_dim, name="z_mean", kernel_regularizer=regularizers.l2(1e-4))(x)
-        z_log_var = layers.Dense(self.latent_dim, name="z_log_var", kernel_regularizer=regularizers.l2(1e-4))(x)
+        z_mean = layers.Dense(self.latent_dim, name="z_mean", kernel_regularizer=regularizers.l2(self.l2r))(x)
+        z_log_var = layers.Dense(self.latent_dim, name="z_log_var", kernel_regularizer=regularizers.l2(self.l2r))(x)
         z = self.sampling([z_mean, z_log_var])
         return models.Model(inputs, [z_mean, z_log_var, z], name="encoder")
 
 #########################################################
     def build_decoder(self):
         latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(self.latent_space * self.latent_space * self.depths[-1], activation="relu", kernel_regularizer=regularizers.l2(1e-4))(latent_inputs)
+        x = layers.Dense(self.latent_space * self.latent_space * self.depths[-1], activation=layers.LeakyReLU(alpha=self.relu_alpha),
+                         kernel_regularizer=regularizers.l2(self.l2r))(latent_inputs)
         x = layers.Reshape((self.latent_space, self.latent_space, self.depths[-1]))(x)
 
         for depth in reversed(self.depths):
-            x = layers.Conv2DTranspose(depth, 3, activation="relu", strides=2, padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
+            x = layers.Conv2DTranspose(depth, 3, activation=layers.LeakyReLU(alpha=self.relu_alpha),
+                    strides=2, padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
             x = layers.BatchNormalization()(x)
 #            x = layers.UpSampling2D((2, 2))(x)
 
-        outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same", kernel_regularizer=regularizers.l2(1e-4))(x)
+        outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
         return models.Model(latent_inputs, outputs, name="decoder")
 
 #########################################################
