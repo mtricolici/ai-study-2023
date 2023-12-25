@@ -43,17 +43,28 @@ def downscale_image(img, size=128):
     return canvas
 
 ###########################################################
+def is_face_good(face, em=30):
+    pitch, yaw, roll = face.pose
+    return abs(pitch) <= em and abs(yaw) <= em and abs(roll) <= em
+###########################################################
 def handle_file(path):
     global face_idx
 
     img, faces = face_detector.detect_faces(path)
     for face in faces:
-        x1, y1, x2, y2 = face
+        pos = face.bbox.astype(int)
+        x1, y1, x2, y2 = pos
         x1 = max(0, x1)
         y1 = max(0, y1)
         x2 = min(img.shape[1], x2)
         y2 = min(img.shape[0], y2)
         face_img = img[y1:y2, x1:x2]
+
+        # Ignore faces that are rotated too much
+        # Face should look into the camera
+        # Max allowed angle: 30
+        if not is_face_good(face):
+            continue
 
         face_img = downscale_image(face_img)
         if face_img is not None:
@@ -80,8 +91,9 @@ def main():
             el = time.time() - start_time
             rtime = (total - i - 1) * el / (i + 1)
             p = (i + 1) / total * 100
-            print(f"Processed {p:.0f}% {i + 1}/{total} files ({el:.2f} seconds < {rtime:.2f} seconds). Faces found: {face_idx}")
+            print(f"Processed {p:.0f}% {i + 1}/{total} files ({el:.2f} seconds < {rtime:.2f} seconds). Faces found: {face_idx-1}")
 ###########################################################
 
 if __name__ == "__main__":
     main()
+

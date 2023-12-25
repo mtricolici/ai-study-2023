@@ -38,10 +38,6 @@ def release_face_analyser():
 def detect_faces(path):
   img = cv2.imread(path)
   faces = get_face_analyser().get(img)
-  coords = []
-  for face in faces:
-    c = face.bbox.astype(int)
-    coords.append(c)
-  return img, coords
+  return img, faces
 #####################################################################
 
