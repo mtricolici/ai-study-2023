@@ -16,7 +16,7 @@ class VAE:
         self.latent_dim = 128
         self.depths = [64, 128]
         self.latent_space = int(128 / 2 ** len(self.depths))
-        self.learning_rate = 1e-5
+        self.learning_rate = 1e-4
         self.batch_size = 10
         self.epochs = 10
         self.steps_per_epoch = 100
@@ -74,7 +74,7 @@ class VAE:
 
 #########################################################
     @tf.function(reduce_retracing=True)
-    def _train_step(self, optimizer, x_batch, loss_metric):
+    def _train_step(self, optimizer, x_batch, mtx):
         with tf.GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(x_batch)
 
@@ -87,21 +87,26 @@ class VAE:
 
         grads = tape.gradient(loss, self.encoder.trainable_variables + self.decoder.trainable_variables)
         optimizer.apply_gradients(zip(grads, self.encoder.trainable_variables + self.decoder.trainable_variables))
-        loss_metric(loss)
+
+        # collect metrics
+        mtx[0](loss)
+        mtx[1](kl_loss)
+        mtx[2](reconstruction_loss)
 #########################################################
-    def _train_epoch(self, optimizer, dl, loss_metric):
+    def _train_epoch(self, optimizer, dl, mtx):
         for step in range(self.steps_per_epoch):
             x_batch = next(dl)
-            self._train_step(optimizer, x_batch, loss_metric)
+            self._train_step(optimizer, x_batch, mtx)
 #########################################################
     def train(self):
         dl = ds.data_loader(self.batch_size)
         optimizer = optimizers.Adam(learning_rate=self.learning_rate)
-        loss_metric = metrics.Mean()
+
+        mtx = [metrics.Mean(), metrics.Mean(), metrics.Mean()]
 
         for epoch in range(self.epochs):
-            self._train_epoch(optimizer, dl, loss_metric)
-            print(f"Epoch {epoch + 1}/{self.epochs}, Loss: {loss_metric.result()}")
+            self._train_epoch(optimizer, dl, mtx)
+            loss = f'Loss: {mtx[0].result()} kl_loss: {mtx[1].result()} reconstruction_loss: {mtx[2].result()}'
+            print(f"Epoch {epoch + 1}/{self.epochs}, {loss}")
 #########################################################
-
 
