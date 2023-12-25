@@ -51,6 +51,9 @@ def handle_file(path):
     global face_idx
 
     img, faces = face_detector.detect_faces(path)
+    if img is None or faces is None:
+        return
+
     for face in faces:
         pos = face.bbox.astype(int)
         x1, y1, x2, y2 = pos

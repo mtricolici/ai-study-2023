@@ -37,6 +37,12 @@ def release_face_analyser():
 #####################################################################
 def detect_faces(path):
   img = cv2.imread(path)
+  if img is None:
+      return None, None
+  if len(img.shape) != 3 or img.shape[2] != 3:
+      # unexpected format. image should be RGB
+      return None, None
+
   faces = get_face_analyser().get(img)
   return img, faces
 #####################################################################
