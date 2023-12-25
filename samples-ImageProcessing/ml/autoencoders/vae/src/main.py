@@ -15,6 +15,7 @@ def invoke_train():
       vae.train()
     except KeyboardInterrupt:
         print('\nAborting ...')
+    vae.save_model()
 #########################################################
 def continue_train():
     print('creating model ...')
@@ -25,11 +26,12 @@ def continue_train():
       vae.train()
     except KeyboardInterrupt:
         print('\nAborting ...')
+    vae.save_model()
 #########################################################
 def invoke_demo():
     vae = VAE()
     vae.load_model()
-    samples = vae.generate_samples(50)
+    samples = vae.generate_samples(10)
     for i, sample in enumerate(samples):
         filename = f'/content/result-{i + 1:03d}.png'
         save_image(samples[i], filename)

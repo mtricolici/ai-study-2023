@@ -9,25 +9,6 @@ import dataset as ds
 from image import save_image
 
 #########################################################
-class SampleGenerationCallback(Callback):
-    def __init__(self, vae):
-        super().__init__()
-        self.vae = vae
-
-    def on_epoch_end(self, epoch, logs=None):
-        # Save weights after each epoch
-        self.vae.save_weights(f'/content/model-ep-{epoch+1}.h5')
-        decoder = self.vae.get_layer('decoder')
-
-        num_samples=3
-
-        random_latent_vectors = tf.random.normal(shape=(num_samples, decoder.input_shape[-1]))
-        samples = decoder.predict(random_latent_vectors)
-        for i, img in enumerate(samples):
-            path = f'/content/ep{epoch+1:03d}-s{i+1}.png'
-            save_image(img, path)
-
-#########################################################
 class VAE:
 #########################################################
     def __init__(self):
@@ -37,70 +18,23 @@ class VAE:
         self.latent_space = int(128 / 2 ** len(self.depths))
         self.learning_rate = 1e-5
         self.batch_size = 10
-        self.epochs = 1000
+        self.epochs = 10
         self.steps_per_epoch = 100
-        self.encoder = None
-        self.decoder = None
-        self.vae = None
-        self.create_model()
+
+        self.encoder = self.build_encoder()
+        self.decoder = self.build_decoder()
+#########################################################
+    def save_model(self):
+        self.encoder.save_weights('/content/encoder.h5')
+        self.decoder.save_weights('/content/decoder.h5')
 #########################################################
     def load_model(self):
-        self.vae.load_weights('/content/model.h5')
-        self.encoder.set_weights(self.vae.get_layer('encoder').get_weights())
-        self.decoder.set_weights(self.vae.get_layer('decoder').get_weights())
+        self.encoder.load_weights('/content/encoder.h5')
+        self.decoder.load_weights('/content/decoder.h5')
 #########################################################
     def generate_samples(self, num_samples):
         random_latent_points = np.random.normal(size=(num_samples, self.latent_dim))
         return self.decoder.predict(random_latent_points)
-#########################################################
-    def train(self):
-        self.vae.compile(
-            optimizer=optimizers.Adam(learning_rate=self.learning_rate))
-
-        callbacks = [
-            # Stop if no progress for 5 epoches
-            EarlyStopping(monitor='loss', patience=5, restore_best_weights=True),
-
-            # Save best models only
-            ModelCheckpoint('/content/model.h5', monitor='loss', save_best_only=True, save_weights_only=True),
-
-            # Reduce learning rate if no progress during 1 epoches
-            ReduceLROnPlateau(monitor='loss', factor=0.1, patience=1, min_lr=1e-30),
-
-            # Generate some samples per epoch to see how it progress during training
-            SampleGenerationCallback(self.vae),
-        ]
-
-        self.vae.fit(
-          ds.data_loader(self.batch_size),
-          steps_per_epoch=self.steps_per_epoch,
-          epochs=self.epochs,
-          verbose=1,
-          callbacks=callbacks)
-
-#########################################################
-    def create_model(self):
-        # Define the encoder
-        self.encoder = self.build_encoder()
-
-        # Define the decoder
-        self.decoder = self.build_decoder()
-
-        # Combine encoder and decoder to create VAE model
-        x = self.encoder.inputs[0]
-        z_mean, z_log_var, z = self.encoder(x)
-        x_decoded = self.decoder(z)
-        self.vae = models.Model(x, x_decoded, name="vae")
-
-        # Define custom loss function for VAE
-        reconstruction_loss = losses.mse(K.flatten(x), K.flatten(x_decoded))
-        reconstruction_loss *= self.input_shape[0] * self.input_shape[1] * self.input_shape[2]
-        kl_loss = 1 + z_log_var - K.square(z_mean) - K.exp(z_log_var)
-        kl_loss = K.sum(kl_loss, axis=-1)
-        kl_loss *= -0.5
-        vae_loss = K.mean(reconstruction_loss + kl_loss)
-        self.vae.add_loss(vae_loss)
-
 #########################################################
     def build_encoder(self):
         inputs = tf.keras.Input(shape=self.input_shape)
@@ -138,6 +72,36 @@ class VAE:
         epsilon = K.random_normal(shape=(batch, dim))
         return z_mean + K.exp(0.5 * z_log_var) * epsilon
 
+#########################################################
+    @tf.function(reduce_retracing=True)
+    def _train_step(self, optimizer, x_batch, loss_metric):
+        with tf.GradientTape() as tape:
+            z_mean, z_log_var, z = self.encoder(x_batch)
+
+            reconstruction = self.decoder(z)
+            reconstruction_loss = tf.reduce_mean(
+                losses.binary_crossentropy(x_batch, reconstruction))
+            kl_loss = -0.5 * tf.reduce_mean(
+                z_log_var - tf.square(z_mean) - tf.exp(z_log_var) + 1)
+            loss = reconstruction_loss + kl_loss
+
+        grads = tape.gradient(loss, self.encoder.trainable_variables + self.decoder.trainable_variables)
+        optimizer.apply_gradients(zip(grads, self.encoder.trainable_variables + self.decoder.trainable_variables))
+        loss_metric(loss)
+#########################################################
+    def _train_epoch(self, optimizer, dl, loss_metric):
+        for step in range(self.steps_per_epoch):
+            x_batch = next(dl)
+            self._train_step(optimizer, x_batch, loss_metric)
+#########################################################
+    def train(self):
+        dl = ds.data_loader(self.batch_size)
+        optimizer = optimizers.Adam(learning_rate=self.learning_rate)
+        loss_metric = metrics.Mean()
+
+        for epoch in range(self.epochs):
+            self._train_epoch(optimizer, dl, loss_metric)
+            print(f"Epoch {epoch + 1}/{self.epochs}, Loss: {loss_metric.result()}")
 #########################################################
 
 
