@@ -32,10 +32,10 @@ class VAE:
 #########################################################
     def __init__(self):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 256
-        self.depths = [32, 64, 128]
+        self.latent_dim = 128
+        self.depths = [64, 128]
         self.latent_space = int(128 / 2 ** len(self.depths))
-        self.learning_rate = 1e-4
+        self.learning_rate = 1e-5
         self.batch_size = 10
         self.epochs = 1000
         self.steps_per_epoch = 100
