@@ -60,8 +60,15 @@ class TrainHelper:
             path = f'/content/ep{epoch:03d}-s{i+1}.png'
             save_image(img, path)
 ####################################################################################
+    def reset_metrics(self):
+        for _, m in self.metrics.items():
+            m.reset_states()
+####################################################################################
     def on_epoch_end(self, epoch):
        loss, loss_s = self._get_loss() 
+
+       # We don't need metrics from previous epoches! just remove the history!
+       self.reset_metrics()
        lr = self.optimizer.learning_rate.numpy()
 
        lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} lr: {lr:.2e}         ")
