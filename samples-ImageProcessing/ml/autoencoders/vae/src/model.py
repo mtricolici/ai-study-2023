@@ -23,7 +23,7 @@ class VAE:
         self.latent_dim = 256
         self.depths = [32, 64]
         self.latent_space = int(128 / 2 ** len(self.depths))
-        self.learning_rate = 3e-4
+        self.learning_rate = 3e-5
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.

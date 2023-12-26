@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow.keras import metrics
 
 from helper import lm
+from image import save_image
 
 ####################################################################################
 class TrainHelper:
@@ -49,17 +50,26 @@ class TrainHelper:
             ls.append(f'{k}: {v:.6f}')
         return loss, " ".join(ls)
 ####################################################################################
+    def generate_some_samples(self, epoch):
+        samples = self.vae.generate_samples(3)
+        for i, img in enumerate(samples):
+            path = f'/content/ep{epoch:03d}-s{i+1}.png'
+            save_image(img, path)
+####################################################################################
     def on_epoch_end(self, epoch):
        loss, loss_s = self._get_loss() 
        lr = self.optimizer.learning_rate.numpy()
 
-       lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} lr: {lr:.2e}")
+       lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} lr: {lr:.2e}         ")
 
        if loss < self.best_loss:
           # Epoch with loss improvement !!!
           self.best_loss = loss
           self.best_ep = epoch
-          self.vae.save_model()
+
+          if epoch > 1:
+              self.vae.save_model()
+              self.generate_some_samples(epoch)
 
           self.early_stop_count = 0
           self.bad_epochs = 0
