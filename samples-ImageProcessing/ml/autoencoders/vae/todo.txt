@@ -1,0 +1,7 @@
+
+- CNN VAE - done
+- MLP VAE - done
+- LSTM-based VAE - if image data has a time-series or sequential nature
+- Residual VAE (ResVAE) -  Incorporate residual connections, similar to residual networks (ResNets), into your VAE architecture. Residual connections can help with training deeper VAEs and improve reconstruction quality.
+- Generative Adversarial Network (GAN) with VAE (VAE-GAN) - Combine the strengths of VAEs and GANs, can help produce high-quality and diverse image samples
+- Auto-Regressive VAE: Use auto-regressive models like PixelCNN or PixelRNN for the decoder in a VAE
