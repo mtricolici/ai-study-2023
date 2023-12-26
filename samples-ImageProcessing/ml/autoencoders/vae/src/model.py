@@ -7,6 +7,7 @@ import numpy as np
 
 import dataset as ds
 from image import save_image
+from train_helper import TrainHelper
 
 #########################################################
 class VAE:
@@ -34,6 +35,8 @@ class VAE:
         self.batch_size = 32
         self.epochs = 10
         self.steps_per_epoch = 30
+
+        self.train_helper = TrainHelper(self)
 
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
@@ -111,33 +114,21 @@ class VAE:
         return loss, kl_loss, reconstruction_loss
 
 #########################################################
-    def _train_epoch(self, optimizer, dl, mtx):
+    def _train_epoch(self, optimizer, dl):
         for step in range(self.steps_per_epoch):
             x_batch = next(dl)
             loss, kl, rl = self._train_step(optimizer, x_batch)
 
-            # collect metrics
-            mtx['loss'](loss)
-            mtx['kl_loss'](kl)
-            mtx['rec_loss'](rl)
+            self.train_helper.on_step_end(step, loss, kl, rl)
 #########################################################
     def train(self):
         dl = ds.data_loader(self.batch_size)
         optimizer = optimizers.Adam(learning_rate=self.learning_rate)
 
-        mtx = {
-            'loss': metrics.Mean(),
-            'kl_loss': metrics.Mean(),
-            'rec_loss': metrics.Mean()
-       }
+        self.train_helper.training_start(optimizer)
 
         for epoch in range(self.epochs):
-            self._train_epoch(optimizer, dl, mtx)
-
-            loss = []
-            for k, m in mtx.items():
-                loss.append(f'{k}: {m.result():.6f}')
-            loss = " ".join(loss)
-            print(f"Epoch {epoch + 1}/{self.epochs}# {loss}")
+            self._train_epoch(optimizer, dl)
+            self.train_helper.on_epoch_end(epoch+1)
 #########################################################
 
