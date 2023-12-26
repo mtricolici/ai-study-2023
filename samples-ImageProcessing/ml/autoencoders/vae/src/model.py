@@ -11,14 +11,15 @@ from train_helper import TrainHelper
 from helper import lm
 
 import variant_cnn
+import variant_mlp
 
 #########################################################
 class VAE:
 #########################################################
-    def __init__(self, model_type = 'cnn'):
+    def __init__(self, model_type = 'mlp'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
         self.latent_dim = 256
-        self.learning_rate = 3e-5
+        self.learning_rate = 3e-4
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
@@ -46,12 +47,19 @@ class VAE:
 
         self.model_type = model_type
 
+        # convolutional neural network (CNN)
         if model_type == 'cnn':
             self.depths = [32, 64]
             self.latent_space = int(128 / 2 ** len(self.depths))
 
             self.encoder = variant_cnn.build_encoder(self)
             self.decoder = variant_cnn.build_decoder(self)
+
+        # fully connected neural network MLP (multi-layer perceptron)
+        elif model_type == 'mlp':
+            self.depths = [1024]
+            self.encoder = variant_mlp.build_encoder(self)
+            self.decoder = variant_mlp.build_decoder(self)
         else:
             raise ValueError(f"Unknown model type for VAE encoder/decoder :(")
 #########################################################
