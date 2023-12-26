@@ -18,7 +18,10 @@ class TrainHelper:
             'kl_loss': metrics.Mean(),
             'rec_loss': metrics.Mean()
         }
-        self.best_loss = float('inf')
+        self.best_loss  = float('inf')
+        self.best_ep    = -1
+        self.bad_epochs = 0
+        self.early_stop_count = 0
 
         lm(f'latent-dim: {self.vae.latent_dim}')
         lm(f'depths    : {self.vae.depths}')
@@ -31,11 +34,11 @@ class TrainHelper:
         self.metrics['kl_loss'](kl_loss)
         self.metrics['rec_loss'](reconstruction_loss)
 
-
         ls = f'loss: {loss:.6f} kl: {kl_loss:.6f} rl: {reconstruction_loss:.6f}'
         perc = step / self.vae.steps_per_epoch * 100.0
+        lr = self.optimizer.learning_rate.numpy()
 
-        lm(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] {ls}', "\r")
+        lm(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] {ls} lr={lr:.2e}', "\r")
 ####################################################################################
     def _get_loss(self):
         ls = []
@@ -52,10 +55,37 @@ class TrainHelper:
 
        lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} lr: {lr:.2e}")
 
-       # Save best weights only
        if loss < self.best_loss:
+          # Epoch with loss improvement !!!
           self.best_loss = loss
+          self.best_ep = epoch
           self.vae.save_model()
+
+          self.early_stop_count = 0
+          self.bad_epochs = 0
+       else:
+          # Epoch without improvement :(
+          self.bad_epochs += 1
+          self.early_stop_count += 1
+
+          if self.early_stop_count >= self.vae.early_stop:
+              # Training must stop
+              lm(f'Early stop. No improvements for {self.early_stop_count} epoches.')
+              return True
+
+          if self.bad_epochs > self.vae.learning_rate_patience:
+              lm(f'... Restoring best weights from epoch {self.best_ep} ...')
+              self.bad_epochs = 0
+              self.vae.load_model()
+
+              # Decrease learning rate
+              new_lr = self.optimizer.learning_rate.numpy() * self.vae.learning_rate_decrease_factor
+              if new_lr < self.vae.minimum_learning_rate:
+                  new_lr = self.vae.minimum_learning_rate
+              self.optimizer.learning_rate = new_lr
+
+       # Training must continue
+       return False
 
 ####################################################################################
 

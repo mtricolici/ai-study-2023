@@ -34,8 +34,18 @@ class VAE:
         # Smaller values: forces the model to learn more paterns. ex: 1e-5, 1e-6
         self.l2r = 1e-6
         self.batch_size = 32
-        self.epochs = 10
+        self.epochs = 5000
         self.steps_per_epoch = 100
+
+        # new_lr = lr * factor
+        self.learning_rate_decrease_factor = 0.1
+        self.minimum_learning_rate = 1e-18
+
+        # number of epochs with no improvement then LR will be reduced
+        self.learning_rate_patience = 3
+
+        # Stop traing if no improvements for this nr of epoches
+        self.early_stop = 10
 
         self.train_helper = TrainHelper(self)
 
@@ -130,6 +140,8 @@ class VAE:
 
         for epoch in range(self.epochs):
             self._train_epoch(epoch, optimizer, dl)
-            self.train_helper.on_epoch_end(epoch+1)
+            must_stop = self.train_helper.on_epoch_end(epoch+1)
+            if must_stop:
+                break
 #########################################################
 
