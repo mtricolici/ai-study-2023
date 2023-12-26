@@ -10,19 +10,14 @@ from image import save_image
 from train_helper import TrainHelper
 from helper import lm
 
+import variant_cnn
+
 #########################################################
 class VAE:
 #########################################################
-    def __init__(self):
+    def __init__(self, model_type = 'cnn'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        #
-        #      latent-dim: 256, depths=[ 32, 64], batchs:10 => 1377MiB VRAM
-        #      latent-dim: 128, dephts=[ 64,128], batchs:10 => 2333MiB VRAM
-        #      latent-dim: 128, dephts=[128,256], batchs:10 => 3560MiB VRAM
-        #
         self.latent_dim = 256
-        self.depths = [32, 64]
-        self.latent_space = int(128 / 2 ** len(self.depths))
         self.learning_rate = 3e-5
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
@@ -49,8 +44,16 @@ class VAE:
 
         self.train_helper = TrainHelper(self)
 
-        self.encoder = self.build_encoder()
-        self.decoder = self.build_decoder()
+        self.model_type = model_type
+
+        if model_type == 'cnn':
+            self.depths = [32, 64]
+            self.latent_space = int(128 / 2 ** len(self.depths))
+
+            self.encoder = variant_cnn.build_encoder(self)
+            self.decoder = variant_cnn.build_decoder(self)
+        else:
+            raise ValueError(f"Unknown model type for VAE encoder/decoder :(")
 #########################################################
     def save_model(self):
         self.encoder.save_weights('/content/encoder.h5')
@@ -63,49 +66,6 @@ class VAE:
     def generate_samples(self, num_samples):
         random_latent_points = np.random.normal(size=(num_samples, self.latent_dim))
         return self.decoder.predict(random_latent_points)
-#########################################################
-    def build_encoder(self):
-        inputs = tf.keras.Input(shape=self.input_shape)
-        x = inputs
-        for depth in self.depths:
-            x = layers.Conv2D(depth, 3, activation=layers.LeakyReLU(alpha=self.relu_alpha), strides=2, padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
-            x = layers.BatchNormalization()(x)
-#            x = layers.MaxPooling2D((2, 2), padding='same')(x)
-
-        x = layers.Flatten()(x)
-        z_mean = layers.Dense(self.latent_dim, name="z_mean", kernel_regularizer=regularizers.l2(self.l2r))(x)
-        z_log_var = layers.Dense(self.latent_dim, name="z_log_var", kernel_regularizer=regularizers.l2(self.l2r))(x)
-        z = self.sampling([z_mean, z_log_var])
-        return models.Model(inputs, [z_mean, z_log_var, z], name="encoder")
-
-#########################################################
-    def build_decoder(self):
-        latent_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(self.latent_space * self.latent_space * self.depths[-1], activation=layers.LeakyReLU(alpha=self.relu_alpha),
-                         kernel_regularizer=regularizers.l2(self.l2r))(latent_inputs)
-        x = layers.Reshape((self.latent_space, self.latent_space, self.depths[-1]))(x)
-
-        for depth in reversed(self.depths):
-            x = layers.Conv2DTranspose(depth, 3, activation=layers.LeakyReLU(alpha=self.relu_alpha),
-                    strides=2, padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
-            x = layers.BatchNormalization()(x)
-#            x = layers.UpSampling2D((2, 2))(x)
-
-        outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
-
-        if outputs.shape[1:] != self.input_shape:
-            raise ValueError(f"Decoder OUTPUT shape {outputs.shape[1:]} does not match input shape {self.input_shape}!!!")
-
-        return models.Model(latent_inputs, outputs, name="decoder")
-
-#########################################################
-    def sampling(self, args):
-        z_mean, z_log_var = args
-        batch = K.shape(z_mean)[0]
-        dim = K.int_shape(z_mean)[1]
-        epsilon = K.random_normal(shape=(batch, dim))
-        return z_mean + K.exp(0.5 * z_log_var) * epsilon
-
 #########################################################
     @tf.function(reduce_retracing=True)
     def _train_step(self, optimizer, x_batch):

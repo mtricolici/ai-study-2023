@@ -24,8 +24,10 @@ class TrainHelper:
         self.bad_epochs = 0
         self.early_stop_count = 0
 
+        if self.vae.model_type == 'cnn':
+            lm(f'depths    : {self.vae.depths}')
+
         lm(f'latent-dim: {self.vae.latent_dim}')
-        lm(f'depths    : {self.vae.depths}')
         lm(f'batch-size: {self.vae.batch_size}')
         lm(f'learn-rate: {optimizer.learning_rate.numpy():.2e}')
 
