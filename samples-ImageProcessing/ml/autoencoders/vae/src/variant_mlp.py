@@ -17,9 +17,10 @@ def build_encoder(vae):
 
     for d in vae.depths:
         x = layers.Dense(d,
-            activation=layers.LeakyReLU(alpha=vae.relu_alpha),
             kernel_initializer='he_normal',
             kernel_regularizer=regularizers.l2(vae.l2r))(x)
+        x = layers.BatchNormalization()(x)
+        x = layers.LeakyReLU(alpha=vae.relu_alpha)(x)
 
     z_mean = layers.Dense(vae.latent_dim, kernel_initializer='he_normal',
         kernel_regularizer=regularizers.l2(vae.l2r))(x)
@@ -38,9 +39,10 @@ def build_decoder(vae):
 
     for d in reversed(vae.depths):
         x = layers.Dense(d,
-            activation=layers.LeakyReLU(alpha=vae.relu_alpha),
             kernel_initializer='he_normal',
             kernel_regularizer=regularizers.l2(vae.l2r))(x)
+        x = layers.BatchNormalization()(x)
+        x = layers.LeakyReLU(alpha=vae.relu_alpha)(x)
 
     outputs = layers.Dense(tf.reduce_prod(vae.input_shape), activation='sigmoid',
                            kernel_initializer='he_normal',
