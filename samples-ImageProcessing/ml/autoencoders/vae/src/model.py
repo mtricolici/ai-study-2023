@@ -21,7 +21,7 @@ class VAE:
         self.latent_dim = 256
         self.depths = [32, 64]
         self.latent_space = int(128 / 2 ** len(self.depths))
-        self.learning_rate = 3e-5
+        self.learning_rate = 3e-4
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
@@ -31,7 +31,7 @@ class VAE:
         # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
         # Smaller values: forces the model to learn more paterns. ex: 1e-5, 1e-6
         self.l2r = 1e-6
-        self.batch_size = 10
+        self.batch_size = 32
         self.epochs = 10
         self.steps_per_epoch = 200
 
@@ -78,6 +78,10 @@ class VAE:
 #            x = layers.UpSampling2D((2, 2))(x)
 
         outputs = layers.Conv2DTranspose(3, 3, activation="sigmoid", padding="same", kernel_regularizer=regularizers.l2(self.l2r))(x)
+
+        if outputs.shape[1:] != self.input_shape:
+            raise ValueError(f"Decoder OUTPUT shape {outputs.shape[1:]} does not match input shape {self.input_shape}!!!")
+
         return models.Model(latent_inputs, outputs, name="decoder")
 
 #########################################################
