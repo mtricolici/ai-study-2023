@@ -8,6 +8,7 @@ import numpy as np
 import dataset as ds
 from image import save_image
 from train_helper import TrainHelper
+from helper import lm
 
 #########################################################
 class VAE:
@@ -34,7 +35,7 @@ class VAE:
         self.l2r = 1e-6
         self.batch_size = 32
         self.epochs = 10
-        self.steps_per_epoch = 50
+        self.steps_per_epoch = 100
 
         self.train_helper = TrainHelper(self)
 

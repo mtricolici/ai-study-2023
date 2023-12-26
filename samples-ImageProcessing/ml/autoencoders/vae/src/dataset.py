@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 
 from image import load_image
+from helper import lm
 
 #########################################################
 def generate_batch(indices, files):
@@ -17,7 +18,7 @@ def data_loader(batch_size):
   DATASET_DIR = '/dataset'
   files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if file.endswith(".png")]
   num_files = len(files)
-  print(f'Dataset - found {num_files} samples.')
+  lm(f'Dataset - found {num_files} samples.')
 
   available_indices = np.arange(num_files)
   np.random.shuffle(available_indices)

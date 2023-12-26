@@ -5,28 +5,27 @@ import numpy as np
 
 from model import VAE
 from image import save_image
+from helper import lm
 
 #########################################################
 def invoke_train():
-    print('creating model ...')
+    lm('creating model ...')
     vae = VAE()
-    print('starting training ...')
+    lm('starting training ...')
     try:
       vae.train()
     except KeyboardInterrupt:
-        print('\nAborting ...')
-    vae.save_model()
+        lm('\nAborting ...')
 #########################################################
 def continue_train():
-    print('creating model ...')
+    lm('creating model ...')
     vae = VAE()
     vae.load_model()
-    print('starting training ...')
+    lm('starting training ...')
     try:
       vae.train()
     except KeyboardInterrupt:
-        print('\nAborting ...')
-    vae.save_model()
+        lm('\nAborting ...')
 #########################################################
 def invoke_demo():
     vae = VAE()
@@ -38,14 +37,14 @@ def invoke_demo():
 #########################################################
 def show_info():
     if tf.config.list_physical_devices('GPU'):
-        print("Available GPUs:")
+        lm("Available GPUs:")
         for gpu in tf.config.list_physical_devices('GPU'):
-            print(gpu)
+            lm(gpu)
     else:
-        print("GPU is not available :((")
+        lm("GPU is not available :((")
 #########################################################
 def main():
-    print(f"TensorFlowVersion: {tf.__version__}")
+    lm(f"TensorFlowVersion: {tf.__version__}")
 
     parser = argparse.ArgumentParser(description='GAN try 2')
     parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
