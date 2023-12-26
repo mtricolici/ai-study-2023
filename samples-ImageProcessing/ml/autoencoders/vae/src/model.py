@@ -33,7 +33,7 @@ class VAE:
         self.l2r = 1e-6
         self.batch_size = 32
         self.epochs = 10
-        self.steps_per_epoch = 200
+        self.steps_per_epoch = 30
 
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
@@ -94,7 +94,7 @@ class VAE:
 
 #########################################################
     @tf.function(reduce_retracing=True)
-    def _train_step(self, optimizer, x_batch, mtx):
+    def _train_step(self, optimizer, x_batch):
         with tf.GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(x_batch)
 
@@ -108,25 +108,36 @@ class VAE:
         grads = tape.gradient(loss, self.encoder.trainable_variables + self.decoder.trainable_variables)
         optimizer.apply_gradients(zip(grads, self.encoder.trainable_variables + self.decoder.trainable_variables))
 
-        # collect metrics
-        mtx[0](loss)
-        mtx[1](kl_loss)
-        mtx[2](reconstruction_loss)
+        return loss, kl_loss, reconstruction_loss
+
 #########################################################
     def _train_epoch(self, optimizer, dl, mtx):
         for step in range(self.steps_per_epoch):
             x_batch = next(dl)
-            self._train_step(optimizer, x_batch, mtx)
+            loss, kl, rl = self._train_step(optimizer, x_batch)
+
+            # collect metrics
+            mtx['loss'](loss)
+            mtx['kl_loss'](kl)
+            mtx['rec_loss'](rl)
 #########################################################
     def train(self):
         dl = ds.data_loader(self.batch_size)
         optimizer = optimizers.Adam(learning_rate=self.learning_rate)
 
-        mtx = [metrics.Mean(), metrics.Mean(), metrics.Mean()]
+        mtx = {
+            'loss': metrics.Mean(),
+            'kl_loss': metrics.Mean(),
+            'rec_loss': metrics.Mean()
+       }
 
         for epoch in range(self.epochs):
             self._train_epoch(optimizer, dl, mtx)
-            loss = f'Loss: {mtx[0].result()} kl_loss: {mtx[1].result()} reconstruction_loss: {mtx[2].result()}'
-            print(f"Epoch {epoch + 1}/{self.epochs}, {loss}")
+
+            loss = []
+            for k, m in mtx.items():
+                loss.append(f'{k}: {m.result():.6f}')
+            loss = " ".join(loss)
+            print(f"Epoch {epoch + 1}/{self.epochs}# {loss}")
 #########################################################
 
