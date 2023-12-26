@@ -34,7 +34,7 @@ class VAE:
         self.l2r = 1e-6
         self.batch_size = 32
         self.epochs = 10
-        self.steps_per_epoch = 30
+        self.steps_per_epoch = 50
 
         self.train_helper = TrainHelper(self)
 
@@ -114,12 +114,12 @@ class VAE:
         return loss, kl_loss, reconstruction_loss
 
 #########################################################
-    def _train_epoch(self, optimizer, dl):
+    def _train_epoch(self, epoch, optimizer, dl):
         for step in range(self.steps_per_epoch):
             x_batch = next(dl)
             loss, kl, rl = self._train_step(optimizer, x_batch)
 
-            self.train_helper.on_step_end(step, loss, kl, rl)
+            self.train_helper.on_step_end(epoch+1, step, loss, kl, rl)
 #########################################################
     def train(self):
         dl = ds.data_loader(self.batch_size)
@@ -128,7 +128,7 @@ class VAE:
         self.train_helper.training_start(optimizer)
 
         for epoch in range(self.epochs):
-            self._train_epoch(optimizer, dl)
+            self._train_epoch(epoch, optimizer, dl)
             self.train_helper.on_epoch_end(epoch+1)
 #########################################################
 

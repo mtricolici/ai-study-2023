@@ -24,10 +24,16 @@ class TrainHelper:
         print(f'learn-rate: {optimizer.learning_rate.numpy():.2e}')
 
 ####################################################################################
-    def on_step_end(self, step, loss, kl_loss, reconstruction_loss):
+    def on_step_end(self, ep, step, loss, kl_loss, reconstruction_loss):
         self.metrics['loss'](loss)
         self.metrics['kl_loss'](kl_loss)
         self.metrics['rec_loss'](reconstruction_loss)
+
+
+        ls = f'loss: {loss:.6f} kl: {kl_loss:.6f} rl: {reconstruction_loss:.6f}'
+        perc = step / self.vae.steps_per_epoch * 100.0
+
+        print(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] {ls}', end="\r")
 ####################################################################################
     def _get_loss_str(self):
         loss = []
