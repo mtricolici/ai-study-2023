@@ -12,11 +12,12 @@ from helper import lm
 
 import variant_cnn
 import variant_mlp
+import variant_resnet
 
 #########################################################
 class VAE:
 #########################################################
-    def __init__(self, model_type = 'mlp'):
+    def __init__(self, model_type = 'resnet'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
         self.latent_dim = 256
         self.learning_rate = 1e-4
@@ -60,6 +61,12 @@ class VAE:
             self.depths = [256, 512]
             self.encoder = variant_mlp.build_encoder(self)
             self.decoder = variant_mlp.build_decoder(self)
+
+        elif model_type == 'resnet':
+            self.rblocks = [32, 64]
+            self.ls = 7
+            self.encoder = variant_resnet.build_encoder(self)
+            self.decoder = variant_resnet.build_decoder(self)
         else:
             raise ValueError(f"Unknown model type for VAE encoder/decoder :(")
 #########################################################
