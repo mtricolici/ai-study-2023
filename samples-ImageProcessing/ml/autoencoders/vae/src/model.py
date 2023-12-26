@@ -19,17 +19,17 @@ class VAE:
     def __init__(self, model_type = 'mlp'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
         self.latent_dim = 256
-        self.learning_rate = 3e-4
+        self.learning_rate = 1e-4
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
-        self.relu_alpha = 0.7
+        self.relu_alpha = 0.6
 
         # L2 Regularization. strength of regularization.
         # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
         # Smaller values: forces the model to learn more paterns. ex: 1e-5, 1e-6
-        self.l2r = 1e-6
-        self.batch_size = 32
+        self.l2r = 1e-4
+        self.batch_size = 20
         self.epochs = 5000
         self.steps_per_epoch = 100
 
@@ -57,7 +57,7 @@ class VAE:
 
         # fully connected neural network MLP (multi-layer perceptron)
         elif model_type == 'mlp':
-            self.depths = [1024]
+            self.depths = [256, 512]
             self.encoder = variant_mlp.build_encoder(self)
             self.decoder = variant_mlp.build_decoder(self)
         else:
@@ -73,7 +73,7 @@ class VAE:
 #########################################################
     def generate_samples(self, num_samples):
         random_latent_points = np.random.normal(size=(num_samples, self.latent_dim))
-        return self.decoder.predict(random_latent_points)
+        return self.decoder.predict(random_latent_points, verbose=0)
 #########################################################
     @tf.function(reduce_retracing=True)
     def _train_step(self, optimizer, x_batch):
