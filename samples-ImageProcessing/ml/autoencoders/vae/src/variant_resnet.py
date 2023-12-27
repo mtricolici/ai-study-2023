@@ -52,8 +52,8 @@ def build_decoder(vae):
 
     x = layers.Dense(128, layers.LeakyReLU(alpha=vae.relu_alpha))(inputs)
 
-    w = vae.input_shape[0] // 4
-    h = vae.input_shape[1] // 4
+    w = vae.input_shape[0] // vae.resnet_d
+    h = vae.input_shape[1] // vae.resnet_d
 
     x = layers.Dense(w * h * 64, layers.LeakyReLU(alpha=vae.relu_alpha))(x)
     x = layers.Reshape((w, h, 64))(x)

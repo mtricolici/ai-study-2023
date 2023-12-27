@@ -29,8 +29,8 @@ class VAE:
         # L2 Regularization. strength of regularization.
         # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
         # Smaller values: forces the model to learn more paterns. ex: 1e-5, 1e-6
-        self.l2r = 1e-4
-        self.batch_size = 20
+        self.l2r = 1e-7
+        self.batch_size = 10
         self.epochs = 5000
         self.steps_per_epoch = 100
 
@@ -42,7 +42,7 @@ class VAE:
         self.learning_rate_patience = 3
 
         # Stop traing if no improvements for this nr of epoches
-        self.early_stop = 10
+        self.early_stop = 20
 
         self.train_helper = TrainHelper(self)
 
@@ -63,8 +63,8 @@ class VAE:
             self.decoder = variant_mlp.build_decoder(self)
 
         elif model_type == 'resnet':
-            self.rblocks = [32, 64]
-            self.ls = 7
+            self.rblocks = [64, 256, 512]
+            self.resnet_d = 8
             self.encoder = variant_resnet.build_encoder(self)
             self.decoder = variant_resnet.build_decoder(self)
         else:
