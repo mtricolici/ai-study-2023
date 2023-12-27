@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 
 from model import VAE
-from image import save_image
+from image import save_image, save_images_as_grid
 from helper import lm
 
 #########################################################
@@ -30,10 +30,8 @@ def continue_train():
 def invoke_demo():
     vae = VAE()
     vae.load_model()
-    samples = vae.generate_samples(10)
-    for i, sample in enumerate(samples):
-        filename = f'/content/result-{i + 1:03d}.png'
-        save_image(samples[i], filename)
+    samples = vae.generate_samples(20)
+    save_images_as_grid(samples, '/content/grid.jpg', 5)
 #########################################################
 def show_info():
     if tf.config.list_physical_devices('GPU'):

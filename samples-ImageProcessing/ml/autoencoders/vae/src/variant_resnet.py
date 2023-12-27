@@ -39,7 +39,7 @@ def build_encoder(vae):
         x = layers.MaxPooling2D()(x)
 
     x = layers.Flatten()(x)
-    x = layers.Dense(128, activation=layers.LeakyReLU(alpha=vae.relu_alpha))(x)
+    x = layers.Dense(vae.resnet_dense, activation=layers.LeakyReLU(alpha=vae.relu_alpha))(x)
 
     z_mean = layers.Dense(vae.latent_dim)(x)
     z_log_var = layers.Dense(vae.latent_dim)(x)
@@ -50,7 +50,7 @@ def build_encoder(vae):
 def build_decoder(vae):
     inputs = tf.keras.Input(shape=(vae.latent_dim,))
 
-    x = layers.Dense(128, layers.LeakyReLU(alpha=vae.relu_alpha))(inputs)
+    x = layers.Dense(vae.resnet_dense, layers.LeakyReLU(alpha=vae.relu_alpha))(inputs)
 
     w = vae.input_shape[0] // vae.resnet_d
     h = vae.input_shape[1] // vae.resnet_d

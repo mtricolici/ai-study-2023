@@ -63,8 +63,9 @@ class VAE:
             self.decoder = variant_mlp.build_decoder(self)
 
         elif model_type == 'resnet':
-            self.rblocks = [64, 256, 512]
-            self.resnet_d = 8
+            self.rblocks = [64, 128]
+            self.resnet_d = 4
+            self.resnet_dense = 512
             self.encoder = variant_resnet.build_encoder(self)
             self.decoder = variant_resnet.build_decoder(self)
         else:
