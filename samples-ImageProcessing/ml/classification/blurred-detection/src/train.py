@@ -7,14 +7,14 @@ from dataset import DataSet
 #########################################################################
 def train_model(model):
 
-    ds = DataSet(batch_size=32, split_ratio=0.9)
+    ds = DataSet(batch_size=32, split_ratio=0.8)
 
     model.compile(
         optimizer=optimizers.Adam(learning_rate=1e-3),
         loss='binary_crossentropy',
         metrics=['accuracy'])
 
-    checkpoint = callbacks.ModelCheckpoint('/content/model.keras', save_best_only=True)
+    checkpoint = callbacks.ModelCheckpoint('/content/model.hdf5', save_best_only=True) #, save_weights_only=True)
 
     early_stopping = callbacks.EarlyStopping(
         monitor='val_loss',
@@ -34,7 +34,7 @@ def train_model(model):
       model.fit(
         ds.train_data(),
         steps_per_epoch=100,
-        epochs=1000,
+        epochs=2,
         validation_data=ds.validation_data(),
         validation_steps=ds.validation_steps,
         callbacks=[checkpoint, early_stopping, lr_scheduler])
