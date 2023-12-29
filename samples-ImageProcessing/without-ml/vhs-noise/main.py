@@ -5,6 +5,19 @@ import sys
 import random
 
 ##################################################################
+def add_motion_blur_effect(img):
+    kernel_size = np.random.choice(np.arange(7, 18, step=2))
+
+    # Create a motion blur kernel
+    kernel = np.zeros((kernel_size, kernel_size))
+    kernel[int((kernel_size-1)/2), :] = np.ones(kernel_size) / kernel_size
+
+    # Apply the convolution filter to the image
+    motion_blur = cv2.filter2D(img, -1, kernel)
+
+    return motion_blur
+##################################################################
+
 def add_chromatic_aberration(img):
     shift_x=random.randint(1,3)
     shift_y=random.randint(1,3)
@@ -184,10 +197,13 @@ def main():
             sys.exit(1)
 
         # Add various effects to the image
-        img = add_downscale_effect(img)
-        img = add_blur_effect(img)
-        img = add_grain_effect(img)
-        img = add_jpeg_effect(img)
+        img = add_motion_blur_effect(img)
+#        img = add_downscale_effect(img)
+#        img = add_blur_effect(img)
+#        img = add_grain_effect(img)
+#        img = add_jpeg_effect(img)
+
+
 
 #        img = add_chromatic_aberration(img)
 
