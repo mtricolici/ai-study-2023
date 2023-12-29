@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import argparse
 import cv2
@@ -43,9 +44,20 @@ def downscale_image(img, size=128):
     return canvas
 
 ###########################################################
-def is_face_good(face, em=30):
+def is_face_good(face):
     pitch, yaw, roll = face.pose
-    return abs(pitch) <= em and abs(yaw) <= em and abs(roll) <= em
+
+    # Face tilt up/down
+    if pitch < -20 or pitch > 10:
+        return False
+
+    if abs(yaw) > 5:
+        return False
+
+    if abs(roll) > 10:
+        return False
+
+    return face.det_score >= 0.7 and face.age <= 50
 ###########################################################
 def handle_file(path):
     global face_idx
@@ -55,6 +67,14 @@ def handle_file(path):
         return
 
     for face in faces:
+        if face_idx >= 100:
+            sys.exit(0)
+
+        # Ignore faces that are rotated too much
+        # Face should look into the camera
+        if not is_face_good(face):
+            continue
+
         pos = face.bbox.astype(int)
         x1, y1, x2, y2 = pos
         x1 = max(0, x1)
@@ -62,12 +82,6 @@ def handle_file(path):
         x2 = min(img.shape[1], x2)
         y2 = min(img.shape[0], y2)
         face_img = img[y1:y2, x1:x2]
-
-        # Ignore faces that are rotated too much
-        # Face should look into the camera
-        # Max allowed angle: 30
-        if not is_face_good(face):
-            continue
 
         face_img = downscale_image(face_img)
         if face_img is not None:
