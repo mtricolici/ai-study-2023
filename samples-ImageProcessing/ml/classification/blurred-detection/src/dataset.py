@@ -41,8 +41,10 @@ class DataSet:
 
         for idx in indices:
             batch_input.append(load_image(files[idx]))
-            v = [0.0] if files[idx].endswith('good.png') else [1.0]
-            batch_output.append(v)
+            if files[idx].endswith('good.png'):
+                batch_output.append([1.0, 0.0])
+            else:
+                batch_output.append([0.0, 1.1])
 
         batch_x = tf.stack(batch_input)
         batch_y = tf.stack(batch_output)
