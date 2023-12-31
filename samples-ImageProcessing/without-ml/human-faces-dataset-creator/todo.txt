@@ -1,0 +1,10 @@
+Image score
+no-reference image quality assessment algorithms:
+- NIQE (Natural Image Quality Evaluator)
+- PIQE (Perception based Image Quality Evaluator)
+- DIIVINE (Distortion Identification-based Image Verity and INtegrity Evaluation)
+- IL-NIQE (Integrated Local Natural Image Quality Evaluator)
+- HIGRADE (Highly Integrated Gradient-Based/Gradient Magnitude Similarity Deviation)
+- CORNIA (Codebook Representation for No-reference Image Assessment)
+- NFERM (No-Reference Quality Metric Based on Natural Scene Statistics)
+- BIQI (Blind Image Quality Index)
