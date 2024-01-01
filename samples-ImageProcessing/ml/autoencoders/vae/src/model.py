@@ -17,14 +17,14 @@ import variant_resnet
 #########################################################
 class VAE:
 #########################################################
-    def __init__(self, model_type = 'resnet'):
+    def __init__(self, model_type = 'cnn'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 256
-        self.learning_rate = 1e-4
+        self.latent_dim = 32
+        self.learning_rate = 1e-3
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
-        self.relu_alpha = 0.6
+        self.relu_alpha = 0.01
 
         # L2 Regularization. strength of regularization.
         # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
@@ -50,7 +50,7 @@ class VAE:
 
         # convolutional neural network (CNN)
         if model_type == 'cnn':
-            self.depths = [32, 64]
+            self.depths = [64, 128]
             self.latent_space = int(128 / 2 ** len(self.depths))
 
             self.encoder = variant_cnn.build_encoder(self)

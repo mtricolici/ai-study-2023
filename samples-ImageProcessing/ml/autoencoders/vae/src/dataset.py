@@ -17,7 +17,7 @@ def generate_batch(indices, files):
 def find_files(folder):
   files = []
 
-  for root, _, filenames in os.walk(DATASET_DIR):
+  for root, _, filenames in os.walk(folder):
     for filename in filenames:
       if filename.endswith(".png"):
         files.append(os.path.join(root, filename))
