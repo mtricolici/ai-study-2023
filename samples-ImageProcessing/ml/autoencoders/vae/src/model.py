@@ -24,7 +24,7 @@ class VAE:
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
-        self.relu_alpha = 0.01
+        self.relu_alpha = 0.3
 
         # L2 Regularization. strength of regularization.
         # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
@@ -50,7 +50,7 @@ class VAE:
 
         # convolutional neural network (CNN)
         if model_type == 'cnn':
-            self.depths = [64, 128]
+            self.depths = [128, 256]
             self.latent_space = int(128 / 2 ** len(self.depths))
 
             self.encoder = variant_cnn.build_encoder(self)
