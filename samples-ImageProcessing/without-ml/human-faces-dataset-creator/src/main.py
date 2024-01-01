@@ -4,10 +4,12 @@ import time
 import argparse
 import cv2
 import numpy as np
-
 from cmdparser import parse_cmd_args
 import vars
 import face_detector
+
+from image_score import image_score
+
 
 ###########################################################
 face_idx = 1
@@ -85,7 +87,8 @@ def handle_file(path):
 
         face_img = downscale_image(face_img)
         if face_img is not None:
-            face_path = os.path.join(vars.target_path, f'{face_idx:05d}-face.png')
+            score = image_score(face_img)
+            face_path = os.path.join(vars.target_path, f'{face_idx:05d}-face-{score:.2f}.png')
             cv2.imwrite(face_path, face_img)
             face_idx += 1
 ###########################################################

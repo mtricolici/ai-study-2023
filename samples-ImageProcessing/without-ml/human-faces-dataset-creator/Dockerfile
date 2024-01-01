@@ -17,6 +17,8 @@ ADD src/requirements.txt /
 
 RUN pip install -r /requirements.txt
 
+RUN pip install piq
+
 # This library just use print without possiblity to hide warnings!!!
 RUN find /usr/local/lib/python3.8/dist-packages/insightface -name "*.py" -type f -exec sed -i 's/print(/pass#print(/g' {} +
 
