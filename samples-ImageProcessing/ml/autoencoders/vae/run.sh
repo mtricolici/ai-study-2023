@@ -35,6 +35,6 @@ docker run --gpus all -it --rm \
   --workdir /app \
   -v $(pwd)/src:/app \
   -v $(pwd)/content:/content \
-  -v $HOME/temp/human-faces-dataset:/dataset \
+  -v $HOME/datasets/human-faces:/dataset \
   $IMG \
   python /app/main.py $@ || echo "Error: $?"
