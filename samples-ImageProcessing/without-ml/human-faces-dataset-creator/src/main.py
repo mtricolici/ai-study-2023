@@ -8,7 +8,7 @@ from cmdparser import parse_cmd_args
 import vars
 import face_detector
 
-from image_score import image_score
+from image_score import good_quality_image
 
 
 ###########################################################
@@ -69,8 +69,8 @@ def handle_file(path):
         return
 
     for face in faces:
-        if face_idx >= 100:
-            sys.exit(0)
+#        if face_idx >= 100:
+#            sys.exit(0)
 
         # Ignore faces that are rotated too much
         # Face should look into the camera
@@ -87,10 +87,10 @@ def handle_file(path):
 
         face_img = downscale_image(face_img)
         if face_img is not None:
-            score = image_score(face_img)
-            face_path = os.path.join(vars.target_path, f'{face_idx:05d}-face-{score:.2f}.png')
-            cv2.imwrite(face_path, face_img)
-            face_idx += 1
+            if good_quality_image(face_img):
+                face_path = os.path.join(vars.target_path, f'{face_idx:05d}-face.png')
+                cv2.imwrite(face_path, face_img)
+                face_idx += 1
 ###########################################################
 def main():
     global face_idx
