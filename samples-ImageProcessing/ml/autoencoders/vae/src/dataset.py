@@ -14,9 +14,18 @@ def generate_batch(indices, files):
 
   return tf.stack(batch)
 #########################################################
+def find_files(folder):
+  files = []
+
+  for root, _, filenames in os.walk(DATASET_DIR):
+    for filename in filenames:
+      if filename.endswith(".png"):
+        files.append(os.path.join(root, filename))
+
+  return files
+#########################################################
 def data_loader(batch_size):
-  DATASET_DIR = '/dataset'
-  files = [os.path.join(DATASET_DIR, file) for file in os.listdir(DATASET_DIR) if file.endswith(".png")]
+  files = find_files('/dataset')
   num_files = len(files)
   lm(f'Dataset - found {num_files} samples.')
 
