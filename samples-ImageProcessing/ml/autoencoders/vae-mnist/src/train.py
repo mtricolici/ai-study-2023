@@ -50,6 +50,8 @@ def train(model, epochs=10):
     train_dataset, test_dataset = load_dataset()
     optimizer = tf.keras.optimizers.Adam(1e-4)
 
+    best_loss  = float('inf')
+
     for epoch in range(1, epochs + 1):
         # training
         start_time = time.time()
@@ -64,6 +66,9 @@ def train(model, epochs=10):
         elbo = -loss.result()
         print('Epoch: {}, loss: {}, elapsed: {}'
             .format(epoch, elbo, end_time - start_time))
+        if best_loss > elbo:
+            best_loss = elbo
+            model.save_model()
 ##############################################################################
 
 

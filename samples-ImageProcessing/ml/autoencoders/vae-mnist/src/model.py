@@ -68,6 +68,14 @@ class CVAE(tf.keras.Model):
             return tf.sigmoid(logits)
         return logits
 ##############################################################################
+    def save_model(self):
+        self.encoder.save_weights('/content/encoder.h5')
+        self.decoder.save_weights('/content/decoder.h5')
+##############################################################################
+    def load_model(self):
+        self.encoder.load_weights('/content/encoder.h5')
+        self.decoder.load_weights('/content/decoder.h5')
+##############################################################################
 
 
 
