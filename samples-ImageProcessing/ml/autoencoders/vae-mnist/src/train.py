@@ -31,7 +31,7 @@ def preprocess_images(images):
   images = images.reshape((images.shape[0], 28, 28, 1)) / 255.
   return np.where(images > 0.5, 1.0, 0.0).astype('float32')
 ##############################################################################
-def load_dataset(train_size = 10000, batch_size = 32, test_size = 1000):
+def load_dataset(train_size = 60000, batch_size = 32, test_size = 10000):
 
     (train_images, _), (test_images, _) = tf.keras.datasets.mnist.load_data()
 
@@ -46,7 +46,7 @@ def load_dataset(train_size = 10000, batch_size = 32, test_size = 1000):
 
     return train_dataset, test_dataset
 ##############################################################################
-def train(model, epochs=10):
+def train(model, epochs=20):
     train_dataset, test_dataset = load_dataset()
     optimizer = tf.keras.optimizers.Adam(1e-4)
 
@@ -63,7 +63,7 @@ def train(model, epochs=10):
         loss = tf.keras.metrics.Mean()
         for test_x in test_dataset:
             loss(compute_loss(model, test_x))
-        elbo = -loss.result()
+        elbo = tf.abs(loss.result())
         print('Epoch: {}, loss: {}, elapsed: {}'
             .format(epoch, elbo, end_time - start_time))
         if best_loss > elbo:

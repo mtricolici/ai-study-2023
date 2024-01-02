@@ -9,7 +9,7 @@ class CVAE(tf.keras.Model):
 
         self.image_shape = (28, 28, 1)
         self.latent_dim = 2
-        self.filters = [32, 64]
+        self.filters = [64, 128]
         self.u = 7
 
         self.encoder = self.build_encoder()
