@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models, losses, optimizers, metrics, regularizers
 from tensorflow.keras import backend as K
-from tensorflow.keras.callbacks import Callback, ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
 import numpy as np
 
