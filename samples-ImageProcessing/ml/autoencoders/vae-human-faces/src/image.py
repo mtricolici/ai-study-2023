@@ -28,6 +28,8 @@ def save_images_as_grid(images, output_path, items_per_row):
   big_image = np.zeros((big_image_height, big_image_width, 3), dtype=np.uint8)
 
   for i, img in enumerate(images):
+    if isinstance(img, tf.Tensor):
+      img = img.numpy()
     row = i // items_per_row
     col = i % items_per_row
     y_start = row * image_height

@@ -4,7 +4,7 @@ import argparse
 import tensorflow as tf
 import numpy as np
 
-from helper import lm
+from helper import lm, save_images_as_grid
 from model import CVAE
 from train import train
 
@@ -16,8 +16,16 @@ def invoke_train():
     train(model)
     lm('training finished')
 #########################################################
-def invoke_demo():
+def invoke_demo(num_samples=20, items_per_row=5):
+    lm('loading model ...')
     model = CVAE()
+    model.load_model()
+    lm('generating samples ...')
+
+    eps = np.random.normal(size=(num_samples, model.latent_dim))
+    samples = model.sample(eps)
+    save_images_as_grid(samples, '/content/grid.jpg', items_per_row)
+    lm('Done!')
 #########################################################
 def show_info():
     if tf.config.list_physical_devices('GPU'):
