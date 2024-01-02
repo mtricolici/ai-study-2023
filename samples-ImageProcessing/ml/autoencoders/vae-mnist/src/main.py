@@ -16,7 +16,7 @@ def invoke_train():
     train(model)
     lm('training finished')
 #########################################################
-def invoke_demo(num_samples=20, items_per_row=5):
+def invoke_demo(num_samples=400, items_per_row=20):
     lm('loading model ...')
     model = CVAE()
     model.load_model()
