@@ -24,21 +24,27 @@ def find_files(folder):
 
   return files
 #########################################################
-def data_loader(batch_size):
+def data_loader(batch_size, simple_random=True):
   files = find_files('/dataset')
   num_files = len(files)
   lm(f'Dataset - found {num_files} samples.')
 
-  available_indices = np.arange(num_files)
-  np.random.shuffle(available_indices)
+  if simple_random:
+    while True:
+      indices = np.random.choice(num_files, size=batch_size, replace=False)
+      yield generate_batch(indices, files)
+  else:
+    available_indices = np.arange(num_files)
+    np.random.shuffle(available_indices)
 
-  while True:
-    if len(available_indices) < batch_size:
-        available_indices = np.arange(num_files)
-        np.random.shuffle(available_indices)
+    while True:
+      if len(available_indices) < batch_size:
+          available_indices = np.arange(num_files)
+          np.random.shuffle(available_indices)
 
-    indices = available_indices[:batch_size]
-    available_indices = available_indices[batch_size:]
+      indices = available_indices[:batch_size]
+      available_indices = available_indices[batch_size:]
 
-    yield generate_batch(indices, files)
+      yield generate_batch(indices, files)
 #########################################################
+

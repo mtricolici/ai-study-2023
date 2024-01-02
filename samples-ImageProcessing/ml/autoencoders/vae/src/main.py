@@ -17,16 +17,6 @@ def invoke_train():
     except KeyboardInterrupt:
         lm('\nAborting ...')
 #########################################################
-def continue_train():
-    lm('creating model ...')
-    vae = VAE()
-    vae.load_model()
-    lm('starting training ...')
-    try:
-      vae.train()
-    except KeyboardInterrupt:
-        lm('\nAborting ...')
-#########################################################
 def invoke_demo():
     vae = VAE()
     vae.load_model()
@@ -45,13 +35,11 @@ def main():
     lm(f"TensorFlowVersion: {tf.__version__}")
 
     parser = argparse.ArgumentParser(description='GAN try 2')
-    parser.add_argument('command', choices=['train', 'continue', 'demo', 'info'], help='The command to execute')
+    parser.add_argument('command', choices=['train', 'demo', 'info'], help='The command to execute')
     args = parser.parse_args()
 
     if args.command == 'train':
         invoke_train()
-    elif args.command == 'continue':
-        continue_train()
     elif args.command == 'demo':
         invoke_demo()
     elif args.command == 'info':

@@ -19,8 +19,8 @@ class VAE:
 #########################################################
     def __init__(self, model_type = 'cnn'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 32
-        self.learning_rate = 1e-3
+        self.latent_dim = 64
+        self.learning_rate = 1e-4
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
@@ -29,13 +29,13 @@ class VAE:
         # L2 Regularization. strength of regularization.
         # Biger values: forces the model to learn simpler patterns: ex:  1e-3, 1e-2
         # Smaller values: forces the model to learn more paterns. ex: 1e-5, 1e-6
-        self.l2r = 1e-7
+        self.l2r = 1e-5
         self.batch_size = 10
         self.epochs = 5000
         self.steps_per_epoch = 100
 
         # new_lr = lr * factor
-        self.learning_rate_decrease_factor = 0.1
+        self.learning_rate_decrease_factor = 0.5
         self.minimum_learning_rate = 1e-18
 
         # number of epochs with no improvement then LR will be reduced
@@ -82,6 +82,9 @@ class VAE:
     def generate_samples(self, num_samples):
         random_latent_points = np.random.normal(size=(num_samples, self.latent_dim))
         return self.decoder.predict(random_latent_points, verbose=0)
+#########################################################
+    def generate_samples_by_dim(self, dim):
+        return self.decoder.predict(dim, verbose=0)
 #########################################################
     @tf.function(reduce_retracing=True)
     def _train_step(self, optimizer, x_batch):

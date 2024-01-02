@@ -24,6 +24,8 @@ class TrainHelper:
         self.bad_epochs = 0
         self.early_stop_count = 0
 
+        self.random_samples_dim = np.random.normal(size=(1, self.vae.latent_dim))
+
         lm(f'MODEL-TYPE: {self.vae.model_type.upper()}')
 
         if self.vae.model_type in ('cnn', 'mlp'):
@@ -55,7 +57,7 @@ class TrainHelper:
         return loss, " ".join(ls)
 ####################################################################################
     def generate_some_samples(self, epoch):
-        samples = self.vae.generate_samples(3)
+        samples = self.vae.generate_samples_by_dim(self.random_samples_dim)
         for i, img in enumerate(samples):
             path = f'/content/ep{epoch:03d}-s{i+1}.png'
             save_image(img, path)
@@ -71,16 +73,17 @@ class TrainHelper:
        self.reset_metrics()
        lr = self.optimizer.learning_rate.numpy()
 
-       lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} lr: {lr:.2e}         ")
+       improvement = "+" if loss < self.best_loss else "-"
+
+       lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} {improvement}lr: {lr:.2e}           ")
 
        if loss < self.best_loss:
           # Epoch with loss improvement !!!
           self.best_loss = loss
           self.best_ep = epoch
 
-          if epoch > 1:
-              self.vae.save_model()
-              self.generate_some_samples(epoch)
+          self.vae.save_model()
+          self.generate_some_samples(epoch)
 
           self.early_stop_count = 0
           self.bad_epochs = 0
@@ -95,9 +98,9 @@ class TrainHelper:
               return True
 
           if self.bad_epochs > self.vae.learning_rate_patience:
-              lm(f'... Restoring best weights from epoch {self.best_ep} ...')
+#              lm(f'... Restoring best weights from epoch {self.best_ep} ...')
+#              self.vae.load_model()
               self.bad_epochs = 0
-              self.vae.load_model()
 
               # Decrease learning rate
               new_lr = self.optimizer.learning_rate.numpy() * self.vae.learning_rate_decrease_factor
