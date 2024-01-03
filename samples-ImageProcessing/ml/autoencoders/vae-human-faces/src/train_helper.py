@@ -73,8 +73,8 @@ class TrainHelper:
               return True
 
           if self.bad_epochs > self.vae.learning_rate_patience:
-#              lm(f'... Restoring best weights from epoch {self.best_ep} ...')
-#              self.vae.load_model()
+              lm(f'... Restoring best weights from epoch {self.best_ep} ...')
+              self.vae.load_model()
               self.bad_epochs = 0
 
               # Decrease learning rate
