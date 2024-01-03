@@ -7,38 +7,49 @@ import numpy as np
 ##################################################################################################################
 def build_encoder(vae):
     inputs = tf.keras.Input(shape=vae.input_shape)
-    x = inputs
-    for depth in vae.depths:
-        x = layers.Conv2D(depth, 3, activation=layers.LeakyReLU(alpha=vae.relu_alpha),
-              strides=2, padding="same", kernel_regularizer=regularizers.l2(vae.l2r))(x)
+
+    x = layers.Conv2D(vae.f1, 3, 1, padding='same')(inputs)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU()(x)
+
+    for _ in range(2):
+        x = layers.Conv2D(vae.f2, 3, 2, padding='same')(x)
         x = layers.BatchNormalization()(x)
+        x = layers.LeakyReLU()(x)
+
+    x = layers.Conv2D(vae.f2, 3, 1, padding='same')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU()(x)
 
     x = layers.Flatten()(x)
-    x = layers.Dense(vae.latent_dim * 2)(x)
 
-    return models.Model(inputs, x, name="encoder")
+    mean = layers.Dense(vae.latent_dim, name='mean')(x)
+    log_var = layers.Dense(vae.latent_dim, name='log_var')(x)
+
+    return models.Model(inputs, (mean, log_var), name="encoder")
 ##################################################################################################################
 def build_decoder(vae):
     inputs = tf.keras.Input(shape=(vae.latent_dim,))
 
-    du = vae.latent_space * vae.latent_space * vae.depths[0]
+    x = layers.Dense(vae.u * vae.u * vae.f2)(inputs)
+    x = layers.Reshape((vae.u, vae.u, vae.f2))(x)
 
-    x = layers.Dense(units=du, activation=layers.LeakyReLU(alpha=vae.relu_alpha),
-                     kernel_regularizer=regularizers.l2(vae.l2r))(inputs)
+    x = layers.Conv2DTranspose(vae.f2, 3, 1, padding='same')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU()(x)
 
-    x = layers.Reshape((vae.latent_space, vae.latent_space, vae.depths[0]))(x)
+    x = layers.Conv2DTranspose(vae.f2, 3, 2, padding='same')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU()(x)
 
-    for depth in reversed(vae.depths):
-        x = layers.Conv2DTranspose(depth, 3, activation=layers.LeakyReLU(alpha=vae.relu_alpha),
-                strides=2, padding="same", kernel_regularizer=regularizers.l2(vae.l2r))(x)
-        x = layers.BatchNormalization()(x)
+    x = layers.Conv2DTranspose(vae.f1, 3, 2, padding='same')(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.LeakyReLU()(x)
 
-    x = layers.Conv2DTranspose(filters=3, kernel_size=3, strides=1, padding='same', kernel_regularizer=regularizers.l2(vae.l2r))(x)
+    x = layers.Conv2DTranspose(3, 3, 1, padding='same', activation='sigmoid')(x)
 
-    # TODO: not sure if we need this check
     if x.shape[1:] != vae.input_shape:
         raise ValueError(f"Decoder OUTPUT shape {x.shape[1:]} does not match input shape {vae.input_shape}!!!")
 
     return models.Model(inputs, x, name="decoder")
 ##################################################################################################################
-

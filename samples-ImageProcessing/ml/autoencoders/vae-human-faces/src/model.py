@@ -9,8 +9,7 @@ import numpy as np
 from dataset import DataSet
 from image import save_image
 from train_helper import TrainHelper
-from helper import lm
-from metrics import Metrics
+from helper import lm, vae_loss, build_final
 
 import variant_cnn
 import variant_mlp
@@ -22,7 +21,7 @@ class VAE:
     def __init__(self, model_type = 'cnn'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
         self.latent_dim = 16
-        self.learning_rate = 1e-3
+        self.learning_rate = 1e-4
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
@@ -49,12 +48,13 @@ class VAE:
         self.train_helper = TrainHelper(self)
 
         self.model_type = model_type
+        self.final   = build_final(self)
 
         # convolutional neural network (CNN)
         if model_type == 'cnn':
-            self.depths = [64, 128]
-            self.latent_space = int(128 / 2 ** len(self.depths))
-
+            self.f1 = 64
+            self.f2 = 128
+            self.u = 32
             self.encoder = variant_cnn.build_encoder(self)
             self.decoder = variant_cnn.build_decoder(self)
 
@@ -90,64 +90,51 @@ class VAE:
         if eps is None:
             print('vae.sample. eps is NONE!')
             sys.exit(1)
-        return self.decode(eps, apply_sigmoid=True)
-#########################################################
-    def encode(self, x):
-        mean, logvar = tf.split(self.encoder(x), num_or_size_splits=2, axis=1)
-        return mean, logvar
-#########################################################
-    def reparameterize(self, mean, logvar):
-        eps = tf.random.normal(shape=mean.shape)
-        return eps * tf.exp(logvar * 0.5) + mean
-#########################################################
-    def decode(self, z, apply_sigmoid=False):
-        logits = self.decoder(z)
-        if apply_sigmoid:
-            return tf.sigmoid(logits)
-        return logits
-#########################################################
-    def log_normal_pdf(self, sample, mean, logvar, raxis=1):
-        log2pi = tf.math.log(2. * np.pi)
-        return tf.reduce_sum(
-            -0.5 * ((sample - mean) ** 2. * tf.exp(-logvar) + logvar + log2pi),
-            axis=raxis)
-#########################################################
-    def compute_loss(self, x):
-        mean, logvar = self.encode(x)
-        z = self.reparameterize(mean, logvar)
-        reconstruction = self.decode(z)
-
-        # Reconstruction Loss
-        cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=reconstruction, labels=x)
-        reconstruction_loss = tf.reduce_sum(cross_ent, axis=[1, 2, 3])
-
-        # KL Divergence Loss
-        logpz = self.log_normal_pdf(z, 0., 0.)
-        logqz_x = self.log_normal_pdf(z, mean, logvar)
-        kl_loss = tf.reduce_mean(logqz_x - logpz)
-
-        # total loss
-        loss = reconstruction_loss + kl_loss
-        return loss, kl_loss, reconstruction_loss
+        return self.decoder(eps, training=False)
 #########################################################
     @tf.function
     def _train_step(self, optimizer, x):
         with tf.GradientTape() as tape:
-            loss, kl_loss, reconstruction_loss = self.compute_loss(x)
+            mean, log_var = self.encoder(x, training=True)
+            latent = self.final([mean, log_var])
+            generated_images = self.decoder(latent, training=True)
+            loss = vae_loss(x, generated_images, mean, log_var)
 
-        grads = tape.gradient(loss, self.encoder.trainable_variables + self.decoder.trainable_variables)
-        optimizer.apply_gradients(zip(grads, self.encoder.trainable_variables + self.decoder.trainable_variables))
+        train_vars = self.encoder.trainable_variables + self.decoder.trainable_variables
+        grads = tape.gradient(loss, train_vars)
+        optimizer.apply_gradients(zip(grads, train_vars))
 
-        return loss, kl_loss, reconstruction_loss
-
+        return loss
+#########################################################
+    @tf.function
+    def _calc_validation_loss(self, x):
+        with tf.GradientTape() as tape:
+            mean, log_var = self.encoder(x, training=False)
+            latent = self.final([mean, log_var])
+            generated_images = self.decoder(latent, training=False)
+            loss = vae_loss(x, generated_images, mean, log_var)
+        return loss
 #########################################################
     def _train_epoch(self, epoch, optimizer, training_data):
-        mtx = Metrics()
+        loss = tf.keras.metrics.Mean()
+
         for step in range(self.steps_per_epoch):
             x_batch = next(training_data)
-            mtx.collect(*self._train_step(optimizer, x_batch))
+            loss(self._train_step(optimizer, x_batch))
+            self.train_helper.on_step_end(epoch+1, step, loss.result())
 
-            self.train_helper.on_step_end(epoch+1, step, mtx.as_string())
+        # Return training loss for this epoch
+        return tf.abs(loss.result())
+#########################################################
+    def _validation(self, validation_data):
+        loss = tf.keras.metrics.Mean()
+
+        for x in validation_data:
+            loss(self._calc_validation_loss(x))
+            self.train_helper.on_validation_step(loss.result())
+
+        # Return validation loss for this epoch
+        return tf.abs(loss.result())
 #########################################################
     def train(self):
         ds = DataSet(self.batch_size)
@@ -156,15 +143,12 @@ class VAE:
         self.train_helper.training_start(optimizer)
 
         for epoch in range(self.epochs):
-            # train 1 epoch
-            self._train_epoch(epoch, optimizer, ds.train_samples())
+            # train one epoch
+            loss = self._train_epoch(epoch, optimizer, ds.train_samples())
             # Invoke validation
-            mtx = Metrics()
-            for val_batch in ds.validation_samples():
-                mtx.collect(*self.compute_loss(val_batch))
-                self.train_helper.on_validation_step(mtx.as_string())
+            val_loss = self._validation(ds.validation_samples())
 
-            must_stop = self.train_helper.on_epoch_end(epoch+1, mtx.loss(), mtx.as_string())
+            must_stop = self.train_helper.on_epoch_end(epoch+1, loss, val_loss)
             if must_stop:
                 break
 #########################################################

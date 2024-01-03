@@ -22,22 +22,25 @@ class TrainHelper:
 
         lm(f'MODEL-TYPE: {self.vae.model_type.upper()}')
 
-        if self.vae.model_type in ('cnn', 'mlp'):
+        if self.vae.model_type == 'mlp':
             lm(f'depths    : {self.vae.depths}')
+
+        if self.vae.model_type == 'cnn':
+            lm(f'depths    : [{self.vae.f1} {self.vae.f2}]')
 
         lm(f'latent-dim: {self.vae.latent_dim}')
         lm(f'batch-size: {self.vae.batch_size}')
         lm(f'learn-rate: {optimizer.learning_rate.numpy():.2e}')
 
 ####################################################################################
-    def on_step_end(self, ep, step, metrics):
+    def on_step_end(self, ep, step, loss):
         perc = step / self.vae.steps_per_epoch * 100.0
         lr = self.optimizer.learning_rate.numpy()
 
-        lm(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] {metrics} lr={lr:.2e}', "\r")
+        lm(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] loss:{loss:.5f} lr={lr:.2e}', "\r")
 ####################################################################################
-    def on_validation_step(self, metrics):
-        lm(f'>> validation {metrics}  ', "\r")
+    def on_validation_step(self, loss):
+        lm(f'>> validation loss: {loss:.5f}  ', "\r")
 ####################################################################################
     def generate_some_samples(self, epoch):
         samples = self.vae.sample(self.random_samples_dim)
@@ -45,16 +48,17 @@ class TrainHelper:
             path = f'/content/ep{epoch:03d}-s{i+1}.png'
             save_image(img, path)
 ####################################################################################
-    def on_epoch_end(self, epoch, loss, metrics):
+    def on_epoch_end(self, epoch, loss, val_loss):
        lr = self.optimizer.learning_rate.numpy()
 
-       improvement = "+" if loss < self.best_loss else "-"
+       improvement = "+" if val_loss < self.best_loss else "-"
 
-       lm(f"Epoch {epoch}/{self.vae.epochs} {improvement}{metrics} lr: {lr:.2e}           ")
+       m = f'loss: {loss:.5f}, val_loss: {val_loss:.5f}'
+       lm(f"Epoch {epoch}/{self.vae.epochs} {improvement}{m} lr: {lr:.2e}           ")
 
-       if loss < self.best_loss:
+       if val_loss < self.best_loss:
           # Epoch with loss improvement !!!
-          self.best_loss = loss
+          self.best_loss = val_loss
           self.best_ep = epoch
 
           self.vae.save_model()
