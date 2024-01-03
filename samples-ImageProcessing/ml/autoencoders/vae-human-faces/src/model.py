@@ -162,6 +162,7 @@ class VAE:
             mtx = Metrics()
             for val_batch in ds.validation_samples():
                 mtx.collect(*self.compute_loss(val_batch))
+                self.train_helper.on_validation_step(mtx.as_string())
 
             must_stop = self.train_helper.on_epoch_end(epoch+1, mtx.loss(), mtx.as_string())
             if must_stop:

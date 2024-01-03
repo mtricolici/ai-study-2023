@@ -36,6 +36,9 @@ class TrainHelper:
 
         lm(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] {metrics} lr={lr:.2e}', "\r")
 ####################################################################################
+    def on_validation_step(self, metrics):
+        lm(f'>> validation {metrics}  ', "\r")
+####################################################################################
     def generate_some_samples(self, epoch):
         samples = self.vae.sample(self.random_samples_dim)
         for i, img in enumerate(samples):
