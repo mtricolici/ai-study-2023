@@ -5,7 +5,7 @@ from tensorflow.keras.callbacks import Callback, ModelCheckpoint, EarlyStopping,
 
 import numpy as np
 
-import dataset as ds
+from dataset import DataSet
 from image import save_image
 from train_helper import TrainHelper
 from helper import lm
@@ -104,21 +104,22 @@ class VAE:
         return loss, kl_loss, reconstruction_loss
 
 #########################################################
-    def _train_epoch(self, epoch, optimizer, dl):
+    def _train_epoch(self, epoch, optimizer, training_data, validation_data):
         for step in range(self.steps_per_epoch):
-            x_batch = next(dl)
+            x_batch = next(training_data)
             loss, kl, rl = self._train_step(optimizer, x_batch)
+            #TODO: implement validation !
 
             self.train_helper.on_step_end(epoch+1, step, loss, kl, rl)
 #########################################################
     def train(self):
-        dl = ds.data_loader(self.batch_size)
+        ds = DataSet(self.batch_size)
         optimizer = optimizers.Adam(learning_rate=self.learning_rate)
 
         self.train_helper.training_start(optimizer)
 
         for epoch in range(self.epochs):
-            self._train_epoch(epoch, optimizer, dl)
+            self._train_epoch(epoch, optimizer, ds.train_samples(), ds.validation_samples())
             must_stop = self.train_helper.on_epoch_end(epoch+1)
             if must_stop:
                 break
