@@ -2,21 +2,20 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 
 ##############################################################################
-class CVAE(tf.keras.Model):
+class CVAE:
 ##############################################################################
     def __init__(self):
-        super(CVAE, self).__init__()
-
-        self.image_shape = (28, 28, 1)
+        self.input_shape = (28, 28, 1)
         self.latent_dim = 2
         self.filters = [64, 128]
         self.u = 7
+
 
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
 ##############################################################################
     def build_encoder(self):
-        inputs = tf.keras.Input(shape=self.image_shape)
+        inputs = tf.keras.Input(shape=self.input_shape)
         x = inputs
 
         for f in self.filters:
@@ -42,8 +41,8 @@ class CVAE(tf.keras.Model):
 
         x = layers.Conv2DTranspose(filters=1, kernel_size=3, strides=1, padding='same')(x)
 
-        if x.shape[1:] != self.image_shape:
-            raise ValueError(f"Decoder OUTPUT shape {x.shape[1:]} does not match input shape {self.image_shape}!!!")
+        if x.shape[1:] != self.input_shape:
+            raise ValueError(f"Decoder OUTPUT shape {x.shape[1:]} does not match input shape {self.input_shape}!!!")
 
         model = models.Model(inputs=inputs, outputs=x)
         return model

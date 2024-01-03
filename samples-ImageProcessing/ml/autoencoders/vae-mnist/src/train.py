@@ -1,6 +1,7 @@
-import time
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras import metrics, losses
+from helper import lm
 
 ##############################################################################
 def log_normal_pdf(sample, mean, logvar, raxis=1):
@@ -12,9 +13,26 @@ def log_normal_pdf(sample, mean, logvar, raxis=1):
 def compute_loss(model, x):
     mean, logvar = model.encode(x)
     z = model.reparameterize(mean, logvar)
-    x_logit = model.decode(z)
 
-    cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=x_logit, labels=x)
+    reconstruction = model.decode(z)
+
+    reconstruction_loss = tf.reduce_mean(
+        losses.binary_crossentropy(x, reconstruction))
+
+    kl_loss = -0.5 * tf.reduce_mean(
+        logvar - tf.square(mean) - tf.exp(logvar) + 1)
+
+    loss = reconstruction_loss + kl_loss
+
+    return loss, kl_loss, reconstruction_loss
+##############################################################################
+def compute_loss2(model, x):
+    mean, logvar = model.encode(x)
+    z = model.reparameterize(mean, logvar)
+
+    reconstruction = model.decode(z)
+
+    cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=reconstruction, labels=x)
     logpx_z = -tf.reduce_sum(cross_ent, axis=[1, 2, 3])
     logpz = log_normal_pdf(z, 0., 0.)
     logqz_x = log_normal_pdf(z, mean, logvar)
@@ -23,9 +41,13 @@ def compute_loss(model, x):
 @tf.function
 def train_step(model, x, optimizer):
     with tf.GradientTape() as tape:
-        loss = compute_loss(model, x)
-    gradients = tape.gradient(loss, model.trainable_variables)
-    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+        loss, _, _ = compute_loss(model, x)
+    gradients = tape.gradient(
+        loss,
+        model.encoder.trainable_variables + model.decoder.trainable_variables)
+    optimizer.apply_gradients(
+        zip(gradients,
+            model.encoder.trainable_variables + model.decoder.trainable_variables))
 ##############################################################################
 def preprocess_images(images):
   images = images.reshape((images.shape[0], 28, 28, 1)) / 255.
@@ -46,29 +68,55 @@ def load_dataset(train_size = 60000, batch_size = 32, test_size = 10000):
 
     return train_dataset, test_dataset
 ##############################################################################
+def create_metrics():
+    return {
+        'loss': metrics.Mean(),
+        'kl_loss': metrics.Mean(),
+        'rec_loss': metrics.Mean()
+    }
+##############################################################################
+def collect_validation_loss(metrics, model, test_x):
+    loss, kl_loss, rec_loss = compute_loss(model, test_x)
+    metrics['loss'](loss)
+    metrics['kl_loss'](kl_loss)
+    metrics['rec_loss'](rec_loss)
+##############################################################################
+def get_loss(metrics):
+    ls = []
+    for k, m in metrics.items():
+        v = tf.abs(m.result())
+        if k == 'loss':
+            loss = v
+        ls.append(f'{k}: {v:.6f}')
+    return loss, ", ".join(ls)
+##############################################################################
 def train(model, epochs=20):
     train_dataset, test_dataset = load_dataset()
-    optimizer = tf.keras.optimizers.Adam(1e-4)
+    optimizer = tf.keras.optimizers.Adam(1e-3)
 
     best_loss  = float('inf')
 
     for epoch in range(1, epochs + 1):
         # training
-        start_time = time.time()
         for train_x in train_dataset:
             train_step(model, train_x, optimizer)
-        end_time = time.time()
 
         # validation
-        loss = tf.keras.metrics.Mean()
+        mtx = create_metrics()
         for test_x in test_dataset:
-            loss(compute_loss(model, test_x))
-        elbo = tf.abs(loss.result())
-        print('Epoch: {}, loss: {}, elapsed: {}'
-            .format(epoch, elbo, end_time - start_time))
-        if best_loss > elbo:
-            best_loss = elbo
+            collect_validation_loss(mtx, model, test_x)
+
+        # get loss and save model if it is better
+        loss, loss_s = get_loss(mtx)
+        best = '-'
+        if best_loss > loss:
+            best_loss = loss
+            best = '+'
             model.save_model()
+
+        # print stats
+        lm(f'Epoch: {epoch:02d}# {best}{loss_s}')
+
 ##############################################################################
 
 
