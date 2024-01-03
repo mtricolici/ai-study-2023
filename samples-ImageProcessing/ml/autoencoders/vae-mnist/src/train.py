@@ -10,33 +10,41 @@ def log_normal_pdf(sample, mean, logvar, raxis=1):
         -0.5 * ((sample - mean) ** 2. * tf.exp(-logvar) + logvar + log2pi),
         axis=raxis)
 ##############################################################################
-def compute_loss(model, x):
+def compute_loss2(model, x):
     mean, logvar = model.encode(x)
     z = model.reparameterize(mean, logvar)
-
     reconstruction = model.decode(z)
 
+    # Reconstruction Loss
     reconstruction_loss = tf.reduce_mean(
         losses.binary_crossentropy(x, reconstruction))
 
+    # KL Divergence Loss
     kl_loss = -0.5 * tf.reduce_mean(
         logvar - tf.square(mean) - tf.exp(logvar) + 1)
 
+    # total loss
     loss = reconstruction_loss + kl_loss
 
     return loss, kl_loss, reconstruction_loss
 ##############################################################################
-def compute_loss2(model, x):
+def compute_loss(model, x):
     mean, logvar = model.encode(x)
     z = model.reparameterize(mean, logvar)
-
     reconstruction = model.decode(z)
 
+    # Reconstruction Loss
     cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=reconstruction, labels=x)
-    logpx_z = -tf.reduce_sum(cross_ent, axis=[1, 2, 3])
+    reconstruction_loss = tf.reduce_sum(cross_ent, axis=[1, 2, 3])
+
+    # KL Divergence Loss
     logpz = log_normal_pdf(z, 0., 0.)
     logqz_x = log_normal_pdf(z, mean, logvar)
-    return -tf.reduce_mean(logpx_z + logpz - logqz_x)
+    kl_loss = tf.reduce_mean(logqz_x - logpz)
+
+    # total loss
+    loss = reconstruction_loss + kl_loss
+    return loss, kl_loss, reconstruction_loss
 ##############################################################################
 @tf.function
 def train_step(model, x, optimizer):
