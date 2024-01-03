@@ -1,61 +1,44 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import metrics, losses
+from tensorflow.keras import backend as K
 from helper import lm
 
 ##############################################################################
-def log_normal_pdf(sample, mean, logvar, raxis=1):
-    log2pi = tf.math.log(2. * np.pi)
-    return tf.reduce_sum(
-        -0.5 * ((sample - mean) ** 2. * tf.exp(-logvar) + logvar + log2pi),
-        axis=raxis)
+def mse_loss(y_true, y_pred):
+    r_loss = K.mean(K.square(y_true - y_pred), axis = [1,2,3])
+    return 1000 * r_loss # Why????
 ##############################################################################
-def compute_loss2(model, x):
-    mean, logvar = model.encode(x)
-    z = model.reparameterize(mean, logvar)
-    reconstruction = model.decode(z)
-
-    # Reconstruction Loss
-    reconstruction_loss = tf.reduce_mean(
-        losses.binary_crossentropy(x, reconstruction))
-
-    # KL Divergence Loss
-    kl_loss = -0.5 * tf.reduce_mean(
-        logvar - tf.square(mean) - tf.exp(logvar) + 1)
-
-    # total loss
-    loss = reconstruction_loss + kl_loss
-
-    return loss, kl_loss, reconstruction_loss
+def kl_loss(mean, log_var):
+    return -0.5 * K.sum(1 + log_var - K.square(mean) - K.exp(log_var), axis = 1)
 ##############################################################################
-def compute_loss(model, x):
-    mean, logvar = model.encode(x)
-    z = model.reparameterize(mean, logvar)
-    reconstruction = model.decode(z)
-
-    # Reconstruction Loss
-    cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=reconstruction, labels=x)
-    reconstruction_loss = tf.reduce_sum(cross_ent, axis=[1, 2, 3])
-
-    # KL Divergence Loss
-    logpz = log_normal_pdf(z, 0., 0.)
-    logqz_x = log_normal_pdf(z, mean, logvar)
-    kl_loss = tf.reduce_mean(logqz_x - logpz)
-
-    # total loss
-    loss = reconstruction_loss + kl_loss
-    return loss, kl_loss, reconstruction_loss
+def vae_loss(y_true, y_pred, mean, log_var):
+    r_loss = mse_loss(y_true, y_pred)
+    kl = kl_loss(mean, log_var)
+    return  r_loss + kl
 ##############################################################################
 @tf.function
 def train_step(model, x, optimizer):
     with tf.GradientTape() as tape:
-        loss, _, _ = compute_loss(model, x)
-    gradients = tape.gradient(
-        loss,
-        model.encoder.trainable_variables + model.decoder.trainable_variables)
-    optimizer.apply_gradients(
-        zip(gradients,
-            model.encoder.trainable_variables + model.decoder.trainable_variables))
+        mean, log_var = model.encoder(x, training=True)
+        latent = model.final([mean, log_var])
+        generated_images = model.decoder(latent, training=True)
+        loss = vae_loss(x, generated_images, mean, log_var)
+
+    train_vars = model.encoder.trainable_variables + model.decoder.trainable_variables
+
+    grads = tape.gradient(loss, train_vars)
+    optimizer.apply_gradients(zip(grads, train_vars))
+
+##############################################################################
+@tf.function
+def calc_validation_loss(model, x):
+    with tf.GradientTape() as tape:
+        mean, log_var = model.encoder(x, training=False)
+        latent = model.final([mean, log_var])
+        generated_images = model.decoder(latent, training=False)
+        loss = vae_loss(x, generated_images, mean, log_var)
+    return loss
 ##############################################################################
 def preprocess_images(images):
   images = images.reshape((images.shape[0], 28, 28, 1)) / 255.
@@ -76,28 +59,6 @@ def load_dataset(train_size = 60000, batch_size = 32, test_size = 10000):
 
     return train_dataset, test_dataset
 ##############################################################################
-def create_metrics():
-    return {
-        'loss': metrics.Mean(),
-        'kl_loss': metrics.Mean(),
-        'rec_loss': metrics.Mean()
-    }
-##############################################################################
-def collect_validation_loss(metrics, model, test_x):
-    loss, kl_loss, rec_loss = compute_loss(model, test_x)
-    metrics['loss'](loss)
-    metrics['kl_loss'](kl_loss)
-    metrics['rec_loss'](rec_loss)
-##############################################################################
-def get_loss(metrics):
-    ls = []
-    for k, m in metrics.items():
-        v = tf.abs(m.result())
-        if k == 'loss':
-            loss = v
-        ls.append(f'{k}: {v:.6f}')
-    return loss, ", ".join(ls)
-##############################################################################
 def train(model, epochs=20):
     train_dataset, test_dataset = load_dataset()
     optimizer = tf.keras.optimizers.Adam(1e-3)
@@ -110,12 +71,12 @@ def train(model, epochs=20):
             train_step(model, train_x, optimizer)
 
         # validation
-        mtx = create_metrics()
+        lossMetric = metrics.Mean()
         for test_x in test_dataset:
-            collect_validation_loss(mtx, model, test_x)
+            lossMetric(calc_validation_loss(model, test_x))
 
         # get loss and save model if it is better
-        loss, loss_s = get_loss(mtx)
+        loss = tf.abs(lossMetric.result())
         best = '-'
         if best_loss > loss:
             best_loss = loss
@@ -123,7 +84,7 @@ def train(model, epochs=20):
             model.save_model()
 
         # print stats
-        lm(f'Epoch: {epoch:02d}# {best}{loss_s}')
+        lm(f'Epoch: {epoch:02d}# {best}loss:{loss:.5f}')
 
 ##############################################################################
 
