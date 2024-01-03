@@ -1,6 +1,6 @@
 import sys
 import tensorflow as tf
-from tensorflow.keras import layers, models, losses, optimizers, metrics, regularizers
+from tensorflow.keras import layers, models, losses, optimizers, regularizers
 from tensorflow.keras import backend as K
 from tensorflow.keras.callbacks import Callback, ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 
@@ -10,6 +10,7 @@ from dataset import DataSet
 from image import save_image
 from train_helper import TrainHelper
 from helper import lm
+from metrics import Metrics
 
 import variant_cnn
 import variant_mlp
@@ -141,11 +142,12 @@ class VAE:
 
 #########################################################
     def _train_epoch(self, epoch, optimizer, training_data):
+        mtx = Metrics()
         for step in range(self.steps_per_epoch):
             x_batch = next(training_data)
-            loss, kl, rl = self._train_step(optimizer, x_batch)
+            mtx.collect(*self._train_step(optimizer, x_batch))
 
-            self.train_helper.on_step_end(epoch+1, step, loss, kl, rl)
+            self.train_helper.on_step_end(epoch+1, step, mtx.as_string())
 #########################################################
     def train(self):
         ds = DataSet(self.batch_size)
@@ -157,8 +159,11 @@ class VAE:
             # train 1 epoch
             self._train_epoch(epoch, optimizer, ds.train_samples())
             # Invoke validation
-#            for val_batch in ds.validation_samples():
-            must_stop = self.train_helper.on_epoch_end(epoch+1)
+            mtx = Metrics()
+            for val_batch in ds.validation_samples():
+                mtx.collect(*self.compute_loss(val_batch))
+
+            must_stop = self.train_helper.on_epoch_end(epoch+1, mtx.loss(), mtx.as_string())
             if must_stop:
                 break
 #########################################################

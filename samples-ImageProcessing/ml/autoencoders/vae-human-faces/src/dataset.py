@@ -35,8 +35,8 @@ class DataSet:
         self.train_files = files[:split_idx]
         self.valid_files = files[split_idx:]
 
-        print(f'Training files   : {len(self.train_files)}')
-        print(f'Validation files : {len(self.valid_files)}')
+        lm(f'Training files   : {len(self.train_files)}')
+        lm(f'Validation files : {len(self.valid_files)}')
 #########################################################
     def _generate_batch(self, indices, files):
         batch = []
