@@ -20,8 +20,8 @@ class VAE:
 #########################################################
     def __init__(self, model_type = 'cnn'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 64
-        self.learning_rate = 1e-4
+        self.latent_dim = 16
+        self.learning_rate = 1e-3
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.

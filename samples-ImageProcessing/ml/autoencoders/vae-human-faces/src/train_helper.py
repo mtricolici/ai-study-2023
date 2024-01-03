@@ -79,7 +79,7 @@ class TrainHelper:
 
        improvement = "+" if loss < self.best_loss else "-"
 
-       lm(f"Epoch {epoch}/{self.vae.epochs} {loss_s} {improvement}lr: {lr:.2e}           ")
+       lm(f"Epoch {epoch}/{self.vae.epochs} {improvement}{loss_s} lr: {lr:.2e}           ")
 
        if loss < self.best_loss:
           # Epoch with loss improvement !!!
