@@ -41,7 +41,11 @@ class TrainHelper:
         self.metrics['kl_loss'](kl_loss)
         self.metrics['rec_loss'](reconstruction_loss)
 
-        ls = f'loss: {loss:.6f} kl: {kl_loss:.6f} rl: {reconstruction_loss:.6f}'
+        l1 = self.metrics['loss'].result()
+        l2 = self.metrics['kl_loss'].result()
+        l3 = self.metrics['rec_loss'].result()
+
+        ls = f'loss: {l1:.6f} kl: {l2:.6f} rl: {l3:.6f}'
         perc = step / self.vae.steps_per_epoch * 100.0
         lr = self.optimizer.learning_rate.numpy()
 
@@ -57,7 +61,7 @@ class TrainHelper:
         return loss, " ".join(ls)
 ####################################################################################
     def generate_some_samples(self, epoch):
-        samples = self.vae.generate_samples_by_dim(self.random_samples_dim)
+        samples = self.vae.sample(self.random_samples_dim)
         for i, img in enumerate(samples):
             path = f'/content/ep{epoch:03d}-s{i+1}.png'
             save_image(img, path)

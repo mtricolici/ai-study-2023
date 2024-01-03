@@ -1,3 +1,4 @@
+import sys
 import tensorflow as tf
 from tensorflow.keras import layers, models, losses, optimizers, metrics, regularizers
 from tensorflow.keras import backend as K
@@ -50,7 +51,7 @@ class VAE:
 
         # convolutional neural network (CNN)
         if model_type == 'cnn':
-            self.depths = [128, 256]
+            self.depths = [64, 128]
             self.latent_space = int(128 / 2 ** len(self.depths))
 
             self.encoder = variant_cnn.build_encoder(self)
@@ -80,23 +81,58 @@ class VAE:
         self.decoder.load_weights('/content/decoder.h5')
 #########################################################
     def generate_samples(self, num_samples):
-        random_latent_points = np.random.normal(size=(num_samples, self.latent_dim))
-        return self.decoder.predict(random_latent_points, verbose=0)
+        eps = np.random.normal(size=(num_samples, self.latent_dim))
+        return self.sample(eps)
 #########################################################
-    def generate_samples_by_dim(self, dim):
-        return self.decoder.predict(dim, verbose=0)
+    @tf.function
+    def sample(self, eps=None):
+        if eps is None:
+            print('vae.sample. eps is NONE!')
+            sys.exit(1)
+        return self.decode(eps, apply_sigmoid=True)
 #########################################################
-    @tf.function(reduce_retracing=True)
-    def _train_step(self, optimizer, x_batch):
-        with tf.GradientTape() as tape:
-            z_mean, z_log_var, z = self.encoder(x_batch)
+    def encode(self, x):
+        mean, logvar = tf.split(self.encoder(x), num_or_size_splits=2, axis=1)
+        return mean, logvar
+#########################################################
+    def reparameterize(self, mean, logvar):
+        eps = tf.random.normal(shape=mean.shape)
+        return eps * tf.exp(logvar * 0.5) + mean
+#########################################################
+    def decode(self, z, apply_sigmoid=False):
+        logits = self.decoder(z)
+        if apply_sigmoid:
+            return tf.sigmoid(logits)
+        return logits
+#########################################################
+    def log_normal_pdf(self, sample, mean, logvar, raxis=1):
+        log2pi = tf.math.log(2. * np.pi)
+        return tf.reduce_sum(
+            -0.5 * ((sample - mean) ** 2. * tf.exp(-logvar) + logvar + log2pi),
+            axis=raxis)
+#########################################################
+    def compute_loss(self, x):
+        mean, logvar = self.encode(x)
+        z = self.reparameterize(mean, logvar)
+        reconstruction = self.decode(z)
 
-            reconstruction = self.decoder(z)
-            reconstruction_loss = tf.reduce_mean(
-                losses.binary_crossentropy(x_batch, reconstruction))
-            kl_loss = -0.5 * tf.reduce_mean(
-                z_log_var - tf.square(z_mean) - tf.exp(z_log_var) + 1)
-            loss = reconstruction_loss + kl_loss
+        # Reconstruction Loss
+        cross_ent = tf.nn.sigmoid_cross_entropy_with_logits(logits=reconstruction, labels=x)
+        reconstruction_loss = tf.reduce_sum(cross_ent, axis=[1, 2, 3])
+
+        # KL Divergence Loss
+        logpz = self.log_normal_pdf(z, 0., 0.)
+        logqz_x = self.log_normal_pdf(z, mean, logvar)
+        kl_loss = tf.reduce_mean(logqz_x - logpz)
+
+        # total loss
+        loss = reconstruction_loss + kl_loss
+        return loss, kl_loss, reconstruction_loss
+#########################################################
+    @tf.function
+    def _train_step(self, optimizer, x):
+        with tf.GradientTape() as tape:
+            loss, kl_loss, reconstruction_loss = self.compute_loss(x)
 
         grads = tape.gradient(loss, self.encoder.trainable_variables + self.decoder.trainable_variables)
         optimizer.apply_gradients(zip(grads, self.encoder.trainable_variables + self.decoder.trainable_variables))
@@ -104,11 +140,10 @@ class VAE:
         return loss, kl_loss, reconstruction_loss
 
 #########################################################
-    def _train_epoch(self, epoch, optimizer, training_data, validation_data):
+    def _train_epoch(self, epoch, optimizer, training_data):
         for step in range(self.steps_per_epoch):
             x_batch = next(training_data)
             loss, kl, rl = self._train_step(optimizer, x_batch)
-            #TODO: implement validation !
 
             self.train_helper.on_step_end(epoch+1, step, loss, kl, rl)
 #########################################################
@@ -119,7 +154,10 @@ class VAE:
         self.train_helper.training_start(optimizer)
 
         for epoch in range(self.epochs):
-            self._train_epoch(epoch, optimizer, ds.train_samples(), ds.validation_samples())
+            # train 1 epoch
+            self._train_epoch(epoch, optimizer, ds.train_samples())
+            # Invoke validation
+#            for val_batch in ds.validation_samples():
             must_stop = self.train_helper.on_epoch_end(epoch+1)
             if must_stop:
                 break
