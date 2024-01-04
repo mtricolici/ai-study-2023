@@ -48,9 +48,9 @@ def invoke_demo_animated(f=0, r=5, s=0.25, d=5):
             save_images_as_grid(samples, jpg, 5)
 
             # Add text annotation to image
-            txt=f"feature:{f}={value:0.2f}"
+            txt=f"f{f}={value:0.2f}"
             subprocess.run(["bash", "-c",
-                f'convert {jpg} -fill white -pointsize 36 -annotate +30+30 "{txt}" {jpg}'])
+                f'convert {jpg} -undercolor black -fill white -pointsize 36 -annotate +30+30 "{txt}" {jpg}'])
 
             # save filename to create GIF later
             file.write(f"{jpg}\n")
