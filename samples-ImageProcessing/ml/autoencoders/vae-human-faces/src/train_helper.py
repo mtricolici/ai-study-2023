@@ -16,7 +16,7 @@ class TrainHelper:
         self.bad_epochs = 0
         self.early_stop_count = 0
 
-        self.random_samples_dim = np.random.normal(size=(25, self.vae.latent_dim))
+        self.random_samples_dim = np.random.normal(size=(28, self.vae.latent_dim))
 
         lm(f'MODEL-TYPE: {self.vae.model_type.upper()}')
 
@@ -42,7 +42,7 @@ class TrainHelper:
 ####################################################################################
     def generate_some_samples(self, epoch):
         samples = self.vae.sample(self.random_samples_dim)
-        save_images_as_grid(samples, f'/content/epoch-{epoch:03d}.jpg', 5)
+        save_images_as_grid(samples, f'/content/epoch-{epoch:03d}.jpg', 7)
 ####################################################################################
     def on_epoch_end(self, epoch, loss, val_loss):
        lr = self.vae.optimizer.learning_rate.numpy()
