@@ -20,8 +20,8 @@ class VAE:
 #########################################################
     def __init__(self, model_type = 'cnn'):
         self.input_shape = (128, 128, 3) # 128x128 RGB images
-        self.latent_dim = 32
-        self.learning_rate = 1e-4
+        self.latent_dim = 8
+        self.learning_rate = 1e-5
 
         # Higher alpha (near 1): Smoother learning, less sparsity, potential performance gains.
         # Lower alpha  (near 0): More sparsity, efficiency, risk of dying ReLU.
@@ -40,7 +40,7 @@ class VAE:
         self.minimum_learning_rate = 1e-18
 
         # number of epochs with no improvement then LR will be reduced
-        self.learning_rate_patience = 3
+        self.learning_rate_patience = 2
 
         # Stop traing if no improvements for this nr of epoches
         self.early_stop = 20
@@ -52,8 +52,8 @@ class VAE:
 
         # convolutional neural network (CNN)
         if model_type == 'cnn':
-            self.f1 = 64
-            self.f2 = 128
+            self.f1 = 128
+            self.f2 = 256
             self.u = 32
             self.encoder = variant_cnn.build_encoder(self)
             self.decoder = variant_cnn.build_decoder(self)
@@ -93,7 +93,7 @@ class VAE:
         return self.decoder(eps, training=False)
 #########################################################
     @tf.function
-    def _train_step(self, optimizer, x):
+    def _train_step(self, x):
         with tf.GradientTape() as tape:
             mean, log_var = self.encoder(x, training=True)
             latent = self.final([mean, log_var])
@@ -102,7 +102,7 @@ class VAE:
 
         train_vars = self.encoder.trainable_variables + self.decoder.trainable_variables
         grads = tape.gradient(loss, train_vars)
-        optimizer.apply_gradients(zip(grads, train_vars))
+        self.optimizer.apply_gradients(zip(grads, train_vars))
 
         return loss
 #########################################################
@@ -115,12 +115,12 @@ class VAE:
             loss = vae_loss(x, generated_images, mean, log_var)
         return loss
 #########################################################
-    def _train_epoch(self, epoch, optimizer, training_data):
+    def _train_epoch(self, epoch, training_data):
         loss = tf.keras.metrics.Mean()
 
         for step in range(self.steps_per_epoch):
             x_batch = next(training_data)
-            loss(self._train_step(optimizer, x_batch))
+            loss(self._train_step(x_batch))
             self.train_helper.on_step_end(epoch+1, step, loss.result())
 
         # Return training loss for this epoch
@@ -136,15 +136,25 @@ class VAE:
         # Return validation loss for this epoch
         return tf.abs(loss.result())
 #########################################################
+    def create_optimizer(self, lr):
+#        self.optimizer = optimizers.Adam(learning_rate=lr)
+#        self.optimizer = optimizers.RMSprop(learning_rate=lr)
+#        self.optimizer = optimizers.SGD(learning_rate=lr)
+#        self.optimizer = optimizers.Adagrad(learning_rate=lr)
+        self.optimizer = optimizers.Nadam(learning_rate=lr)
+#        self.optimizer = optimizers.Adadelta(learning_rate=lr)
+#########################################################
     def train(self):
         ds = DataSet(self.batch_size)
-        optimizer = optimizers.Adam(learning_rate=self.learning_rate)
 
-        self.train_helper.training_start(optimizer)
+        # Create optimizer with initial learning rate
+        self.create_optimizer(self.learning_rate)
+
+        self.train_helper.training_start()
 
         for epoch in range(self.epochs):
             # train one epoch
-            loss = self._train_epoch(epoch, optimizer, ds.train_samples())
+            loss = self._train_epoch(epoch, ds.train_samples())
             # Invoke validation
             val_loss = self._validation(ds.validation_samples())
 

@@ -9,10 +9,8 @@ class TrainHelper:
 ####################################################################################
     def __init__(self, vae):
         self.vae = vae
-        self.optimizer = None
 ####################################################################################
-    def training_start(self, optimizer):
-        self.optimizer = optimizer
+    def training_start(self):
         self.best_loss  = float('inf')
         self.best_ep    = -1
         self.bad_epochs = 0
@@ -30,12 +28,12 @@ class TrainHelper:
 
         lm(f'latent-dim: {self.vae.latent_dim}')
         lm(f'batch-size: {self.vae.batch_size}')
-        lm(f'learn-rate: {optimizer.learning_rate.numpy():.2e}')
+        lm(f'learn-rate: {self.vae.optimizer.learning_rate.numpy():.2e}')
 
 ####################################################################################
     def on_step_end(self, ep, step, loss):
         perc = step / self.vae.steps_per_epoch * 100.0
-        lr = self.optimizer.learning_rate.numpy()
+        lr = self.vae.optimizer.learning_rate.numpy()
 
         lm(f'>>> ep {ep}: {perc:.0f}% [step {step} of {self.vae.steps_per_epoch}] loss:{loss:.5f} lr={lr:.2e}', "\r")
 ####################################################################################
@@ -47,7 +45,7 @@ class TrainHelper:
         save_images_as_grid(samples, f'/content/epoch-{epoch:03d}.jpg', 5)
 ####################################################################################
     def on_epoch_end(self, epoch, loss, val_loss):
-       lr = self.optimizer.learning_rate.numpy()
+       lr = self.vae.optimizer.learning_rate.numpy()
 
        improvement = "+" if val_loss < self.best_loss else "-"
 
@@ -80,10 +78,12 @@ class TrainHelper:
               self.bad_epochs = 0
 
               # Decrease learning rate
-              new_lr = self.optimizer.learning_rate.numpy() * self.vae.learning_rate_decrease_factor
+              new_lr = self.vae.optimizer.learning_rate.numpy() * self.vae.learning_rate_decrease_factor
               if new_lr < self.vae.minimum_learning_rate:
                   new_lr = self.vae.minimum_learning_rate
-              self.optimizer.learning_rate = new_lr
+
+              # Create NEW optimizer with smaller LR
+              self.vae.create_optimizer(new_lr)
 
        # Training must continue
        return False
