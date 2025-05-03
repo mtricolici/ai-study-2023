@@ -1,7 +1,11 @@
+import os
 import warnings
 import threading
 import cv2
 import gc
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import traceback
 import insightface
 import onnxruntime as ort
 import vars
@@ -38,20 +42,29 @@ def release_face_analyser():
     FACE_ANALYSER = None
 
 #####################################################################
-def detect_faces(files):
+def detect_faces(files, threads_count=12):
   print(f"detecting faces in {len(files)} frames ...")
+  vars.faces = [None] * len(files)  # Pre-allocate to preserve order
 
-  vars.faces = []
-  for idx, path in enumerate(files):
+  def process_frame(idx, path):
     img = cv2.imread(path)
-
     faces = get_face_analyser().get(img)
-    coords = []
-    for face in faces:
-      c = face.bbox.astype(int)
-      coords.append(c)
+    coords = [face.bbox.astype(int) for face in faces]
+    return idx, coords
 
-    vars.faces.append(coords) # Save faces coordinates for each image
+  with tqdm(total=len(files)) as pbar:
+    with ThreadPoolExecutor(max_workers=threads_count) as executor:
+      futures = {executor.submit(process_frame, idx, path): idx for idx, path in enumerate(files)}
+      for future in as_completed(futures):
+        try:
+          idx, coords = future.result()
+          vars.faces[idx] = coords
+          pbar.update(1)
+        except Exception as e:
+          print(f"[ERROR] {e}")
+          traceback.print_exc()
+          executor.shutdown(wait=True, cancel_futures=True)
+          os._exit(1)
 
   release_face_analyser() # Release GPU used VRAM for other models
   gc.collect()

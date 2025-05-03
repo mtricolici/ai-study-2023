@@ -92,7 +92,7 @@ def process_frames():
   model = load_model()
 
   with tqdm(total=total) as pbar:
-    with ThreadPoolExecutor(max_workers=16) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
       futures = {executor.submit(process_single_frame, i, model, files[i], files[i]): i for i in range(total)}
       for future in as_completed(futures):
         frame_index = futures[future]
