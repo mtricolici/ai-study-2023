@@ -4,6 +4,9 @@ import datetime
 import cv2
 import torch
 from collections import OrderedDict
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import traceback
 import basicsr.models as bm
 import basicsr.train as bt
 import basicsr.utils as bu
@@ -88,26 +91,23 @@ def process_frames():
 
   model = load_model()
 
-  last_print_time = time.time()
-  last_print_iterations = 0
-
-  for i, f in enumerate(files, start=1):
-    process_single_frame(i-1, model, f, f)
-
-    if vars.sleep is not None and isinstance(vars.sleep, float) and vars.sleep > 0.0:
-      time.sleep(vars.sleep) # Let GPU FAN to do its job to cool GPU
-
-    time_elapsed = time.time() - last_print_time
-    iterations_processed = i - last_print_iterations
-    fps = iterations_processed / time_elapsed
-    if time_elapsed > 5:
-      done = (i / total) * 100.0
-      ert = int((total - i) / fps)
-      ert = str(datetime.timedelta(seconds=ert))
-      print(f'{i} of {total} = {done:.2f} % ({fps:.2f} frames/sec). Will finish in ~ {ert} \r', end='')
-      last_print_time = time.time()
-      last_print_iterations = i
+  with tqdm(total=total) as pbar:
+    with ThreadPoolExecutor(max_workers=16) as executor:
+      futures = {executor.submit(process_single_frame, i, model, files[i], files[i]): i for i in range(total)}
+      for future in as_completed(futures):
+        frame_index = futures[future]
+        try:
+          pbar.update(1)
+          future.result()
+        except Exception as e:
+          print(f"[ERROR] Frame {frame_index + 1}: {e}")
+          traceback.print_exc()
+          executor.shutdown(wait=True, cancel_futures=True)
+          os._exit(1)
 
   print('\nprocess frames finished!')
 ############################################################################
+
+
+
 

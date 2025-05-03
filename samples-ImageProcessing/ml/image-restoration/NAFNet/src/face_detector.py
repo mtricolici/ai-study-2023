@@ -1,6 +1,7 @@
 import warnings
 import threading
 import cv2
+import gc
 import insightface
 import onnxruntime as ort
 import vars
@@ -32,6 +33,8 @@ def get_face_analyser():
 #####################################################################
 def release_face_analyser():
     global FACE_ANALYSER
+    if FACE_ANALYSER:
+        del FACE_ANALYSER
     FACE_ANALYSER = None
 
 #####################################################################
@@ -51,6 +54,7 @@ def detect_faces(files):
     vars.faces.append(coords) # Save faces coordinates for each image
 
   release_face_analyser() # Release GPU used VRAM for other models
+  gc.collect()
 #####################################################################
 def demo_face_detector(input_file, output_file):
   print(f'detecting faces in {input_file} ...')
