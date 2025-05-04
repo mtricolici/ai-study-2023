@@ -27,9 +27,9 @@ pipeline.enable_model_cpu_offload()
 pipeline.unet.enable_forward_chunking()
 
 image = load_image("/content/input.png")
-image = image.resize((1024, 576))
+#image = image.resize((1024, 576))
 
-seed = random.randint(0, 1000)
+seed = random.randint(0, 1_000_000)
 print(f"Using seed: {seed:04d}")
 
 generator = torch.manual_seed(seed)
