@@ -23,6 +23,9 @@ pipeline = StableVideoDiffusionPipeline.from_pretrained(
     "stabilityai/stable-video-diffusion-img2vid-xt", torch_dtype=torch.float16, variant="fp16"
 ).to(device)
 
+pipeline.enable_model_cpu_offload()
+pipeline.unet.enable_forward_chunking()
+
 image = load_image("/content/input.png")
 image = image.resize((1024, 576))
 
