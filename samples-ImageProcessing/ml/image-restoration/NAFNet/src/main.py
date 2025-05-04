@@ -1,3 +1,6 @@
+import onnxruntime as ort
+ort.set_default_logger_severity(3)
+
 import argparse
 
 from cmdparser import parse_cmd_args

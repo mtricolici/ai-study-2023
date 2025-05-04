@@ -1,26 +1,22 @@
 import os
+import gc
 import time
 import datetime
 import cv2
-import torch
 from collections import OrderedDict
 from tqdm import tqdm
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import traceback
-import basicsr.models as bm
-import basicsr.train as bt
-import basicsr.utils as bu
+import numpy as np
+import onnxruntime as ort
 import face_detector
 import vars
 
 ############################################################################
 def load_model():
-  model_ops_path = f'/app/{vars.model_name}.yml'
-  opt = bt.parse(model_ops_path, is_train=False)
-  opt['num_gpu'] = torch.cuda.device_count()
-  opt['dist'] = False
-  model = bm.create_model(opt)
-  return model
+  return ort.InferenceSession(
+    f'/models/{vars.model_name}.onnx',
+    providers=["CUDAExecutionProvider"])
 ############################################################################
 def clamp_coordinates(x1, y1, x2, y2, image_width, image_height):
     x1 = max(0, min(x1, image_width - 1))
@@ -28,7 +24,6 @@ def clamp_coordinates(x1, y1, x2, y2, image_width, image_height):
     x2 = max(0, min(x2, image_width - 1))
     y2 = max(0, min(y2, image_height - 1))
     return x1, y1, x2, y2
-
 ############################################################################
 def save_faces_in_memory(path, index):
   img = cv2.imread(path)
@@ -53,34 +48,39 @@ def restore_faces(path, index, face_images):
   cv2.imwrite(path, img)
 
 ############################################################################
+def load_image_onnx(path):
+    img = cv2.imread(path, cv2.IMREAD_COLOR)  # BGR format
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert to RGB
+    img = img.astype(np.float32) / 255.0  # Normalize to [0, 1]
+    img = np.transpose(img, (2, 0, 1))  # HWC -> CHW
+    img = np.expand_dims(img, 0)  # Add batch dim -> [1, 3, H, W]
+    return img
+############################################################################
+def save_image_onnx(img_tensor, path):
+    img = img_tensor.squeeze(0)  # [1, 3, H, W] -> [3, H, W]
+    img = np.transpose(img, (1, 2, 0))  # CHW -> HWC
+    img = np.clip(img * 255.0, 0, 255).astype(np.uint8)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # Convert back to BGR
+    cv2.imwrite(path, img)
+############################################################################
 def process_single_frame(frame_idx, model, in_path, out_path):
 
   if vars.keep_faces:
     faces = save_faces_in_memory(in_path, frame_idx)
 
-  # read image
-  file_client = bu.FileClient('disk')
-  img = file_client.get(in_path, None)
-  img = bu.imfrombytes(img, float32=True)
-  img = bu.img2tensor(img, bgr2rgb=True, float32=True)
+  img = load_image_onnx(in_path)
+  output = model.run(None, {"input": img})[0]
+  save_image_onnx(output, out_path)
 
-  # Feed model
-  model.feed_data(data={'lq': img.unsqueeze(dim=0)})
-  if model.opt['val'].get('grids', False):
-    model.grids()
-  model.test()
-  if model.opt['val'].get('grids', False):
-    model.grids_inverse()
-
-  # Save image
-  visuals = model.get_current_visuals()
-  img = bu.tensor2img([visuals['result']])
-  bu.imwrite(img, out_path)
+  del img
+  del output
+  gc.collect()
 
   if vars.keep_faces:
     restore_faces(out_path, frame_idx, faces)
+
 ############################################################################
-def process_frames():
+def process_frames(threads_count=4):
   files = [os.path.join('/images/tmp',f) for f in os.listdir('/images/tmp/') if f.endswith('.png')]
   files.sort()
 
@@ -92,7 +92,7 @@ def process_frames():
   model = load_model()
 
   with tqdm(total=total) as pbar:
-    with ThreadPoolExecutor(max_workers=1) as executor:
+    with ThreadPoolExecutor(max_workers=threads_count) as executor:
       futures = {executor.submit(process_single_frame, i, model, files[i], files[i]): i for i in range(total)}
       for future in as_completed(futures):
         frame_index = futures[future]
